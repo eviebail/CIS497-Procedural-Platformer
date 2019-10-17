@@ -31,7 +31,11 @@ public class RhythmBlock : MonoBehaviour, Block
             case rType.random:
                 for (int i = 1; i < length; i++)
                 {
-                    if (Random.value < 0.5)
+                    if (rhythm[i - 1] == 1)
+                    {
+                        continue;
+                    }
+                    if (Random.value < 0.33)
                     {
                         rhythm[i] = 1;
                     }
@@ -103,7 +107,7 @@ public class RhythmBlock : MonoBehaviour, Block
                 currAction = i;
                 //ensures duration is no bigger than the distance between actions
                 duration = (int)(Random.value * (currAction - prevAction));
-                type = (int)(Random.value * 2); //SHOULD BE 3!! TEST
+                type = (int)(Random.value * 3); //SHOULD BE 3!! TEST
                 if (type == 1 && duration > 0)
                 {
                     act = new Vector2(type, 1);
@@ -114,15 +118,15 @@ public class RhythmBlock : MonoBehaviour, Block
                     {
                         if (Random.value < 0.5f)
                         {
-                            act = new Vector2(0, Mathf.Min(duration, 3));
+                            act = new Vector2(0, Mathf.Min(duration, 2));
                         } else
                         {
-                            act = new Vector2(2, Mathf.Min(duration, 3));//TESTINGact = new Vector2(2, Mathf.Min(duration, 3));
+                            act = new Vector2(2, Mathf.Min(duration, 2));//TESTINGact = new Vector2(2, Mathf.Min(duration, 3));
                         }
                     }
                     else
                     {
-                        act = new Vector2(type, Mathf.Min(duration, 3));
+                        act = new Vector2(type, Mathf.Min(duration, 2));
                     }
                 }
                 action.Add(act);
@@ -138,11 +142,11 @@ public class RhythmBlock : MonoBehaviour, Block
         {
             if (duration == 0)
             {
-                act = new Vector2(0, Mathf.Min(duration, 3));
+                act = new Vector2(0, Mathf.Min(duration, 2));
             }
             else
             {
-                act = new Vector2(type, Mathf.Min(duration, 3));
+                act = new Vector2(type, Mathf.Min(duration, 2));
             }
         }
         action.Add(act);

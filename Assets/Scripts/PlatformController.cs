@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlatformController : MonoBehaviour
 {
-    public float speed = 0.1f;
+    public float speed = 0.03f;
     public Vector2 dest = Vector2.zero;
 
     public float v_x = 0;

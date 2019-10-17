@@ -16,6 +16,8 @@ public class RhythmGenerator : MonoBehaviour
     public Texture2D texEnemy;
     public Texture2D texSpike;
     public Texture2D texCoin;
+    public Texture2D texGnd;
+    public Texture2D texGoal;
     //private Sprite mySprite;
     //private SpriteRenderer sr;
     //GameObject gameObject;
@@ -23,7 +25,7 @@ public class RhythmGenerator : MonoBehaviour
     protected void selectType()
     {
         int val = (int) (Random.value * 3.0f);
-        val = 0;
+        val = 2;
         switch (val)
         {
             case 0:
@@ -44,34 +46,34 @@ public class RhythmGenerator : MonoBehaviour
 
     protected int selectLength()
     {
-        float val = 0.5f;// Random.value;
+        float val = Random.value;
         if (val < 0.33)
         {
-            return 4;
+            return 8;
         } else if (val < 0.66)
         {
-            return 8;
+            return 16;
         }
         else
         {
-            return 16;
+            return 32;
         }
     }
 
     protected int selectDensity(int max)
     {
-        float val = 0.5f;// Random.value;
+        float val = Random.value;
         if (val < 0.33)
-        {
-            return Mathf.Min(2, max);
-        }
-        else if (val < 0.66)
         {
             return Mathf.Min(4, max);
         }
-        else
+        else if (val < 0.66)
         {
             return Mathf.Min(8, max);
+        }
+        else
+        {
+            return Mathf.Min(16, max);
         }
         //return Mathf.Min(val, max);
     }
@@ -81,8 +83,8 @@ public class RhythmGenerator : MonoBehaviour
         selectType();
         int length = selectLength();
         Debug.Log("Length: " + length);
-        int density = selectDensity(length);
-        Debug.Log("Denisty: " + density);
+        int density = selectDensity(length / 2);
+        Debug.Log("Density: " + density);
         return new RhythmBlock(type, length, density);
         //density can't be b
     }
@@ -128,10 +130,11 @@ public class RhythmGenerator : MonoBehaviour
 
         //place geometry based on the blocks generated
         Debug.Log("START X: " + startX);
-        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin);
+        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin, texGnd, texGoal);
         gen.generateGeometry();
         gen.cleanUpEnemies();
         gen.cleanUpStomps();
+        Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
         //mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),
         //                         new Vector2(0.5f, 0.5f), 100.0f);
         //sr.sprite = mySprite;

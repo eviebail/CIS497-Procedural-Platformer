@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour
     private Sprite mySprite;
     private SpriteRenderer sr;
 
+    public static bool win = false;
+    public static bool death = false;
+
     public float v_x = 0;
     public float max_vx = 0.15f;
     public float v_y = 0;
@@ -23,6 +26,9 @@ public class PlayerController : MonoBehaviour
     public bool f_ext = false;
     public float f_vy = 0;
     public int pIndex = -1;
+    public bool isAir = false;
+    public float obstacleY = 0;
+    public float obstacleY1 = 0;
 
     public int prevStomp = -1;
     public int prevEnemy = -1;
@@ -91,6 +97,8 @@ public class PlayerController : MonoBehaviour
         stompers = GeometryGenerator.stompers;
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
+        win = false;
+        death = false;
     }
 
     private void Move()
@@ -101,17 +109,21 @@ public class PlayerController : MonoBehaviour
             dest = new Vector2(transform.position.x + v_x, transform.position.y + v_y - a_y);
         } else
         {
-            dest = new Vector2(transform.position.x + v_x, platforms[pIndex].transform.position.y + 1 + a_y);
+            obstacleY = platforms[pIndex].transform.position.y;
+            obstacleY1 = obstacleY + 1;
+            dest = new Vector2(transform.position.x + v_x, platforms[pIndex].transform.position.y + 1 + v_y);
+            if (isAir)
+            {
+                dest = new Vector2(transform.position.x + v_x, transform.position.y + v_y - a_y);
+            }
+            //fext is no longer true when we move up
             //Debug.Log("Dest: " + dest);
         }
         
         Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
         GetComponent<Rigidbody2D>().MovePosition(p);
 
-        if (!f_ext)
-        {
-            v_y = Mathf.Max(v_y - a_y * 2f, 0);
-        }
+        v_y = Mathf.Max(v_y - a_y * 2f, 0);
 
         if (direction.x == 1)
         {
@@ -128,7 +140,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        isAir = isAirborne(transform.position); //TESTING PURPOSES
         if (isAirborne(transform.position))
         {
             //dest = new Vector2(dest.x, dest.y - 0.1f);
@@ -180,6 +192,12 @@ public class PlayerController : MonoBehaviour
         if (numLives <= 0)
         {
             //death
+            death = true;
+            SceneManager.LoadScene("Death");
+        }
+        if ((int)Mathf.Round(transform.position.x + 10) == (GeometryGenerator.lvl.Count - 1))
+        {
+            win = true;
             SceneManager.LoadScene("Death");
         }
     }
@@ -263,8 +281,19 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("-1!!!!!!!");
             return false;
         }
-        if (System.Math.Abs(obstacle.z - 2) < 0.1)
+        if (System.Math.Abs(obstacle.z - 2) < 0.1) //this means its a moving platform
         {
+
+            for (int i = 0; i < platforms.Count; i++)
+            {
+                Vector2 playerPos = transform.position;
+                Vector2 platPos = platforms[i].transform.position;
+                if (playerPos.x < platPos.x + 0.5f && playerPos.x > platPos.x - 0.5f &&
+                (playerPos.y - 1) > (platPos.y - 0.1) && (playerPos.y - 1) < (platPos.y + 0.1))
+                {
+                    return true;
+                }
+            }
             return false;
         }
         //Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
@@ -347,7 +376,7 @@ public class PlayerController : MonoBehaviour
             Vector2 playerPos = transform.position;
 
             if (playerPos.x < platPos.x + 0.5f && playerPos.x > platPos.x - 0.5f &&
-                (playerPos.y - 1) > (platPos.y) && (playerPos.y - 1) < (platPos.y + 1))
+                (playerPos.y - 1) > (platPos.y - 1) && (playerPos.y - 1) < (platPos.y + 2))
             {
                 //if (prevPlatform != i)
                 //{

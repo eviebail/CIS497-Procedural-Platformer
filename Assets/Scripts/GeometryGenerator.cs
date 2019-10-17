@@ -21,6 +21,8 @@ public class GeometryGenerator : MonoBehaviour
     public Texture2D texEnemy;
     public Texture2D texSpike;
     public Texture2D texCoin;
+    public Texture2D texGnd;
+    public Texture2D texGoal;
 
     public int enemyID = 0; 
 
@@ -45,6 +47,9 @@ public class GeometryGenerator : MonoBehaviour
             if (lvl[l].z == -1)
             {
                 end = l;
+            } else if (lvl[l].z == 1)
+            {
+                end = l;
             } else
             {
                 if (lvl[l].y != lvl[l-1].y)
@@ -54,36 +59,35 @@ public class GeometryGenerator : MonoBehaviour
             }
             if (start != end)
             {
-                if ((end - start) <= 3)
+                if ((end - start) < 3)
                 {
                     start = end + 1;
                     end = end + 1;
                 } else
                 {
-                    if (Random.value < 0.75)
+                    if (Random.value < 0.66)
                     {
-                        for (int i = start; i < end; i++)
+                        for (int i = start; i < Mathf.Min(end, lvl.Count - 2); i++)
                         {
                             //place coin
-
+                            if (lvl[i].z == 1)
+                            {
+                                continue;
+                            }
                             GameObject coin = new GameObject();
                             SpriteRenderer sr2 = coin.AddComponent<SpriteRenderer>() as SpriteRenderer;
                             sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                            if (lvl[i].z == 1)
-                            {
-                                coin.transform.position = new Vector3(lvl[i].x, lvl[i].y + 2f, 0);
-                            } else
-                            {
-                                coin.transform.position = new Vector3(lvl[i].x, lvl[i].y + 1f, 0);
-                            }
+                            
+                            coin.transform.position = new Vector3(lvl[i].x, lvl[i].y + 1f, 0);
                             
                             coin.transform.localScale = blockScale;
                             Sprite mySprite2 = Sprite.Create(texCoin, new Rect(0.0f, 0.0f, texCoin.width, texCoin.height),
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr2.sprite = mySprite2;
+                            sr2.sortingLayerName = "coin";
                             coins.Add(coin);
 
-                            Debug.Log("(" + lvl[i].z + " , " + lvl[i].x + ")");
+                            //Debug.Log("(" + lvl[i].z);// + " , " + lvl[i].x + ")");
                         }
                     }
                     start = end + 1;
@@ -210,7 +214,7 @@ public class GeometryGenerator : MonoBehaviour
     }
 
     public GeometryGenerator(List<Block> blocks, int startX, int startY, Texture2D ground,
-        Texture2D enemy, Texture2D spike, Texture2D coin)
+        Texture2D enemy, Texture2D spike, Texture2D coin, Texture2D gnd, Texture2D goal)
     {
         this.blocks = blocks;
         globalX = -9;
@@ -220,6 +224,8 @@ public class GeometryGenerator : MonoBehaviour
         texEnemy = enemy;
         texSpike = spike;
         texCoin = coin;
+        texGnd = gnd;
+        texGoal = goal;
     }
 
     //for now, assume geometry is 1x1 cubes
@@ -231,6 +237,7 @@ public class GeometryGenerator : MonoBehaviour
 
         //loops over rhythm array in block to place geometry according
         //to the state machine
+        Debug.Log("BLOCKS: " + blocks.Count);
         Debug.Log("STARTX: " + globalX);
         lvl.Add(new Vector3(0,0, -1));
         for (int i = 0; i < blocks.Count; i++)
@@ -238,6 +245,25 @@ public class GeometryGenerator : MonoBehaviour
             int[] rhythm = blocks[i].getRhythmArray();
             List<Vector2> action = blocks[i].getActionArray();
             int s = state.getNextState();
+            //Debug.Log("GENERATOR RHYTHM LENGTH: " + rhythm.Length);
+
+            //Break area:
+            for (int k = 0; k < 4; k++)
+            {
+                GameObject cube = new GameObject();
+                SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                cube.transform.position = new Vector3(globalX, globalY, 0);
+                cube.transform.localScale = blockScale;
+                Sprite mySprite = Sprite.Create(texGnd, new Rect(0.0f, 0.0f, texGnd.width, texGnd.height),
+                         new Vector2(0.5f, 0.5f), 100.0f);
+                sr.sprite = mySprite;
+                cube.AddComponent<BoxCollider2D>();
+                lvl.Add(new Vector3(globalX, globalY, 0));
+                globalX += 1;
+            }
+
+
             for (int j = 0; j < rhythm.Length; j++)
             {
                 if (rhythm[j] == 0)
@@ -439,6 +465,36 @@ public class GeometryGenerator : MonoBehaviour
                 
             }
         }
+
+        //Break area:
+        for (int k = 0; k < 4; k++)
+        {
+            GameObject cube = new GameObject();
+            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+            cube.transform.position = new Vector3(globalX, globalY, 0);
+            cube.transform.localScale = blockScale;
+            Sprite mySprite = Sprite.Create(texGnd, new Rect(0.0f, 0.0f, texGnd.width, texGnd.height),
+                     new Vector2(0.5f, 0.5f), 100.0f);
+            sr.sprite = mySprite;
+            cube.AddComponent<BoxCollider2D>();
+            lvl.Add(new Vector3(globalX, globalY, 0));
+            globalX += 1;
+        }
+
+
+        //add goal sprite at last block!
+        GameObject cube3 = new GameObject();
+        SpriteRenderer sr3 = cube3.AddComponent<SpriteRenderer>() as SpriteRenderer;
+        sr3.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+        cube3.transform.position = new Vector3(globalX - 1, globalY + 1.5f, 0);
+        cube3.transform.localScale = blockScale;
+        Sprite mySprite3 = Sprite.Create(texGoal, new Rect(0.0f, 0.0f, texGoal.width, texGoal.height),
+                 new Vector2(0.5f, 0.5f), 100.0f);
+        sr3.sprite = mySprite3;
+        cube3.AddComponent<BoxCollider2D>();
+
+        Debug.Log("ENDX: " + globalX);
         lvl.Add(new Vector3(0, 0, -1));
         addCoins();
     }
