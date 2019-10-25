@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Reloader : MonoBehaviour
 {
+    public static bool win = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -15,7 +16,16 @@ public class Reloader : MonoBehaviour
 
     IEnumerator wait()
     {
+        Debug.Log("IWON! " + win);
         yield return new WaitForSeconds(3);
-        SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
+        if (win)
+        {
+            
+            SceneManager.LoadScene("Start", LoadSceneMode.Single);
+        } else
+        {
+            SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
+        }
+        
     }
 }

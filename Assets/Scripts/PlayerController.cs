@@ -193,16 +193,23 @@ public class PlayerController : MonoBehaviour
         {
             //death
             death = true;
-            SceneManager.LoadScene("Death");
+            end();
         }
-        if ((int)Mathf.Round(transform.position.x + 10) == (GeometryGenerator.lvl.Count - 1))
+        if ((int)Mathf.Round(transform.position.x + 10) >= (GeometryGenerator.lvl.Count - 1))
         {
-            win = true;
-            SceneManager.LoadScene("Death");
+            
+            Reloader.win = true;
+            Debug.Log("hello??" + win);
+            end();
         }
     }
 
-    bool isAirborne(Vector2 pos)
+    void end()
+    {
+        SceneManager.LoadScene("Death");
+    }
+
+        bool isAirborne(Vector2 pos)
     {
         return !yCollide();
     }

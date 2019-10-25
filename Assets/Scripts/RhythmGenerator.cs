@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+//using AssemblyCSharp.Assets.Scripts;
 using UnityEngine;
 
 public class RhythmGenerator : MonoBehaviour
@@ -11,6 +12,7 @@ public class RhythmGenerator : MonoBehaviour
     GeometryGenerator gen;
     public int startX = -1;
     public int startY = 0;
+    int difficulty = 0;
 
     public Texture2D texGround;
     public Texture2D texEnemy;
@@ -24,18 +26,27 @@ public class RhythmGenerator : MonoBehaviour
 
     protected void selectType()
     {
-        int val = (int) (Random.value * 3.0f);
-        val = 2;
+        int val = -1;
+        if (difficulty == 0) {
+            val = (int)(Random.value * 2.0f);
+        } else if (difficulty == 1)
+        {
+            val = (int)(Random.value * 3.0f);
+        } else
+        {
+            val = (int) Mathf.Min((Random.value * 5.0f), 2);
+    
+        }
         switch (val)
         {
             case 0:
                 type = rType.regular;
                 break;
             case 1:
-                type = rType.random;
+                type = rType.swing;
                 break;
             case 2:
-                type = rType.swing;
+                type = rType.random;
                 break;
             case 3:
                 type = rType.test;
@@ -47,6 +58,9 @@ public class RhythmGenerator : MonoBehaviour
     protected int selectLength()
     {
         float val = Random.value;
+        if (difficulty == 0) { val = 0;  }
+        if (difficulty == 1) { val -= 0.33f; }
+        if (difficulty == 2) { val += 0.33f; }
         if (val < 0.33)
         {
             return 8;
@@ -63,6 +77,19 @@ public class RhythmGenerator : MonoBehaviour
     protected int selectDensity(int max)
     {
         float val = Random.value;
+
+        if (difficulty == 0)
+        {
+            if (val < 0.6)
+            {
+                return Mathf.Min(2, max);
+            }
+            else
+            {
+                return Mathf.Min(4, max);
+            }
+        }
+
         if (val < 0.33)
         {
             return Mathf.Min(4, max);
@@ -113,6 +140,7 @@ public class RhythmGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        difficulty = StateController.option;
         //fill in the layout array
         generateLevel(LEVEL_DURATION);
 
