@@ -20,6 +20,9 @@ public class RhythmGenerator : MonoBehaviour
     public Texture2D texCoin;
     public Texture2D texGnd;
     public Texture2D texGoal;
+
+    public static int[] constraints = new int[5];
+
     //private Sprite mySprite;
     //private SpriteRenderer sr;
     //GameObject gameObject;
@@ -112,7 +115,7 @@ public class RhythmGenerator : MonoBehaviour
         Debug.Log("Length: " + length);
         int density = selectDensity(length / 2);
         Debug.Log("Density: " + density);
-        return new RhythmBlock(type, length, density);
+        return new RhythmBlock(type, length, density, (constraints[1] == 1));
         //density can't be b
     }
 

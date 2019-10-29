@@ -494,6 +494,10 @@ public class GeometryGenerator : MonoBehaviour
         sr3.sprite = mySprite3;
         cube3.AddComponent<BoxCollider2D>();
 
+        //add impenetrable invisible wall to keep players from falling off the map
+        lvl.Add(new Vector3(globalX, globalY + 3, 0));
+        lvl.Add(new Vector3(globalX, globalY + 4, 0));
+
         Debug.Log("ENDX: " + globalX);
         lvl.Add(new Vector3(0, 0, -1));
         addCoins();

@@ -12,16 +12,23 @@ public class CameraController : MonoBehaviour
         text = transform.GetChild(0).GetComponent<TMPro.TextMeshPro>();
         text.text = "Lives: " + PlayerController.numLives + "      " +
             "Coins: " + PlayerController.numCoins;
+
+        if (RhythmGenerator.constraints[1] == 1)
+        {
+            text.text += "      Enemies: " + PlayerController.killed + " / " + PlayerController.totalEnemies;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        //if (prevLife != PlayerController.numLives)
-        //{
-            prevLife = PlayerController.numLives;
-            text.text = "Lives: " + PlayerController.numLives + "      " +
-            "Coins: " + PlayerController.numCoins;
-        //}
+        prevLife = PlayerController.numLives;
+        text.text = "Lives: " + PlayerController.numLives + "      " +
+        "Coins: " + PlayerController.numCoins;
+
+        if (RhythmGenerator.constraints[1] == 1)
+        {
+            text.text += "      Enemies: " + PlayerController.killed + " / " + PlayerController.totalEnemies;
+        }
     }
 }

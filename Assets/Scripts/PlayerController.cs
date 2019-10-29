@@ -30,6 +30,9 @@ public class PlayerController : MonoBehaviour
     public float obstacleY = 0;
     public float obstacleY1 = 0;
 
+    public static int killed = 0;
+    public static int totalEnemies = 0;
+
     public int prevStomp = -1;
     public int prevEnemy = -1;
     public int prevSpike = -1;
@@ -65,6 +68,11 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (RhythmGenerator.constraints[2] == 1)
+        {
+            numLives = 1;
+        }
+
         dest = transform.position;
         a_x = 0f;// 0.015f;
         lastValidPos = transform.position;
@@ -74,6 +82,8 @@ public class PlayerController : MonoBehaviour
         stompers = GeometryGenerator.stompers;
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
+
+        totalEnemies = enemies.Count;
 
         mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
@@ -90,8 +100,15 @@ public class PlayerController : MonoBehaviour
 
     public static void reset()
     {
-        numLives = 5;
+        if (RhythmGenerator.constraints[2] == 1)
+        {
+            numLives = 1;
+        } else
+        {
+            numLives = 5;
+        }
         numCoins = 0;
+        killed = 0;
         enemies = GeometryGenerator.enemies;
         platforms = GeometryGenerator.platforms;
         stompers = GeometryGenerator.stompers;
@@ -99,6 +116,7 @@ public class PlayerController : MonoBehaviour
         coins = GeometryGenerator.coins;
         win = false;
         death = false;
+        totalEnemies = enemies.Count;
     }
 
     private void Move()
@@ -185,7 +203,10 @@ public class PlayerController : MonoBehaviour
 
         if (numCoins >= 5)
         {
-            numLives += 1;
+            if (RhythmGenerator.constraints[2] == 0)
+            {
+                numLives += 1;
+            }
             numCoins = 0;
         }
 
@@ -195,7 +216,16 @@ public class PlayerController : MonoBehaviour
             death = true;
             end();
         }
-        if ((int)Mathf.Round(transform.position.x + 10) >= (GeometryGenerator.lvl.Count - 1))
+
+        if (RhythmGenerator.constraints[1] == 1 && killed == totalEnemies &&
+            (int)Mathf.Round(transform.position.x + 10) >= (GeometryGenerator.lvl.Count - 4))
+        {
+            Reloader.win = true;
+            Debug.Log("hello??" + win);
+            end();
+        }
+        else if (RhythmGenerator.constraints[1] == 0
+            && (int)Mathf.Round(transform.position.x + 10) >= (GeometryGenerator.lvl.Count - 4))
         {
             
             Reloader.win = true;
@@ -352,6 +382,7 @@ public class PlayerController : MonoBehaviour
             }
         }
         //Debug.Log("To delete count: " + toDelete.Count);
+        killed += toDelete.Count;
         for (int j = 0; j < toDelete.Count; j++)
         {
             GameObject en = enemies[toDelete[j]];

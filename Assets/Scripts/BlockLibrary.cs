@@ -14,9 +14,16 @@ public class RhythmBlock : MonoBehaviour, Block
 {
     private int[] rhythm;
     private List<Vector2> action;
+    private bool generateEnemies;
+    private float enemyThreshold = 0.5f;
 
-    public RhythmBlock(rType type, int length, int density)
+    public RhythmBlock(rType type, int length, int density, bool genEn)
     {
+        generateEnemies = genEn;
+        if (genEn)
+        {
+            enemyThreshold = 0.65f;
+        }
         rhythm = new int[length];
         //Debug.Log(length + " " + density);
         int mult = length / density;
@@ -106,8 +113,29 @@ public class RhythmBlock : MonoBehaviour, Block
                 prevAction = currAction;
                 currAction = i;
                 //ensures duration is no bigger than the distance between actions
-                duration = (int)(Random.value * (currAction - prevAction));
-                type = (int)(Random.value * 3); //SHOULD BE 3!! TEST
+                if (generateEnemies)
+                {
+                    if (Random.value < enemyThreshold && (currAction - prevAction) > 0)
+                    {
+                        duration = 1;
+                    }
+                    else
+                    {
+                        duration = (int)(Random.value * (currAction - prevAction));
+                    }
+                } else {
+                    duration = (int)(Random.value * (currAction - prevAction));
+                }
+
+                if (Random.value < enemyThreshold && generateEnemies)
+                {
+                    type = 1;
+                }
+                else
+                {
+                    type = (int)(Random.value * 3);//SHOULD BE 3!! TEST
+                }
+                 
                 if (type == 1 && duration > 0)
                 {
                     act = new Vector2(type, 1);

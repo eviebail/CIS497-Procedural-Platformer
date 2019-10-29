@@ -49,22 +49,46 @@ public class StateController : MonoBehaviour
         if (t0.isOn)
         {
             otp += "-Complete the level without jumping\n";
+            RhythmGenerator.constraints[0] = 1;
+        } else
+        {
+            RhythmGenerator.constraints[0] = 0;
         }
         if (t1.isOn)
         {
             otp += "-Defeat all enemies before finishing level\n";
+            RhythmGenerator.constraints[1] = 1;
+        }
+        else
+        {
+            RhythmGenerator.constraints[1] = 0;
         }
         if (t2.isOn)
         {
             otp += "-Beat the level without getting hurt\n";
+            RhythmGenerator.constraints[2] = 1;
+        }
+        else
+        {
+            RhythmGenerator.constraints[2] = 0;
         }
         if (t3.isOn)
         {
             otp += "-It's like the floor is lava, but with spikes\n";
+            RhythmGenerator.constraints[3] = 1;
+        }
+        else
+        {
+            RhythmGenerator.constraints[3] = 0;
         }
         if (t4.isOn)
         {
             otp += "-Find the elusive stars before you beat the level\n";
+            RhythmGenerator.constraints[4] = 1;
+        }
+        else
+        {
+            RhythmGenerator.constraints[4] = 0;
         }
         constraints.text = otp;
     }
