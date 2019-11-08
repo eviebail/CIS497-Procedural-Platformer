@@ -97,7 +97,7 @@ public class StateController : MonoBehaviour
 	{
 		//Output this to console when Button1 or Button3 is clicked
 		Debug.Log("Start the level!");
-		SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
+        SceneManager.LoadScene("SampleScene", LoadSceneMode.Single);
 	}
 
 	/*

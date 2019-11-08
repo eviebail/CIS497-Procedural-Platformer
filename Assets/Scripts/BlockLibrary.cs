@@ -17,7 +17,7 @@ public class RhythmBlock : MonoBehaviour, Block
     private bool generateEnemies;
     private float enemyThreshold = 0.5f;
 
-    public RhythmBlock(rType type, int length, int density, bool genEn)
+    public RhythmBlock(rType type, int length, int density, bool genEn, int offset)
     {
         generateEnemies = genEn;
         if (genEn)
@@ -26,7 +26,7 @@ public class RhythmBlock : MonoBehaviour, Block
         }
         rhythm = new int[length];
         //Debug.Log(length + " " + density);
-        int mult = length / density;
+        int mult = length / density + offset;
         switch (type)
         {
             case rType.regular:
@@ -52,9 +52,9 @@ public class RhythmBlock : MonoBehaviour, Block
                 for (int i = 1; i < length; i += mult)
                 {
                     rhythm[i] = 1;
-                    if ((i + 2) < length)
+                    if ((i + 2 + offset) < length)
                     {
-                        rhythm[i + 2] = 1;
+                        rhythm[i + 2 + offset] = 1;
                     }
                 }
                 break;

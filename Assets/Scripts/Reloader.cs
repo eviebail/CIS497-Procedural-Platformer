@@ -20,7 +20,7 @@ public class Reloader : MonoBehaviour
         yield return new WaitForSeconds(3);
         if (win)
         {
-            
+            win = false;
             SceneManager.LoadScene("Start", LoadSceneMode.Single);
         } else
         {

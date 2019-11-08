@@ -35,12 +35,14 @@ public class PlayerController : MonoBehaviour
 
     public int prevStomp = -1;
     public int prevEnemy = -1;
+    public int prevEnemy2 = -1;
     public int prevSpike = -1;
     public int prevPlatform = -1;
 
     public Vector2 boundBox = new Vector2(0.5f,0.5f);
 
     public static List<GameObject> enemies;
+    public static List<GameObject> superEnemies;
     public static List<GameObject> platforms;
     public static List<GameObject> stompers;
     public static List<GameObject> spikes;
@@ -71,6 +73,9 @@ public class PlayerController : MonoBehaviour
         if (RhythmGenerator.constraints[2] == 1)
         {
             numLives = 1;
+        } else
+        {
+            numLives = 5;
         }
 
         dest = transform.position;
@@ -78,12 +83,13 @@ public class PlayerController : MonoBehaviour
         lastValidPos = transform.position;
 
         enemies = GeometryGenerator.enemies;
+        superEnemies = GeometryGenerator.superEnemies;
         platforms = GeometryGenerator.platforms;
         stompers = GeometryGenerator.stompers;
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
 
-        totalEnemies = enemies.Count;
+        totalEnemies = enemies.Count + superEnemies.Count;
 
         mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
@@ -110,13 +116,15 @@ public class PlayerController : MonoBehaviour
         numCoins = 0;
         killed = 0;
         enemies = GeometryGenerator.enemies;
+        superEnemies = GeometryGenerator.superEnemies;
         platforms = GeometryGenerator.platforms;
         stompers = GeometryGenerator.stompers;
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
         win = false;
         death = false;
-        totalEnemies = enemies.Count;
+        totalEnemies = enemies.Count + superEnemies.Count;
+
     }
 
     private void Move()
@@ -197,7 +205,7 @@ public class PlayerController : MonoBehaviour
         onCollideWithEnemy();
         onCollideWithPlatform();
         onCollideWithSmasher();
-        onCollideWithSpike();
+        //onCollideWithSpike();
         onCollideWithCoin();
         onFallOfCliff();
 
@@ -355,13 +363,13 @@ public class PlayerController : MonoBehaviour
             Vector2 enemy = en.transform.position;
             //want to know if transform.pos is in the bounding box of the enemy position
             //pos.x < enemy.x + 1 && pos.x > enemy.x - 1
-            if (pos.x < (enemy.x + 0.5) && pos.x > (enemy.x - 0.5) /*&&
+            if (pos.x < (enemy.x + 0.7) && pos.x > (enemy.x - 0.7) /*&&
                 pos.y < (enemy.y + 1) && pos.y >= (enemy.y - 1)*/)
             {
                 if (pos.y - enemy.y < 1.0 && pos.y - enemy.y > 0.5)
                 {
                     toDelete.Add(i);
-                    v_y = 1.0f;
+                    v_y = 2.0f;
                 } else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
                     //Debug.Log("Collision with enemy: " + en.name);
@@ -390,6 +398,54 @@ public class PlayerController : MonoBehaviour
             Destroy(en);
         }
         toDelete.Clear();
+
+        //FOR SUPERENEMIES
+
+        List<int> toDeleteSuper = new List<int>();
+        for (int i = 0; i < superEnemies.Count; i++)
+        {
+            GameObject en = superEnemies[i];
+            Vector2 pos = transform.position;
+            Vector2 enemy = en.transform.position;
+            //want to know if transform.pos is in the bounding box of the enemy position
+            //pos.x < enemy.x + 1 && pos.x > enemy.x - 1
+            if (pos.x < (enemy.x + 0.7) && pos.x > (enemy.x - 0.7) /*&&
+                pos.y < (enemy.y + 1) && pos.y >= (enemy.y - 1)*/)
+            {
+                if (pos.y - enemy.y < 1.0 && pos.y - enemy.y > 0.5)
+                {
+                    toDeleteSuper.Add(i);
+                    v_y = 2.0f;
+                }
+                else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
+                {
+                    //Debug.Log("Collision with enemy: " + en.name);
+                    if (prevEnemy2 != i)
+                    {
+                        numLives -= 1;
+                        v_x = -0.5f * v_x;
+                        prevEnemy2 = i;
+                    }
+                }
+            }
+            else
+            {
+                if (prevEnemy2 == i)
+                {
+                    prevEnemy2 = -1;
+                }
+            }
+        }
+        //Debug.Log("To delete count: " + toDelete.Count);
+        killed += toDeleteSuper.Count;
+        for (int j = 0; j < toDeleteSuper.Count; j++)
+        {
+            GameObject en = superEnemies[toDeleteSuper[j]];
+            superEnemies.RemoveAt(toDeleteSuper[j]);
+            Destroy(en);
+        }
+        toDeleteSuper.Clear();
+
     }
 
     void onFallOfCliff()

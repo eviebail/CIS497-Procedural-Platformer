@@ -16,6 +16,7 @@ public class GeometryGenerator : MonoBehaviour
     public static List<GameObject> stompers = new List<GameObject>();
     public static List<GameObject> spikes = new List<GameObject>();
     public static List<GameObject> coins = new List<GameObject>();
+    public static List<GameObject> superEnemies = new List<GameObject>();
 
     public Texture2D texGround;
     public Texture2D texEnemy;
@@ -24,7 +25,11 @@ public class GeometryGenerator : MonoBehaviour
     public Texture2D texGnd;
     public Texture2D texGoal;
 
-    public int enemyID = 0; 
+    public int enemyID = 0;
+
+    public int timer = 0;
+
+    public bool dir = true;
 
     //private Sprite mySprite;
     //private SpriteRenderer sr;
@@ -207,10 +212,93 @@ public class GeometryGenerator : MonoBehaviour
     {
         lvl.Clear();
         enemies.Clear();
+        superEnemies.Clear();
         platforms.Clear();
         stompers.Clear();
         spikes.Clear();
         coins.Clear();
+    }
+
+    public void placeSuperEnemies()
+    {
+        //loop over spike array and add enemies
+        Vector4 range = new Vector4(spikes[0].transform.position.x,0, spikes[0].transform.position.y, 1); //startX, endX, Ypos, length
+        List<Vector4> ranges = new List<Vector4>();
+        for (int i = 0; i < spikes.Count - 1; i++)
+        {
+            float x1 = spikes[i].transform.position.x;
+            float x2 = spikes[i + 1].transform.position.x;
+            float y1 = spikes[i].transform.position.y;
+            float y2 = spikes[i + 1].transform.position.y;
+            //Debug.Log(y1 + " : " + y2 + " - " + (y1-y2));
+            if (System.Math.Abs(x2 - x1 - 1) < 0.1 &&
+                System.Math.Abs(System.Math.Abs(y2 - y1)) < 0.1)
+            {
+                range.w += 1;
+            } else
+            {
+                range.y = x1;
+                //add enemies here
+                ranges.Add(new Vector4(range.x, range.y, range.z, range.w));
+                range.x = x2;
+                range.y = x2;
+                range.z = spikes[i + 1].transform.position.y;
+                range.w = 1;
+            }
+            if (i == spikes.Count - 2)
+            {
+                ranges.Add(new Vector4(range.x, spikes[i+1].transform.position.x, range.z, range.w + 1));
+            }
+        }
+
+        for (int i = 0; i < ranges.Count; i++)
+        {
+            //Debug.Log("Range" + i + " : " + ranges[i]);
+            Vector4 block = ranges[i];
+            if (block.w > 2)
+            {
+                int numEnemies = (int)(block.w / 3);
+                bool dir = true;
+                for (int j = 0; j < numEnemies; j++)
+                {
+                    //create enemy
+                    GameObject enemy = new GameObject();
+                    SpriteRenderer sr4 = enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                    sr4.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                    if (dir)
+                    {
+                        enemy.transform.position = new Vector3(block.x, block.z + 1, 0);
+                    } else
+                    {
+                        enemy.transform.position = new Vector3(block.x + j*3, block.z + 1, 0);
+                    }
+                    
+                    enemy.transform.localScale = blockScale;
+                    Sprite mySprite4 = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
+                             new Vector2(0.5f, 0.5f), 100.0f);
+                    sr4.sprite = mySprite4;
+                    enemy.AddComponent<BoxCollider2D>();
+                    enemy.AddComponent<Rigidbody2D>();
+                    enemy.GetComponent<Rigidbody2D>().isKinematic = true;
+                    enemy.AddComponent<EnemyController>();
+                    //Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
+                    if (j == numEnemies - 1)
+                    {
+                        enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 3, block.y);
+                    } else
+                    {
+                        enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 3, block.x + j * 3 + 2);
+                    }
+                    
+                    //Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
+                    //enemy.GetComponent<EnemyController>().state = 1;
+                    superEnemies.Add(enemy);
+                    dir = !dir;
+                }
+            }
+        }
+        //Debug.Log("Num: " + superEnemies.Count);
+
     }
 
     public GeometryGenerator(List<Block> blocks, int startX, int startY, Texture2D ground,
@@ -237,11 +325,12 @@ public class GeometryGenerator : MonoBehaviour
 
         //loops over rhythm array in block to place geometry according
         //to the state machine
-        Debug.Log("BLOCKS: " + blocks.Count);
-        Debug.Log("STARTX: " + globalX);
+        //Debug.Log("BLOCKS: " + blocks.Count);
+        //Debug.Log("STARTX: " + globalX);
         lvl.Add(new Vector3(0,0, -1));
         for (int i = 0; i < blocks.Count; i++)
         {
+            timer = 0;
             int[] rhythm = blocks[i].getRhythmArray();
             List<Vector2> action = blocks[i].getActionArray();
             int s = state.getNextState();
@@ -266,52 +355,166 @@ public class GeometryGenerator : MonoBehaviour
 
             for (int j = 0; j < rhythm.Length; j++)
             {
+
+                //don't want to move up at the end of a rhythm
+                if (j == rhythm.Length - 1 || j == rhythm.Length - 2
+                    || j == rhythm.Length - 3)
+                {
+                    state.resetClock();
+                }
+
+                Debug.Log("S: " + s);
+
                 if (rhythm[j] == 0)
                 {
+                    timer += 1;
+
                     //place a block at global x,y
                     if (s == 1) {
+                        //make the ground spikes!!
+                        if (RhythmGenerator.constraints[3] == 1)
+                        {
+                            GameObject cube = new GameObject();
+                            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube.transform.position = new Vector3(globalX, globalY, 0);
+                            cube.transform.localScale = blockScale;
+                            Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr.sprite = mySprite;
+                            cube.AddComponent<BoxCollider2D>();//BoxCollider2D bc = cube.AddComponent<BoxCollider2D>() as BoxCollider2D;
+                                                               //lvl.Add(new Vector3(globalX, globalY,0));
 
-                        GameObject cube = new GameObject();
-                        SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                        sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                        cube.transform.position = new Vector3(globalX, globalY, 0);
-                        cube.transform.localScale = blockScale;
-                        Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
-                                 new Vector2(0.5f, 0.5f), 100.0f);
-                        sr.sprite = mySprite;
-                        cube.AddComponent<BoxCollider2D>();//BoxCollider2D bc = cube.AddComponent<BoxCollider2D>() as BoxCollider2D;
-                        //lvl.Add(new Vector3(globalX, globalY,0));
+                            GameObject cube2 = new GameObject();
+                            SpriteRenderer sr2 = cube2.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube2.transform.position = new Vector3(globalX, globalY + 1, 0);
+                            cube2.transform.localScale = blockScale;
+                            Sprite mySprite2 = Sprite.Create(texSpike, new Rect(0.0f, 0.0f, texSpike.width, texSpike.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr2.sprite = mySprite2;
+                            cube2.AddComponent<BoxCollider2D>();
+                            lvl.Add(new Vector3(globalX, globalY + 1, 1));
+                            spikes.Add(cube);
 
-                        GameObject cube2 = new GameObject();
-                        SpriteRenderer sr2 = cube2.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                        sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                        cube2.transform.position = new Vector3(globalX, globalY + 1, 0);
-                        cube2.transform.localScale = blockScale;
-                        Sprite mySprite2 = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
-                                 new Vector2(0.5f, 0.5f), 100.0f);
-                        sr2.sprite = mySprite2;
-                        cube2.AddComponent<BoxCollider2D>();
-                        lvl.Add(new Vector3(globalX, globalY+1,0));
+                            //if (timer >= 3)
+                            //{
+                            //    GameObject enemy = new GameObject();
+                            //    SpriteRenderer sr4 = enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            //    sr4.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            //    enemy.transform.position = new Vector3(globalX, globalY + 2f, 0);
+                            //    enemy.transform.localScale = blockScale;
+                            //    Sprite mySprite4 = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
+                            //             new Vector2(0.5f, 0.5f), 100.0f);
+                            //    sr4.sprite = mySprite4;
+                            //    enemy.AddComponent<BoxCollider2D>();
+                            //    enemy.AddComponent<Rigidbody2D>();
+                            //    enemy.GetComponent<Rigidbody2D>().isKinematic = true;
+                            //    enemy.AddComponent<EnemyController>();
+                            //    //Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
+                            //    enemy.GetComponent<EnemyController>().xRange = new Vector2(globalX - 3, globalX);
+
+                            //    if (dir)
+                            //    {
+                            //        enemy.GetComponent<EnemyController>().state = 1;
+                            //    }
+                                
+                            //    superEnemies.Add(enemy);
+                            //    timer = 0;
+                            //    dir = !dir;
+                            //}
+
+                        } else
+                        {
+                            GameObject cube = new GameObject();
+                            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube.transform.position = new Vector3(globalX, globalY, 0);
+                            cube.transform.localScale = blockScale;
+                            Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr.sprite = mySprite;
+                            cube.AddComponent<BoxCollider2D>();//BoxCollider2D bc = cube.AddComponent<BoxCollider2D>() as BoxCollider2D;
+                                                               //lvl.Add(new Vector3(globalX, globalY,0));
+
+                            GameObject cube2 = new GameObject();
+                            SpriteRenderer sr2 = cube2.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube2.transform.position = new Vector3(globalX, globalY + 1, 0);
+                            cube2.transform.localScale = blockScale;
+                            Sprite mySprite2 = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr2.sprite = mySprite2;
+                            cube2.AddComponent<BoxCollider2D>();
+                            lvl.Add(new Vector3(globalX, globalY + 1, 0));
+                        }
+                        
 
                     } else
                     {
-                        GameObject cube = new GameObject();
-                        SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                        sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                        cube.transform.position = new Vector3(globalX, globalY, 0);
-                        cube.transform.localScale = blockScale;
-                        Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
-                                 new Vector2(0.5f, 0.5f), 100.0f);
-                        sr.sprite = mySprite;
-                        cube.AddComponent<BoxCollider2D>();
-                        lvl.Add(new Vector3(globalX, globalY,0));
+                        if (RhythmGenerator.constraints[3] == 1)
+                        {
+                            GameObject cube = new GameObject();
+                            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube.transform.position = new Vector3(globalX, globalY, 0);
+                            cube.transform.localScale = blockScale;
+                            Sprite mySprite = Sprite.Create(texSpike, new Rect(0.0f, 0.0f, texSpike.width, texSpike.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr.sprite = mySprite;
+                            cube.AddComponent<BoxCollider2D>();
+                            lvl.Add(new Vector3(globalX, globalY, 1));
+                            spikes.Add(cube);
+
+                            //if (timer >= 3)
+                            //{
+                            //    GameObject enemy = new GameObject();
+                            //    SpriteRenderer sr4 = enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            //    sr4.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            //    enemy.transform.position = new Vector3(globalX, globalY + 1f, 0);
+                            //    enemy.transform.localScale = blockScale;
+                            //    Sprite mySprite4 = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
+                            //             new Vector2(0.5f, 0.5f), 100.0f);
+                            //    sr4.sprite = mySprite4;
+                            //    enemy.AddComponent<BoxCollider2D>();
+                            //    enemy.AddComponent<Rigidbody2D>();
+                            //    enemy.GetComponent<Rigidbody2D>().isKinematic = true;
+                            //    enemy.AddComponent<EnemyController>();
+                            //    //Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
+                            //    enemy.GetComponent<EnemyController>().xRange = new Vector2(globalX - 3, globalX);
+
+                            //    if (dir)
+                            //    {
+                            //        enemy.GetComponent<EnemyController>().state = 1;
+                            //    }
+
+                            //    superEnemies.Add(enemy);
+                            //    timer = 0;
+                            //    dir = !dir;
+                            //}
+                        }
+                        else
+                        {
+                            GameObject cube2 = new GameObject();
+                            SpriteRenderer sr2 = cube2.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube2.transform.position = new Vector3(globalX, globalY, 0);
+                            cube2.transform.localScale = blockScale;
+                            Sprite mySprite2 = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr2.sprite = mySprite2;
+                            cube2.AddComponent<BoxCollider2D>();
+                            lvl.Add(new Vector3(globalX, globalY, 0));
+                        }
+
                     }
 
                     globalX += 1;
                     if (s == 1)
                     {
                         globalY += 1;
-                    } else if (s == 2)
+                    }
+                    if (s == 2)
                     {
                         globalY -= 1;
                     }
@@ -354,25 +557,47 @@ public class GeometryGenerator : MonoBehaviour
                             {
                                 lvl.Add(new Vector3(0, 0, -1));
                             }
+
+                            if (RhythmGenerator.constraints[3] == 1)
+                            {
+                                state.resetClock();
+                                globalY -= 1;
+                            }
                         }
 
                         globalX += (int) (act.y + 1);
-                        
+
 
                     } else if (System.Math.Abs(act.x - 1) < 0.1)
                     {
                         //enemy
 
-                        GameObject cube = new GameObject();
-                        SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                        sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                        cube.transform.position = new Vector3(globalX, globalY, 0);
-                        cube.transform.localScale = blockScale;
-                        Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
-                                 new Vector2(0.5f, 0.5f), 100.0f);
-                        sr.sprite = mySprite;
-                        cube.AddComponent<BoxCollider2D>();
-                        lvl.Add(new Vector3(globalX, globalY, 0));
+                        if (RhythmGenerator.constraints[3] == 1)
+                        {
+                            GameObject cube = new GameObject();
+                            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube.transform.position = new Vector3(globalX, globalY, 0);
+                            cube.transform.localScale = blockScale;
+                            Sprite mySprite = Sprite.Create(texSpike, new Rect(0.0f, 0.0f, texSpike.width, texSpike.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr.sprite = mySprite;
+                            cube.AddComponent<BoxCollider2D>();
+                            lvl.Add(new Vector3(globalX, globalY, 1));
+                            spikes.Add(cube);
+                        } else
+                        {
+                            GameObject cube = new GameObject();
+                            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube.transform.position = new Vector3(globalX, globalY, 0);
+                            cube.transform.localScale = blockScale;
+                            Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr.sprite = mySprite;
+                            cube.AddComponent<BoxCollider2D>();
+                            lvl.Add(new Vector3(globalX, globalY, 0));
+                        }
 
                         GameObject enemy = new GameObject();
                         SpriteRenderer sr2 = enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
@@ -395,7 +620,7 @@ public class GeometryGenerator : MonoBehaviour
                         globalX += 1;
                     } else if (System.Math.Abs(act.x - 2) < 0.1)
                     {
-                        if  (Random.value < 0.5)
+                        if  (Random.value < 0.5 && RhythmGenerator.constraints[3] != 1)
                         {
 
                             // globalX + [X+1 - m] + [X + 2 - space] + newGlobalX
@@ -403,31 +628,6 @@ public class GeometryGenerator : MonoBehaviour
                             //WAIT - either a moving platform or stomper
                             //place a block and add a platformcontroller to it so it moves up and down
 
-                            lvl.Add(new Vector3(globalX, globalY, -1));
-
-                            GameObject cube = new GameObject();
-                            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                            cube.transform.position = new Vector3(globalX + 1, globalY, 0);
-                            cube.transform.localScale = blockScale;
-                            Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
-                                     new Vector2(0.5f, 0.5f), 100.0f);
-                            sr.sprite = mySprite;
-                            lvl.Add(new Vector3(globalX + 1, globalY, 2));
-                            cube.AddComponent<BoxCollider2D>();
-                            cube.AddComponent<Rigidbody2D>();
-                            cube.name = "platform";
-                            cube.AddComponent<PlatformController>();
-                            cube.GetComponent<Rigidbody2D>().freezeRotation = true;
-                            cube.GetComponent<Rigidbody2D>().isKinematic = false;
-
-                            lvl.Add(new Vector3(globalX+2, globalY, -1));
-
-                            platforms.Add(cube);
-
-                            globalX += 3;
-                        } else
-                        {
                             GameObject cube = new GameObject();
                             SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
                             sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
@@ -458,6 +658,34 @@ public class GeometryGenerator : MonoBehaviour
                             cube2.GetComponent<Rigidbody2D>().isKinematic = false;
                             stompers.Add(cube2);
                             globalX += 1;
+                            
+                        } else
+                        {
+                            state.resetClock();
+
+                            lvl.Add(new Vector3(globalX, globalY, -1));
+
+                            GameObject cube = new GameObject();
+                            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube.transform.position = new Vector3(globalX + 1, globalY, 0);
+                            cube.transform.localScale = blockScale;
+                            Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr.sprite = mySprite;
+                            lvl.Add(new Vector3(globalX + 1, globalY, 2));
+                            cube.AddComponent<BoxCollider2D>();
+                            cube.AddComponent<Rigidbody2D>();
+                            cube.name = "platform";
+                            cube.AddComponent<PlatformController>();
+                            cube.GetComponent<Rigidbody2D>().freezeRotation = true;
+                            cube.GetComponent<Rigidbody2D>().isKinematic = false;
+
+                            lvl.Add(new Vector3(globalX + 2, globalY, -1));
+
+                            platforms.Add(cube);
+
+                            globalX += 3;
                         }
                     }
                     action.RemoveAt(0);
@@ -498,7 +726,7 @@ public class GeometryGenerator : MonoBehaviour
         lvl.Add(new Vector3(globalX, globalY + 3, 0));
         lvl.Add(new Vector3(globalX, globalY + 4, 0));
 
-        Debug.Log("ENDX: " + globalX);
+        //Debug.Log("ENDX: " + globalX);
         lvl.Add(new Vector3(0, 0, -1));
         addCoins();
     }
@@ -507,12 +735,24 @@ public class GeometryGenerator : MonoBehaviour
 //state machine for flat (0), slantUp (1), and slantDown(2) platforms
 public class StateMachine : MonoBehaviour
 {
-    private int curr = 0;
+    public int curr = 0;
+    private int stateTimer = 0;
+    private int last = -1;
     bool first;
 
     public StateMachine()
     {
         first = true;
+    }
+
+    public int getTime()
+    {
+        return stateTimer;
+    }
+
+    public void resetClock()
+    {
+        stateTimer = 0;
     }
 
     public int getNextState()
@@ -522,9 +762,17 @@ public class StateMachine : MonoBehaviour
             first = false;
             return curr;
         }
+
         float val = Random.value;
         //can adjust these parameters later on to get the overall shape of the
         //terrain!
+        if (RhythmGenerator.constraints[3] == 1 && stateTimer < 3)
+        {
+            stateTimer += 1;
+            curr = 0;
+            last = curr;
+            return curr;
+        }
         switch (curr)
         {
             case 0:
@@ -559,6 +807,14 @@ public class StateMachine : MonoBehaviour
                     curr = 0;
                 }
                 break;
+        }
+        if (RhythmGenerator.constraints[3] == 1)
+        {
+            if (last != curr)
+            {
+                last = curr;
+                stateTimer = 0;
+            }
         }
         return curr;
     }

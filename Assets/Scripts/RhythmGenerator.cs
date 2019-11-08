@@ -115,7 +115,12 @@ public class RhythmGenerator : MonoBehaviour
         Debug.Log("Length: " + length);
         int density = selectDensity(length / 2);
         Debug.Log("Density: " + density);
-        return new RhythmBlock(type, length, density, (constraints[1] == 1));
+        int offset = 0;
+        if (constraints[3] == 1)
+        {
+            offset = 3;
+        }
+        return new RhythmBlock(type, length, density, (constraints[1] == 1), offset);
         //density can't be b
     }
 
@@ -165,6 +170,7 @@ public class RhythmGenerator : MonoBehaviour
         gen.generateGeometry();
         gen.cleanUpEnemies();
         gen.cleanUpStomps();
+        gen.placeSuperEnemies();
         Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
         //mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),
         //                         new Vector2(0.5f, 0.5f), 100.0f);

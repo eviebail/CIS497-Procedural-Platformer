@@ -14,6 +14,8 @@ public class EnemyController : MonoBehaviour
 
     public int state = 0;
 
+    public Vector2 xRange = new Vector2(-100,0);
+
     //x = x_0 + vxt
     //y = y_0 + vyt + -ayt^2;
     //in fixedupdate, change_t should always be 1
@@ -46,19 +48,38 @@ public class EnemyController : MonoBehaviour
         //    a_y = 0;
         //}
         // Check for Input if not moving
+
+        if (xRange.x != -100)
+        {
+            if (!valid(1f * Vector2.right) || transform.position.x + 1 > xRange.y + 1)
+            {
+                state = 1;
+                //Debug.Log("YO 1");
+                //v_x = 0.15f;
+            }
+            else if (!valid(-1f * Vector2.right) || transform.position.x - 1 < xRange.x - 1)
+            {
+                state = 0;
+                //Debug.Log("YO 2");
+                //v_x = -0.15f;
+            }
+        } else
+        {
+            if (!valid(1f * Vector2.right))
+            {
+                state = 1;
+                //Debug.Log("YO 1");
+                //v_x = 0.15f;
+            }
+            else if (!valid(-1f * Vector2.right))
+            {
+                state = 0;
+                //Debug.Log("YO 2");
+                //v_x = -0.15f;
+            }
+        }
         
-        if (!valid(1f * Vector2.right))
-        {
-            state = 1;
-            //Debug.Log("YO 1");
-            //v_x = 0.15f;
-        }
-        else if (!valid(-1f * Vector2.right))
-        {
-            state = 0;
-            //Debug.Log("YO 2");
-            //v_x = -0.15f;
-        }
+        
 
         if (state == 0)
         {
