@@ -146,7 +146,13 @@ public class RhythmBlock : MonoBehaviour, Block
                     {
                         if (Random.value < 0.5f)
                         {
-                            act = new Vector2(0, Mathf.Min(duration, 2));
+                            if (RhythmGenerator.constraints[0] == 1)
+                            {
+                                act = new Vector2(0, Mathf.Min(duration, 1));
+                            } else
+                            {
+                                act = new Vector2(0, Mathf.Min(duration, 2));
+                            }
                         } else
                         {
                             act = new Vector2(2, Mathf.Min(duration, 2));//TESTINGact = new Vector2(2, Mathf.Min(duration, 3));
@@ -154,7 +160,14 @@ public class RhythmBlock : MonoBehaviour, Block
                     }
                     else
                     {
-                        act = new Vector2(type, Mathf.Min(duration, 2));
+                        if (type == 0 && RhythmGenerator.constraints[0] == 1)
+                        {
+                            act = new Vector2(0, Mathf.Min(duration, 1));
+                        }
+                        else
+                        {
+                            act = new Vector2(type, Mathf.Min(duration, 2));
+                        }
                     }
                 }
                 action.Add(act);
@@ -170,13 +183,28 @@ public class RhythmBlock : MonoBehaviour, Block
         {
             if (duration == 0)
             {
-                act = new Vector2(0, Mathf.Min(duration, 2));
+                if (RhythmGenerator.constraints[0] == 1)
+                {
+                    act = new Vector2(0, Mathf.Min(duration, 1));
+                }
+                else
+                {
+                    act = new Vector2(0, Mathf.Min(duration, 2));
+                }
             }
             else
             {
-                act = new Vector2(type, Mathf.Min(duration, 2));
+                if (type == 0 && RhythmGenerator.constraints[0] == 1)
+                {
+                    act = new Vector2(0, Mathf.Min(duration, 1));
+                } else
+                {
+                    act = new Vector2(type, Mathf.Min(duration, 2));
+                }
             }
         }
+
+        act = new Vector2(0, 1);
         action.Add(act);
 
         string otp = "Action Array: [";

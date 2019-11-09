@@ -40,6 +40,7 @@ public class RhythmGenerator : MonoBehaviour
             val = (int) Mathf.Min((Random.value * 5.0f), 2);
     
         }
+        val = 0;
         switch (val)
         {
             case 0:
@@ -171,6 +172,7 @@ public class RhythmGenerator : MonoBehaviour
         gen.cleanUpEnemies();
         gen.cleanUpStomps();
         gen.placeSuperEnemies();
+        if (constraints[0] == 1) { gen.jumpTerrain(); }
         Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
         //mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),
         //                         new Vector2(0.5f, 0.5f), 100.0f);
