@@ -171,7 +171,7 @@ public class RhythmGenerator : MonoBehaviour
         gen.generateGeometry();
         gen.cleanUpEnemies();
         gen.cleanUpStomps();
-        gen.placeSuperEnemies();
+        if (constraints[3] == 1) { gen.placeSuperEnemies(); }
         if (constraints[0] == 1) { gen.jumpTerrain(); }
         Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
         //mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),

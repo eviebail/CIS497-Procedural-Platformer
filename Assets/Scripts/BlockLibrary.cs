@@ -133,12 +133,27 @@ public class RhythmBlock : MonoBehaviour, Block
                 }
                 else
                 {
-                    type = (int)(Random.value * 3);//SHOULD BE 3!! TEST
+                    if (RhythmGenerator.constraints[0] == 1)
+                    {
+                        type = (int)(Random.value * 5);
+                        type = Mathf.Min(type, 2); //increase likelihood 2 is chosen
+                    } else
+                    {
+                        type = (int)(Random.value * 3);//SHOULD BE 3!! TEST
+                    }
+                    
                 }
                  
                 if (type == 1 && duration > 0)
                 {
-                    act = new Vector2(type, 1);
+                    if (RhythmGenerator.constraints[0] == 1)
+                    {
+                        act = new Vector2(2, Mathf.Min(duration, 2));
+                    } else
+                    {
+                        act = new Vector2(type, 1);
+                    }
+                    
                 }
                 else
                 {
@@ -171,36 +186,6 @@ public class RhythmBlock : MonoBehaviour, Block
                     }
                 }
                 action.Add(act);
-            }
-        }
-        duration = (int)(Random.value * (rhythm.Length - 1 - currAction));
-        type = (int)(Random.value * 2);
-        if (type == 1 && duration > 0)
-        {
-            act = new Vector2(type, 1);
-        }
-        else
-        {
-            if (duration == 0)
-            {
-                if (RhythmGenerator.constraints[0] == 1)
-                {
-                    act = new Vector2(0, Mathf.Min(duration, 1));
-                }
-                else
-                {
-                    act = new Vector2(0, Mathf.Min(duration, 2));
-                }
-            }
-            else
-            {
-                if (type == 0 && RhythmGenerator.constraints[0] == 1)
-                {
-                    act = new Vector2(0, Mathf.Min(duration, 1));
-                } else
-                {
-                    act = new Vector2(type, Mathf.Min(duration, 2));
-                }
             }
         }
 

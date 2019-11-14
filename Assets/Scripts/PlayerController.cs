@@ -450,7 +450,7 @@ public class PlayerController : MonoBehaviour
 
     void onFallOfCliff()
     {
-        if (transform.position.y < -6)
+        if (transform.position.y < -16)
         {
             numLives -= 1;
             transform.position = lastValidPos + 4f*Vector2.up;

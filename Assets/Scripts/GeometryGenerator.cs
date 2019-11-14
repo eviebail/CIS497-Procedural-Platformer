@@ -32,6 +32,8 @@ public class GeometryGenerator : MonoBehaviour
 
     public bool dir = true;
 
+    public bool ledgesExist = true;
+
     //private Sprite mySprite;
     //private SpriteRenderer sr;
     // gameObject;
@@ -40,6 +42,145 @@ public class GeometryGenerator : MonoBehaviour
     void Awake()
     {
         
+    }
+
+    public void jumpLedges()
+    {
+        List<Vector3> ledges = new List<Vector3>();
+        int prevY = 0;
+        int postY = -100;
+        int gapStart = -100;
+        for (int i = 1; i < lvl.Count; i++)
+        {
+            Vector3 element = lvl[i];
+            if (element.z == 0 && gapStart == -100)
+            {
+                prevY = (int)element.y;
+            }
+            if (element.z == -1 && gapStart == -100)
+            {
+                gapStart = i;
+            }
+            if (element.z == 0 && gapStart != -100)
+            {
+                postY = (int)element.y;
+                if (prevY < postY)
+                {
+                    ledges.Add(new Vector3(gapStart, prevY, postY));
+                }
+                prevY = postY;
+                postY = -100;
+                gapStart = -100;
+            }
+        }
+
+        //for (int i = 0; i < ledges.Count; i++)
+        //{
+        //    //Debug.Log("ORIGNAL::: " + lvl[(int)(ledges[i].x - 1)]);
+        //}
+
+            //int offset = 0;
+            //int start = 0;
+            for (int i = 0; i < ledges.Count; i++)
+        {
+            Vector3 ps = ledges[i];
+            ledges[i] = new Vector3(ps.x + 3*i, ps.y, ps.z);
+            Vector3 ranges = ledges[i];
+
+            //Debug.Log("NEW::: " + lvl[(int)(ledges[i].x - 1)]);
+
+            int baseX = (int)lvl[(int)ledges[i].x - 1].x;
+            int baseY = (int)lvl[(int)ledges[i].x - 1].y; //ranges.y;
+            //make and insert three cubes
+            GameObject cube1 = new GameObject();
+            SpriteRenderer sr = cube1.AddComponent<SpriteRenderer>() as SpriteRenderer;
+            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+            cube1.transform.position = new Vector3(baseX + 3, baseY - 1, 0);
+            cube1.transform.localScale = blockScale;
+            Sprite mySprite = Sprite.Create(texCoin, new Rect(0.0f, 0.0f, texGnd.width, texGnd.height),
+                     new Vector2(0.5f, 0.5f), 100.0f);
+            sr.sprite = mySprite;
+            cube1.AddComponent<BoxCollider2D>();
+            lvl.Insert((int)ranges.x, new Vector3(baseX + 3, baseY - 1, 0));
+
+            List<GameObject> l = new List<GameObject>();
+            l.Add(cube1);
+            ground.Insert((int)ranges.x, l);
+
+            GameObject cube2 = new GameObject();
+            SpriteRenderer sr2 = cube2.AddComponent<SpriteRenderer>() as SpriteRenderer;
+            sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+            cube2.transform.position = new Vector3(baseX + 2, baseY - 1, 0);
+            cube2.transform.localScale = blockScale;
+            Sprite mySprite2 = Sprite.Create(texCoin, new Rect(0.0f, 0.0f, texGnd.width, texGnd.height),
+                     new Vector2(0.5f, 0.5f), 100.0f);
+            sr2.sprite = mySprite2;
+            cube2.AddComponent<BoxCollider2D>();
+            lvl.Insert((int)ranges.x, new Vector3(baseX + 2, baseY - 1, 0));
+
+            List<GameObject> l2 = new List<GameObject>();
+            l2.Add(cube2);
+            ground.Insert((int)ranges.x, l2);
+
+            GameObject cube3 = new GameObject();
+            SpriteRenderer sr3 = cube3.AddComponent<SpriteRenderer>() as SpriteRenderer;
+            sr3.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+            cube3.transform.position = new Vector3(baseX + 1, baseY - 1, 0);
+            cube3.transform.localScale = blockScale;
+            Sprite mySprite3 = Sprite.Create(texCoin, new Rect(0.0f, 0.0f, texGnd.width, texGnd.height),
+                     new Vector2(0.5f, 0.5f), 100.0f);
+            sr3.sprite = mySprite3;
+            cube3.AddComponent<BoxCollider2D>();
+            lvl.Insert((int)ranges.x, new Vector3(baseX + 1, baseY - 1, 0));
+            List<GameObject> l3 = new List<GameObject>();
+            l.Add(cube3);
+            ground.Insert((int)ranges.x, l3);
+
+            //Add enemy to bounce off o 
+            GameObject enemy = new GameObject();
+            SpriteRenderer sre = enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
+            sre.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+            enemy.transform.position = new Vector3(baseX + 2, baseY, 0);
+            enemy.transform.localScale = blockScale;
+            Sprite mySpriteE = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
+                     new Vector2(0.5f, 0.5f), 100.0f);
+            sre.sprite = mySpriteE;
+            enemy.AddComponent<BoxCollider2D>();
+            enemy.AddComponent<Rigidbody2D>();
+            enemy.GetComponent<Rigidbody2D>().isKinematic = true;
+            enemy.name = "" + enemyID;//enemy.GetComponent<BoxCollider2D>().isTrigger = true;
+            enemy.AddComponent<EnemyController>();
+            enemyID += 1;
+            enemies.Add(enemy);
+
+            //Debug.Log("::: " + (ranges.x + 4) + " vs " + (baseX + 4));
+
+            //offset += 3;
+            //start = baseX + 4;
+
+            for (int j = (int)ranges.x + 4; j < lvl.Count; j++)
+            {
+                Vector3 pos = lvl[j];
+                lvl[j] = new Vector3(pos.x + 3, pos.y - 1, pos.z);
+
+                List<GameObject> gndTexts = ground[j];
+                for (int k = 0; k < gndTexts.Count; k++)
+                {
+                    Vector3 p = gndTexts[k].transform.position;
+                    gndTexts[k].transform.position = new Vector3(p.x + 3, p.y - 1, p.z);
+                }
+            }
+            Debug.Log("CUTOFF: " + (baseX + 4));
+            for (int k = 0; k < stompers.Count; k++)
+            {
+                Debug.Log("STOMPS: " + stompers[k].transform.position);
+                Vector3 stompPos = stompers[k].transform.position;
+                if (stompPos.x >= (baseX + 4))
+                {
+                    stompers[k].transform.position = new Vector3(stompPos.x + 3, stompPos.y - 1, stompPos.z);
+                }
+            }
+        }
     }
 
     public void jumpTerrain()
@@ -53,8 +194,6 @@ public class GeometryGenerator : MonoBehaviour
         preGap.y = -100;
         postGap.x = -100;
         postGap.y = -100;
-
-        Debug.Log("HIIiiiiiiiiIIIIIIiiiIIII");
 
         for (int i = 1; i < lvl.Count; i++)
         {
@@ -93,24 +232,29 @@ public class GeometryGenerator : MonoBehaviour
         ranges.Add(new Vector2(preGap.x, preGap.y));
         ranges.Add(new Vector2(postGap.x, postGap.y));
 
-        //for (int i = 0; i < ranges.Count-2; i+=2)
+        //for (int i = 0; i < ranges.Count - 2; i += 2)
         //{
-        //    Debug.Log("PRE::: " + lvl[(int)ranges[i].x] + ", " + lvl[(int)ranges[i].y - 1]);
-        //    Debug.Log("POST::: " + lvl[(int)ranges[i+1].x] + ", " + lvl[(int)ranges[i+1].y - 1]);
+        //    //Debug.Log("PRE::: " + lvl[(int)ranges[i].x] + ", " + lvl[(int)ranges[i].y - 1]);
+        //    Debug.Log("POST::: " + lvl[(int)ranges[i + 1].x] + ", " + lvl[(int)ranges[i + 1].y - 1]);
         //}
 
-        Debug.Log("::: " + lvl[(int)ranges[ranges.Count-1].x] + ", " + lvl[(int)ranges[ranges.Count - 1].y - 1]);
+        //for (int k = 0; k < stompers.Count; k++)
+        //{
+        //    Debug.Log("STOMPS::: " + stompers[k].transform.position);
+        //}
+
+        //Debug.Log("::: " + lvl[(int)ranges[ranges.Count-1].x] + ", " + lvl[(int)ranges[ranges.Count - 1].y - 1]);
 
         for (int i = 0; i < ranges.Count - 2; i += 2)
         {
             float preY = lvl[(int)ranges[i].y - 1].y;
             float postY = lvl[(int)ranges[i + 1].x].y;
 
-            Debug.Log("PRE::: " + lvl[(int)ranges[i].x] + ", " + lvl[(int)ranges[i].y - 1]);
-            Debug.Log("POST::: " + lvl[(int)ranges[i + 1].x] + ", " + lvl[(int)ranges[i + 1].y - 1]);
-
-            Debug.Log("DIFF: " + System.Math.Abs(preY - postY));
-            Debug.Log("PRE:: " + preY + " POST:: " + postY);
+            //Debug.Log("PRE::: " + lvl[(int)ranges[i].x] + ", " + lvl[(int)ranges[i].y - 1]);
+            //Debug.Log("POST::: " + lvl[(int)ranges[i + 1].x] + ", " + lvl[(int)ranges[i + 1].y - 1]);
+            
+            //Debug.Log("DIFF: " + System.Math.Abs(preY - postY));
+            //Debug.Log("PRE:: " + preY + " POST:: " + postY);
 
             if (System.Math.Abs(preY - postY) < 0.1)
             {
@@ -124,12 +268,30 @@ public class GeometryGenerator : MonoBehaviour
                         gndTexts[k].transform.position = new Vector3(pos.x, pos.y - 1, pos.z);
                     }
                 }
+                for (int k = 0; k < stompers.Count; k++)
+                {
+                    Vector3 stompPos = stompers[k].transform.position;
+                    if (stompPos.x > lvl[(int)ranges[i + 1].x].x &&
+                        stompPos.x < lvl[(int)ranges[i + 1].y - 1].x)
+                    {
+                        stompers[k].transform.position = new Vector3(stompPos.x, stompPos.y - 1, stompPos.z);
+                    }
+                }
+                for (int k = 0; k < platforms.Count; k++)
+                {
+                    Vector3 platPos = platforms[k].transform.position;
+                    if (platPos.x > lvl[(int)ranges[i + 1].x].x &&
+                        platPos.x < lvl[(int)ranges[i + 1].y - 1].x)
+                    {
+                        platforms[k].transform.position = new Vector3(platPos.x, platPos.y - 1, platPos.z);
+                    }
+                }
                 //ranges[i] = new Vector2(ranges[i].x, ranges[i].y - 1);
                 //ranges[i + 1] = new Vector2(ranges[i + 1].x, ranges[i + 1].y - 1);
                 //Debug.Log("CHANGE! " + "::: " + lvl[(int)preGap.x] + ", " + lvl[(int)preGap.y - 1]);
             }
         }
-
+        jumpLedges();
     }
 
     public void addCoins()
@@ -308,6 +470,11 @@ public class GeometryGenerator : MonoBehaviour
         stompers.Clear();
         spikes.Clear();
         coins.Clear();
+        for (int i = 0; i < ground.Count; i++)
+        {
+            ground[i].Clear();
+        }
+        ground.Clear();
     }
 
     public void placeSuperEnemies()
@@ -353,38 +520,40 @@ public class GeometryGenerator : MonoBehaviour
                 for (int j = 0; j < numEnemies; j++)
                 {
                     //create enemy
-                    //GameObject enemy = new GameObject();
-                    //SpriteRenderer sr4 = enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                    //sr4.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                    //if (dir)
-                    //{
-                    //    enemy.transform.position = new Vector3(block.x, block.z + 1, 0);
-                    //} else
-                    //{
-                    //    enemy.transform.position = new Vector3(block.x + j*3, block.z + 1, 0);
-                    //}
-                    
-                    //enemy.transform.localScale = blockScale;
-                    //Sprite mySprite4 = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
-                    //         new Vector2(0.5f, 0.5f), 100.0f);
-                    //sr4.sprite = mySprite4;
-                    //enemy.AddComponent<BoxCollider2D>();
-                    //enemy.AddComponent<Rigidbody2D>();
-                    //enemy.GetComponent<Rigidbody2D>().isKinematic = true;
-                    //enemy.AddComponent<EnemyController>();
-                    ////Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
-                    //if (j == numEnemies - 1)
-                    //{
-                    //    enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 3, block.y);
-                    //} else
-                    //{
-                    //    enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 3, block.x + j * 3 + 2);
-                    //}
-                    
-                    ////Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
-                    ////enemy.GetComponent<EnemyController>().state = 1;
-                    //superEnemies.Add(enemy);
-                    //dir = !dir;
+                    GameObject enemy = new GameObject();
+                    SpriteRenderer sr4 = enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                    sr4.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                    if (dir)
+                    {
+                        enemy.transform.position = new Vector3(block.x, block.z + 1, 0);
+                    }
+                    else
+                    {
+                        enemy.transform.position = new Vector3(block.x + j * 3, block.z + 1, 0);
+                    }
+
+                    enemy.transform.localScale = blockScale;
+                    Sprite mySprite4 = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
+                             new Vector2(0.5f, 0.5f), 100.0f);
+                    sr4.sprite = mySprite4;
+                    enemy.AddComponent<BoxCollider2D>();
+                    enemy.AddComponent<Rigidbody2D>();
+                    enemy.GetComponent<Rigidbody2D>().isKinematic = true;
+                    enemy.AddComponent<EnemyController>();
+                    //Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
+                    if (j == numEnemies - 1)
+                    {
+                        enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 3, block.y);
+                    }
+                    else
+                    {
+                        enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 3, block.x + j * 3 + 2);
+                    }
+
+                    //Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
+                    //enemy.GetComponent<EnemyController>().state = 1;
+                    superEnemies.Add(enemy);
+                    dir = !dir;
                 }
             }
         }
@@ -650,21 +819,39 @@ public class GeometryGenerator : MonoBehaviour
                         if (System.Math.Abs(act.y) < 0.1)
                         {
                             //spike
-
-                            GameObject spike = new GameObject();
-                            SpriteRenderer sr = spike.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                            spike.transform.position = new Vector3(globalX, globalY, 0);
-                            spike.transform.localScale = blockScale;
-                            Sprite mySprite = Sprite.Create(texSpike, new Rect(0.0f, 0.0f, texSpike.width, texSpike.height),
-                                     new Vector2(0.5f, 0.5f), 100.0f);
-                            sr.sprite = mySprite;
-                            spike.AddComponent<BoxCollider2D>();
-                            lvl.Add(new Vector3(globalX, globalY, 1));
-                            List<GameObject> l = new List<GameObject>();
-                            l.Add(spike);
-                            ground.Add(l);
-                            spikes.Add(spike);
+                            if (RhythmGenerator.constraints[0] == 1)
+                            {
+                                GameObject cube = new GameObject();
+                                SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                                sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                                cube.transform.position = new Vector3(globalX, globalY, 0);
+                                cube.transform.localScale = blockScale;
+                                Sprite mySprite = Sprite.Create(texGnd, new Rect(0.0f, 0.0f, texGnd.width, texGnd.height),
+                                         new Vector2(0.5f, 0.5f), 100.0f);
+                                sr.sprite = mySprite;
+                                cube.AddComponent<BoxCollider2D>();
+                                lvl.Add(new Vector3(globalX, globalY, 0));
+                                List<GameObject> l = new List<GameObject>();
+                                l.Add(cube);
+                                ground.Add(l);
+                            } else
+                            {
+                                GameObject spike = new GameObject();
+                                SpriteRenderer sr = spike.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                                sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                                spike.transform.position = new Vector3(globalX, globalY, 0);
+                                spike.transform.localScale = blockScale;
+                                Sprite mySprite = Sprite.Create(texSpike, new Rect(0.0f, 0.0f, texSpike.width, texSpike.height),
+                                         new Vector2(0.5f, 0.5f), 100.0f);
+                                sr.sprite = mySprite;
+                                spike.AddComponent<BoxCollider2D>();
+                                lvl.Add(new Vector3(globalX, globalY, 1));
+                                List<GameObject> l = new List<GameObject>();
+                                l.Add(spike);
+                                ground.Add(l);
+                                spikes.Add(spike);
+                            }
+                            
                         } else
                         {
                             for (int k = globalX + 1; k < globalX + act.y + 2; k++)
@@ -826,7 +1013,7 @@ public class GeometryGenerator : MonoBehaviour
         }
 
         //Break area:
-        for (int k = 0; k < 4; k++)
+        for (int k = 0; k < 3; k++)
         {
             GameObject cube = new GameObject();
             SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
@@ -844,17 +1031,34 @@ public class GeometryGenerator : MonoBehaviour
             globalX += 1;
         }
 
-
+        GameObject lastCube = new GameObject();
+        SpriteRenderer lastSR = lastCube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+        lastSR.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+        lastCube.transform.position = new Vector3(globalX, globalY, 0);
+        lastCube.transform.localScale = blockScale;
+        Sprite lastMySprite = Sprite.Create(texGnd, new Rect(0.0f, 0.0f, texGnd.width, texGnd.height),
+                 new Vector2(0.5f, 0.5f), 100.0f);
+        lastSR.sprite = lastMySprite;
+        lastCube.AddComponent<BoxCollider2D>();
+        lvl.Add(new Vector3(globalX, globalY, 0));
+        
+        List<GameObject> last = new List<GameObject>();
+        last.Add(lastCube);
         //add goal sprite at last block!
         GameObject cube3 = new GameObject();
         SpriteRenderer sr3 = cube3.AddComponent<SpriteRenderer>() as SpriteRenderer;
         sr3.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-        cube3.transform.position = new Vector3(globalX - 1, globalY + 1.5f, 0);
+        cube3.transform.position = new Vector3(globalX, globalY + 1.5f, 0);
         cube3.transform.localScale = blockScale;
         Sprite mySprite3 = Sprite.Create(texGoal, new Rect(0.0f, 0.0f, texGoal.width, texGoal.height),
                  new Vector2(0.5f, 0.5f), 100.0f);
         sr3.sprite = mySprite3;
         cube3.AddComponent<BoxCollider2D>();
+        last.Add(cube3);
+
+        ground.Add(last);
+
+        
 
         //add impenetrable invisible wall to keep players from falling off the map
         lvl.Add(new Vector3(globalX, globalY + 3, 0));
@@ -868,7 +1072,7 @@ public class GeometryGenerator : MonoBehaviour
         ground.Add(l3);
         ground.Add(l3);
 
-        addCoins();
+        //addCoins();
     }
 }
 
