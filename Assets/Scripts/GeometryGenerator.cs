@@ -6,11 +6,16 @@ public class GeometryGenerator : MonoBehaviour
 {
     private List<Block> blocks; //Rhythm or puzzle block
     private int globalX;
+    private int tempGlobalX;
     private int globalY;
+    private int tempGlobalY;
     private StateMachine state;
     private Vector3 blockScale = new Vector3(6.25f,6.25f,6.25f);
+    private int level = 0;
 
     public static List<Vector3> lvl = new List<Vector3>(); //x,y,type
+    public static List<Vector3> upperLvl = new List<Vector3>();
+    public static List<Vector3> lowerLvl = new List<Vector3>();
     public static List<GameObject> enemies = new List<GameObject>();
     public static List<GameObject> platforms = new List<GameObject>();
     public static List<GameObject> stompers = new List<GameObject>();
@@ -163,13 +168,13 @@ public class GeometryGenerator : MonoBehaviour
             for (int j = (int)ranges.x + 4; j < lvl.Count; j++)
             {
                 Vector3 pos = lvl[j];
-                lvl[j] = new Vector3(pos.x + 3, pos.y - 2, pos.z);
+                lvl[j] = new Vector3(pos.x + 3, pos.y - 1, pos.z);
 
                 List<GameObject> gndTexts = ground[j];
                 for (int k = 0; k < gndTexts.Count; k++)
                 {
                     Vector3 p = gndTexts[k].transform.position;
-                    gndTexts[k].transform.position = new Vector3(p.x + 3, p.y - 2, p.z);
+                    gndTexts[k].transform.position = new Vector3(p.x + 3, p.y - 1, p.z);
                 }
             }
             //Debug.Log("CUTOFF: " + (baseX + 4));
@@ -179,7 +184,7 @@ public class GeometryGenerator : MonoBehaviour
                 Vector3 stompPos = stompers[k].transform.position;
                 if (stompPos.x >= (baseX + 4))
                 {
-                    stompers[k].transform.position = new Vector3(stompPos.x + 3, stompPos.y - 2, stompPos.z);
+                    stompers[k].transform.position = new Vector3(stompPos.x + 3, stompPos.y - 1, stompPos.z);
                 }
             }
         }
@@ -262,12 +267,12 @@ public class GeometryGenerator : MonoBehaviour
             {
                 for (int j = (int)ranges[i+1].x; j < (int)ranges[i+1].y; j++)
                 {
-                    lvl[j] = new Vector3(lvl[j].x, lvl[j].y - 2, lvl[j].z);
+                    lvl[j] = new Vector3(lvl[j].x, lvl[j].y - 1, lvl[j].z);
                     List<GameObject> gndTexts = ground[j];
                     for (int k = 0; k < gndTexts.Count; k++)
                     {
                         Vector3 pos = gndTexts[k].transform.position;
-                        gndTexts[k].transform.position = new Vector3(pos.x, pos.y - 2, pos.z);
+                        gndTexts[k].transform.position = new Vector3(pos.x, pos.y - 1, pos.z);
                     }
                 }
                 for (int k = 0; k < stompers.Count; k++)
@@ -276,7 +281,7 @@ public class GeometryGenerator : MonoBehaviour
                     if (stompPos.x > lvl[(int)ranges[i + 1].x].x &&
                         stompPos.x < lvl[(int)ranges[i + 1].y - 1].x)
                     {
-                        stompers[k].transform.position = new Vector3(stompPos.x, stompPos.y - 2, stompPos.z);
+                        stompers[k].transform.position = new Vector3(stompPos.x, stompPos.y - 1, stompPos.z);
                     }
                 }
                 for (int k = 0; k < platforms.Count; k++)
@@ -285,7 +290,7 @@ public class GeometryGenerator : MonoBehaviour
                     if (platPos.x > lvl[(int)ranges[i + 1].x].x &&
                         platPos.x < lvl[(int)ranges[i + 1].y - 1].x)
                     {
-                        platforms[k].transform.position = new Vector3(platPos.x, platPos.y - 2, platPos.z);
+                        platforms[k].transform.position = new Vector3(platPos.x, platPos.y - 1, platPos.z);
                     }
                 }
                 //ranges[i] = new Vector2(ranges[i].x, ranges[i].y - 1);
@@ -569,7 +574,9 @@ public class GeometryGenerator : MonoBehaviour
     {
         this.blocks = blocks;
         globalX = -9;
+        tempGlobalX = globalX;
         globalY = startY;
+        tempGlobalY = globalY;
         state = new StateMachine();
         texGround = ground;
         texEnemy = enemy;
@@ -593,10 +600,35 @@ public class GeometryGenerator : MonoBehaviour
         //Debug.Log("BLOCKS: " + blocks.Count);
         //Debug.Log("STARTX: " + globalX);
         lvl.Add(new Vector3(0,0, -1));
+        upperLvl.Add(new Vector3(0, 0, -1));
+        lowerLvl.Add(new Vector3(0, 0, -1));
         List<GameObject> l5 = new List<GameObject>();
         ground.Add(l5);
         for (int i = 0; i < blocks.Count; i++)
         {
+            level = (int)blocks[i].getLevel();
+            bool pair = blocks[i].isPair();
+            if (blocks[i].getLevel() != 0)
+            {
+                tempGlobalX = globalX;
+                tempGlobalY = globalY;
+                if (blocks[i].getLevel() == 1)
+                {
+                    globalY += 10;
+                } else
+                {
+                    globalY -= 10;
+                }
+            } else if (i > 0)
+            {
+                if (blocks[i-1].getLevel() != 0)
+                {
+                    globalX = tempGlobalX;
+                    globalY = tempGlobalY;
+                }
+            }
+            Debug.Log("GBX: " + globalX + " GBY " + globalY + " TGBX " + tempGlobalX +
+                " TGBY " + tempGlobalY);
             timer = 0;
             int[] rhythm = blocks[i].getRhythmArray();
             List<Vector2> action = blocks[i].getActionArray();
@@ -615,7 +647,23 @@ public class GeometryGenerator : MonoBehaviour
                          new Vector2(0.5f, 0.5f), 100.0f);
                 sr.sprite = mySprite;
                 cube.AddComponent<BoxCollider2D>();
-                lvl.Add(new Vector3(globalX, globalY, 0));
+                if (level == 0)
+                {
+                    lvl.Add(new Vector3(globalX, globalY, 0));
+                    if (!pair)
+                    {
+                        upperLvl.Add(new Vector3(0, 0, -1));
+                        lowerLvl.Add(new Vector3(0, 0, -1));
+                    }
+                } else if (level == 1)
+                {
+                    upperLvl.Add(new Vector3(globalX, globalY, 0));
+                }
+                else
+                {
+                    lowerLvl.Add(new Vector3(globalX, globalY, 0));
+                }
+
                 List<GameObject> l = new List<GameObject>();
                 l.Add(cube);
                 ground.Add(l);
@@ -664,7 +712,23 @@ public class GeometryGenerator : MonoBehaviour
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr2.sprite = mySprite2;
                             cube2.AddComponent<BoxCollider2D>();
-                            lvl.Add(new Vector3(globalX, globalY + 1, 1));
+
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX, globalY + 1, 1));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX, globalY + 1, 1));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX, globalY + 1, 1));
+                            }
+                            
                             List<GameObject> l = new List<GameObject>();
                             l.Add(cube2);
                             l.Add(cube);
@@ -693,7 +757,24 @@ public class GeometryGenerator : MonoBehaviour
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr2.sprite = mySprite2;
                             cube2.AddComponent<BoxCollider2D>();
-                            lvl.Add(new Vector3(globalX, globalY + 1, 3));
+
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX, globalY + 1, 3));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX, globalY + 1, 3));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX, globalY + 1, 3));
+                            }
+                            
+
                             List<GameObject> l = new List<GameObject>();
                             l.Add(cube2);
                             l.Add(cube);
@@ -714,7 +795,24 @@ public class GeometryGenerator : MonoBehaviour
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr.sprite = mySprite;
                             cube.AddComponent<BoxCollider2D>();
-                            lvl.Add(new Vector3(globalX, globalY, 1));
+
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX, globalY, 1));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX, globalY, 1));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX, globalY, 1));
+                            }
+                            
+
                             spikes.Add(cube);
 
                             List<GameObject> l = new List<GameObject>();
@@ -734,7 +832,24 @@ public class GeometryGenerator : MonoBehaviour
                                          new Vector2(0.5f, 0.5f), 100.0f);
                                 sr2.sprite = mySprite2;
                                 cube2.AddComponent<BoxCollider2D>();
-                                lvl.Add(new Vector3(globalX, globalY, 4));
+
+                                if (level == 0)
+                                {
+                                    lvl.Add(new Vector3(globalX, globalY, 4));
+                                    if (!pair)
+                                    {
+                                        upperLvl.Add(new Vector3(0, 0, -1));
+                                        lowerLvl.Add(new Vector3(0, 0, -1));
+                                    }
+                                } else if (level == 1)
+                                {
+                                    upperLvl.Add(new Vector3(globalX, globalY, 4));
+                                } else
+                                {
+                                    lowerLvl.Add(new Vector3(globalX, globalY, 4));
+                                }
+                                
+
                                 List<GameObject> l = new List<GameObject>();
                                 l.Add(cube2);
                                 ground.Add(l);
@@ -749,7 +864,24 @@ public class GeometryGenerator : MonoBehaviour
                                          new Vector2(0.5f, 0.5f), 100.0f);
                                 sr2.sprite = mySprite2;
                                 cube2.AddComponent<BoxCollider2D>();
-                                lvl.Add(new Vector3(globalX, globalY, 0));
+
+                                if (level == 0)
+                                {
+                                    lvl.Add(new Vector3(globalX, globalY, 0));
+                                    if (!pair)
+                                    {
+                                        upperLvl.Add(new Vector3(0, 0, -1));
+                                        lowerLvl.Add(new Vector3(0, 0, -1));
+                                    }
+                                } else if (level == 1)
+                                {
+                                    upperLvl.Add(new Vector3(globalX, globalY, 0));
+                                } else
+                                {
+                                    lowerLvl.Add(new Vector3(globalX, globalY, 0));
+                                }
+                                
+
                                 List<GameObject> l = new List<GameObject>();
                                 l.Add(cube2);
                                 ground.Add(l);
@@ -799,7 +931,23 @@ public class GeometryGenerator : MonoBehaviour
                                          new Vector2(0.5f, 0.5f), 100.0f);
                                 sr.sprite = mySprite;
                                 cube.AddComponent<BoxCollider2D>();
-                                lvl.Add(new Vector3(globalX, globalY, 0));
+
+                                if (level == 0)
+                                {
+                                    lvl.Add(new Vector3(globalX, globalY, 0));
+                                    if (!pair)
+                                    {
+                                        upperLvl.Add(new Vector3(0, 0, -1));
+                                        lowerLvl.Add(new Vector3(0, 0, -1));
+                                    }
+                                } else if (level == 1)
+                                {
+                                    upperLvl.Add(new Vector3(globalX, globalY, 0));
+                                } else
+                                {
+                                    lowerLvl.Add(new Vector3(globalX, globalY, 0));
+                                }
+
                                 List<GameObject> l = new List<GameObject>();
                                 l.Add(cube);
                                 ground.Add(l);
@@ -814,7 +962,24 @@ public class GeometryGenerator : MonoBehaviour
                                          new Vector2(0.5f, 0.5f), 100.0f);
                                 sr.sprite = mySprite;
                                 spike.AddComponent<BoxCollider2D>();
-                                lvl.Add(new Vector3(globalX, globalY, 1));
+
+                                if (level == 0)
+                                {
+                                    lvl.Add(new Vector3(globalX, globalY, 1));
+                                    if (!pair)
+                                    {
+                                        upperLvl.Add(new Vector3(0, 0, -1));
+                                        lowerLvl.Add(new Vector3(0, 0, -1));
+                                    }
+                                } else if (level == 1)
+                                {
+                                    upperLvl.Add(new Vector3(globalX, globalY, 1));
+                                } else
+                                {
+                                    lowerLvl.Add(new Vector3(globalX, globalY, 1));
+                                }
+                                
+
                                 List<GameObject> l = new List<GameObject>();
                                 l.Add(spike);
                                 ground.Add(l);
@@ -827,7 +992,22 @@ public class GeometryGenerator : MonoBehaviour
                             for (int k = globalX + 1; k < globalX + act.y + 2; k++)
                             {
                                 //Debug.Log("hI");
-                                lvl.Add(new Vector3(0, 0, -1));
+                                if (level == 0)
+                                {
+                                    lvl.Add(new Vector3(0, 0, -1));
+                                    if (!pair)
+                                    {
+                                        upperLvl.Add(new Vector3(0, 0, -1));
+                                        lowerLvl.Add(new Vector3(0, 0, -1));
+                                    }
+                                } else if (level == 1)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                } else
+                                {
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                                
                                 List<GameObject> l2 = new List<GameObject>();
                                 ground.Add(l2);
                             }
@@ -857,7 +1037,23 @@ public class GeometryGenerator : MonoBehaviour
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr.sprite = mySprite;
                             cube.AddComponent<BoxCollider2D>();
-                            lvl.Add(new Vector3(globalX, globalY, 1));
+
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX, globalY, 1));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX, globalY, 1));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX, globalY, 1));
+                            }
+                            
                             spikes.Add(cube);
                             List<GameObject> l = new List<GameObject>();
                             l.Add(cube);
@@ -873,7 +1069,24 @@ public class GeometryGenerator : MonoBehaviour
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr.sprite = mySprite;
                             cube.AddComponent<BoxCollider2D>();
-                            lvl.Add(new Vector3(globalX, globalY, 0));
+
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX, globalY, 0));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX, globalY, 0));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX, globalY, 0));
+                            }
+                            
+
                             List<GameObject> l = new List<GameObject>();
                             l.Add(cube);
                             ground.Add(l);
@@ -917,7 +1130,23 @@ public class GeometryGenerator : MonoBehaviour
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr.sprite = mySprite;
                             cube.AddComponent<BoxCollider2D>();
-                            lvl.Add(new Vector3(globalX, globalY, 0));
+
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX, globalY, 0));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX, globalY, 0));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX, globalY, 0));
+                            }
+                            
                             List<GameObject> l = new List<GameObject>();
                             l.Add(cube);
                             ground.Add(l);
@@ -946,7 +1175,22 @@ public class GeometryGenerator : MonoBehaviour
                         {
                             state.resetClock();
 
-                            lvl.Add(new Vector3(globalX, globalY, -1));
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX, globalY, -1));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX, globalY, -1));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX, globalY, -1));
+                            }
+                            
                             List<GameObject> l = new List<GameObject>();
                             ground.Add(l);
 
@@ -958,7 +1202,23 @@ public class GeometryGenerator : MonoBehaviour
                             Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr.sprite = mySprite;
-                            lvl.Add(new Vector3(globalX + 1, globalY, 2));
+
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX + 1, globalY, 2));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX + 1, globalY, 2));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX + 1, globalY, 2));
+                            }
+                            
                             cube.AddComponent<BoxCollider2D>();
                             cube.AddComponent<Rigidbody2D>();
                             cube.name = "platform";
@@ -969,7 +1229,22 @@ public class GeometryGenerator : MonoBehaviour
                             l2.Add(cube);
                             ground.Add(l2);
 
-                            lvl.Add(new Vector3(globalX + 2, globalY, -1));
+                            if (level == 0)
+                            {
+                                lvl.Add(new Vector3(globalX + 2, globalY, -1));
+                                if (!pair)
+                                {
+                                    upperLvl.Add(new Vector3(0, 0, -1));
+                                    lowerLvl.Add(new Vector3(0, 0, -1));
+                                }
+                            } else if (level == 1)
+                            {
+                                upperLvl.Add(new Vector3(globalX + 2, globalY, -1));
+                            } else
+                            {
+                                lowerLvl.Add(new Vector3(globalX + 2, globalY, -1));
+                            }
+                            
                             ground.Add(l);
 
                             platforms.Add(cube);
@@ -995,7 +1270,20 @@ public class GeometryGenerator : MonoBehaviour
                      new Vector2(0.5f, 0.5f), 100.0f);
             sr.sprite = mySprite;
             cube.AddComponent<BoxCollider2D>();
-            lvl.Add(new Vector3(globalX, globalY, 0));
+
+            if (level == 0)
+            {
+                lvl.Add(new Vector3(globalX, globalY, 0));
+                upperLvl.Add(new Vector3(0, 0, -1));
+                lowerLvl.Add(new Vector3(0, 0, -1));
+            } else if (level == 1)
+            {
+                upperLvl.Add(new Vector3(globalX, globalY, 0));
+            } else
+            {
+                lowerLvl.Add(new Vector3(globalX, globalY, 0));
+            }
+            
             List<GameObject> l = new List<GameObject>();
             l.Add(cube);
             ground.Add(l);
@@ -1011,7 +1299,19 @@ public class GeometryGenerator : MonoBehaviour
                  new Vector2(0.5f, 0.5f), 100.0f);
         lastSR.sprite = lastMySprite;
         lastCube.AddComponent<BoxCollider2D>();
-        lvl.Add(new Vector3(globalX, globalY, 0));
+
+        if (level == 0)
+        {
+            lvl.Add(new Vector3(globalX, globalY, 0));
+            upperLvl.Add(new Vector3(0, 0, -1));
+            lowerLvl.Add(new Vector3(0, 0, -1));
+        } else if (level == 1)
+        {
+            upperLvl.Add(new Vector3(globalX, globalY, 0));
+        } else
+        {
+            lowerLvl.Add(new Vector3(globalX, globalY, 0));
+        }
         
         List<GameObject> last = new List<GameObject>();
         last.Add(lastCube);
@@ -1037,6 +1337,13 @@ public class GeometryGenerator : MonoBehaviour
 
         //Debug.Log("ENDX: " + globalX);
         lvl.Add(new Vector3(0, 0, -1));
+
+        upperLvl.Add(new Vector3(0, 0, -1));
+        lowerLvl.Add(new Vector3(0, 0, -1));
+        upperLvl.Add(new Vector3(0, 0, -1));
+        lowerLvl.Add(new Vector3(0, 0, -1));
+        upperLvl.Add(new Vector3(0, 0, -1));
+        lowerLvl.Add(new Vector3(0, 0, -1));
 
         List<GameObject> l3 = new List<GameObject>();
         ground.Add(l3);

@@ -49,9 +49,14 @@ public class PlayerController : MonoBehaviour
     public static List<GameObject> stompers;
     public static List<GameObject> spikes;
     public static List<GameObject> coins;
+    public static List<Vector3> lvl;
+    public static List<Vector3> upperLvl;
+    public static List<Vector3> lowerLvl;
 
     public static int numLives = 5;
     public static int numCoins = 0;
+
+    public static int timer = 0;
 
     Vector2 lastValidPos;
 
@@ -90,6 +95,9 @@ public class PlayerController : MonoBehaviour
         stompers = GeometryGenerator.stompers;
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
+        lvl = GeometryGenerator.lvl;
+        upperLvl = GeometryGenerator.upperLvl;
+        lowerLvl = GeometryGenerator.lowerLvl;
 
         totalEnemies = enemies.Count + superEnemies.Count;
 
@@ -97,7 +105,9 @@ public class PlayerController : MonoBehaviour
                                  new Vector2(0.5f, 0.5f), 100.0f);
         sr.sprite = mySprite;
 
-        List<Vector3> lvl = GeometryGenerator.lvl;
+        timer = (lvl.Count /*+ upperLvl.Count + lowerLvl.Count*/) / 2 - 5;
+
+        InvokeRepeating("AdvanceTime", 1f, 1f);
 
         //Debug.Log("sTomPS: " + stompers.Count);
         //for (int i = 0; i < lvl.Count; i++)
@@ -123,10 +133,24 @@ public class PlayerController : MonoBehaviour
         stompers = GeometryGenerator.stompers;
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
+        lvl = GeometryGenerator.lvl;
+        upperLvl = GeometryGenerator.upperLvl;
+        lowerLvl = GeometryGenerator.lowerLvl;
         win = false;
         death = false;
         totalEnemies = enemies.Count + superEnemies.Count;
+        timer = (lvl.Count /*+ upperLvl.Count + lowerLvl.Count*/) / 2 - 5;
 
+    }
+
+    void AdvanceTime()
+    {
+        timer = (int)Mathf.Max(timer - 1, 0);
+        if (timer == 0)
+        {
+            death = true;
+            end();
+        }
     }
 
     private void Move()
@@ -182,6 +206,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) && valid(Vector2.up)
                             && !isAirborne(transform.position))
         {
+            if (RhythmGenerator.constraints[0] == 1)
+            {
+                death = true;
+                end();
+            }
             //dest = new Vector2(dest.x, dest.y + 2f);
             v_y = 1.5f;
             transform.parent = null;
@@ -189,11 +218,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.RightArrow))
         {
             Vector2 dir = Vector2.right;
-            if (GeometryGenerator.lvl[(int)(transform.position.x + 10)].z == 3)
+            if (lvl[(int)(transform.position.x + 10)].z == 3)
             {
                 dir = new Vector2(1,1);
             }
-            if (GeometryGenerator.lvl[(int)(transform.position.x + 10)].z == 4)
+            if (lvl[(int)(transform.position.x + 10)].z == 4)
             {
                 dir = new Vector2(-1, -1);
             }
@@ -207,12 +236,17 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
+            if (RhythmGenerator.constraints[5] == 1)
+            {
+                death = true;
+                end();
+            }
             Vector2 dir = Vector2.right;
-            if (GeometryGenerator.lvl[(int)(transform.position.x + 10)].z == 3)
+            if (lvl[(int)(transform.position.x + 10)].z == 3)
             {
                 dir = new Vector2(1, 1);
             }
-            if (GeometryGenerator.lvl[(int)(transform.position.x + 10)].z == 4)
+            if (lvl[(int)(transform.position.x + 10)].z == 4)
             {
                 dir = new Vector2(-1, -1);
             }
@@ -254,14 +288,14 @@ public class PlayerController : MonoBehaviour
         }
 
         if (RhythmGenerator.constraints[1] == 1 && killed == totalEnemies &&
-            (int)Mathf.Round(transform.position.x + 10) >= (GeometryGenerator.lvl.Count - 4))
+            (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4))
         {
             Reloader.win = true;
             Debug.Log("hello??" + win);
             end();
         }
         else if (RhythmGenerator.constraints[1] == 0
-            && (int)Mathf.Round(transform.position.x + 10) >= (GeometryGenerator.lvl.Count - 4))
+            && (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4))
         {
             
             Reloader.win = true;
@@ -288,7 +322,6 @@ public class PlayerController : MonoBehaviour
 
     bool xCollide(Vector2 dir)
     {
-        List<Vector3> lvl = GeometryGenerator.lvl;
         Vector2 pos = transform.position;
         Vector2 posFuture = pos + dir;
 
@@ -362,7 +395,6 @@ public class PlayerController : MonoBehaviour
 
     bool yCollide()
     {
-        List<Vector3> lvl = GeometryGenerator.lvl;
         int pos = (int) Mathf.Round(transform.position.x + 10);
         if (pos < 0 || pos >= lvl.Count)
         {

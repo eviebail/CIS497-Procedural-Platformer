@@ -8,6 +8,8 @@ public interface Block
 {
     int[] getRhythmArray();
     List<Vector2> getActionArray();
+    float getLevel();
+    bool isPair();
 }
 
 public class RhythmBlock : MonoBehaviour, Block
@@ -16,9 +18,13 @@ public class RhythmBlock : MonoBehaviour, Block
     private List<Vector2> action;
     private bool generateEnemies;
     private float enemyThreshold = 0.5f;
+    private float level = 0;
+    private bool pair = false;
 
-    public RhythmBlock(rType type, int length, int density, bool genEn, int offset)
+    public RhythmBlock(rType type, int length, int density, bool genEn, int offset, float level, bool pair)
     {
+        this.level = level;
+        this.pair = pair;
         generateEnemies = genEn;
         if (genEn)
         {
@@ -80,6 +86,16 @@ public class RhythmBlock : MonoBehaviour, Block
     public int[] getRhythmArray()
     {
         return rhythm;
+    }
+
+    public float getLevel()
+    {
+        return level;
+    }
+
+    public bool isPair()
+    {
+        return pair;
     }
 
     //need to add either cliff or enemy for every one I find in rhythm

@@ -30,5 +30,10 @@ public class CameraController : MonoBehaviour
         {
             text.text += "      Enemies: " + PlayerController.killed + " / " + PlayerController.totalEnemies;
         }
+
+        if (RhythmGenerator.constraints[6] == 1)
+        {
+            text.text += "      Time Left: " + PlayerController.timer;
+        }
     }
 }

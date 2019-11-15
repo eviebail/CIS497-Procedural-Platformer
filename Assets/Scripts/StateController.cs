@@ -18,7 +18,7 @@ public class StateController : MonoBehaviour
 {
 	Dropdown drop;
 	Button generate;
-    Toggle t0, t1, t2, t3, t4;
+    Toggle t0, t1, t2, t3, t4, t5, t6;
     Text constraints;
 	public static int option = 0;
     string otp = "";
@@ -36,8 +36,10 @@ public class StateController : MonoBehaviour
         t2 = transform.GetChild(6).GetComponent<Toggle>();
         t3 = transform.GetChild(7).GetComponent<Toggle>();
         t4 = transform.GetChild(8).GetComponent<Toggle>();
+        t5 = transform.GetChild(9).GetComponent<Toggle>();
+        t6 = transform.GetChild(10).GetComponent<Toggle>();
 
-        constraints = transform.GetChild(9).GetComponent<Text>();
+        constraints = transform.GetChild(11).GetComponent<Text>();
 
         generate.onClick.AddListener(TaskOnClick);
 	}
@@ -89,6 +91,24 @@ public class StateController : MonoBehaviour
         else
         {
             RhythmGenerator.constraints[4] = 0;
+        }
+        if (t5.isOn)
+        {
+            otp += "-Complete the level without looking left\n";
+            RhythmGenerator.constraints[5] = 1;
+        }
+        else
+        {
+            RhythmGenerator.constraints[5] = 0;
+        }
+        if (t6.isOn)
+        {
+            otp += "-Complete the level before the time runs out\n";
+            RhythmGenerator.constraints[6] = 1;
+        }
+        else
+        {
+            RhythmGenerator.constraints[6] = 0;
         }
         constraints.text = otp;
     }
