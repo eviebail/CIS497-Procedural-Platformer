@@ -19,6 +19,8 @@ public class RhythmGenerator : MonoBehaviour
     public Texture2D texSpike;
     public Texture2D texCoin;
     public Texture2D texGnd;
+    public Texture2D texSlope;
+    public Texture2D texSlope2;
     public Texture2D texGoal;
 
     public static int[] constraints = new int[5];
@@ -167,7 +169,7 @@ public class RhythmGenerator : MonoBehaviour
 
         //place geometry based on the blocks generated
         Debug.Log("START X: " + startX);
-        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin, texGnd, texGoal);
+        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin, texGnd, texSlope, texSlope2, texGoal);
         gen.generateGeometry();
         gen.cleanUpEnemies();
         gen.cleanUpStomps();

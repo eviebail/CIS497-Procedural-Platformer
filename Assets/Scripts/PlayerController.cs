@@ -29,6 +29,8 @@ public class PlayerController : MonoBehaviour
     public bool isAir = false;
     public float obstacleY = 0;
     public float obstacleY1 = 0;
+    public bool xCollided = false;
+    public Vector2 moveDir = new Vector2();
 
     public static int killed = 0;
     public static int totalEnemies = 0;
@@ -184,17 +186,43 @@ public class PlayerController : MonoBehaviour
             v_y = 1.5f;
             transform.parent = null;
         }
-        if (Input.GetKey(KeyCode.RightArrow) && valid(0.5f*Vector2.right))
+        if (Input.GetKey(KeyCode.RightArrow))
         {
-            v_x = 0.15f;//f_x = 0.05f; //
-            direction.x = 1;
-            transform.parent = null;
+            Vector2 dir = Vector2.right;
+            if (GeometryGenerator.lvl[(int)(transform.position.x + 10)].z == 3)
+            {
+                dir = new Vector2(1,1);
+            }
+            if (GeometryGenerator.lvl[(int)(transform.position.x + 10)].z == 4)
+            {
+                dir = new Vector2(-1, -1);
+            }
+            if (valid(0.5f * dir))
+            {
+                v_x = 0.15f;//f_x = 0.05f; //
+                direction.x = 1;
+                transform.parent = null;
+            }
+            
         }
-        else if (Input.GetKey(KeyCode.LeftArrow) && valid(-0.5f*Vector2.right))
+        else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            v_x = -0.15f;//f_x = 0.05f;// 
-            direction.x = -1;
-            transform.parent = null;
+            Vector2 dir = Vector2.right;
+            if (GeometryGenerator.lvl[(int)(transform.position.x + 10)].z == 3)
+            {
+                dir = new Vector2(1, 1);
+            }
+            if (GeometryGenerator.lvl[(int)(transform.position.x + 10)].z == 4)
+            {
+                dir = new Vector2(-1, -1);
+            }
+            if (valid(-0.5f * dir))
+            {
+                v_x = -0.15f;//f_x = 0.05f;// 
+                direction.x = -1;
+                transform.parent = null;
+            }
+            
         } else
         {
             f_x = 0;
@@ -254,7 +282,8 @@ public class PlayerController : MonoBehaviour
 
     bool valid(Vector2 dir)
     {
-        return !xCollide(dir);
+        xCollided = xCollide(dir); //FOR TESTING
+        return !xCollided;
     }
 
     bool xCollide(Vector2 dir)
@@ -271,10 +300,21 @@ public class PlayerController : MonoBehaviour
         {
             for (int i = posNow + 1; i < posFtr + 1; i++)
             {
-                if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+                if (lvl[i-1].z == 3)
                 {
-                    return true;
+                    if ((pos.y - 0.3) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                } else
+                {
+                    if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
+                        && lvl[i].z !=3 && lvl[i+1].z != 3)
+                    {
+                        return true;
+                    }
                 }
+                
                 if (System.Math.Abs(lvl[i].z - -1) < 0.01)
                 {
                     //==-1
@@ -289,9 +329,20 @@ public class PlayerController : MonoBehaviour
         {
             for (int i = posFtr; i < posNow; i++)
             {
-                if ((pos.y - 1) < lvl[i].y)
+                if (lvl[i - 1].z == 3)
                 {
-                    return true;
+                    if ((pos.y - 0.4) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
+                        && lvl[i].z != 3 && lvl[i+1].z != 3)
+                    {
+                        return true;
+                    }
                 }
                 if (System.Math.Abs(lvl[i].z - -1) < 0.01)
                 {
@@ -324,6 +375,32 @@ public class PlayerController : MonoBehaviour
         {
             //cliff!
             //Debug.Log("-1!!!!!!!");
+            return false;
+        }
+        if (obstacle.z == 3)
+        {
+            float x = transform.position.x - (obstacle.x - 0.5f);
+            float b = (obstacle.y - 0.5f);
+            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            if (transform.position.y > (x+b) && transform.position.y < (x + b + 0.5)) //y=mx + b
+            {
+                v_y = v_x;
+                return true;
+            }
+            //change direction which we move
+            return false;
+        }
+        if (obstacle.z == 4)
+        {
+            float x = transform.position.x - (obstacle.x - 0.5f);
+            float b = (obstacle.y + 0.5f);
+            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            if (transform.position.y > (-x + b) && transform.position.y < (-x + b + 0.5)) //y=mx + b
+            {
+                v_y = -v_x;
+                return true;
+            }
+            //change direction which we move
             return false;
         }
         if (System.Math.Abs(obstacle.z - 2) < 0.1) //this means its a moving platform

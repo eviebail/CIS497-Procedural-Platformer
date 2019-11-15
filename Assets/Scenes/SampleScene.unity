@@ -269,6 +269,8 @@ MonoBehaviour:
   texSpike: {fileID: 0}
   texCoin: {fileID: 0}
   texGnd: {fileID: 0}
+  texSlope: {fileID: 0}
+  texSlope2: {fileID: 0}
   texGoal: {fileID: 0}
 --- !u!1 &146488863
 GameObject:
@@ -433,6 +435,8 @@ MonoBehaviour:
   texSpike: {fileID: 2800000, guid: 2c048898f26ae4477ae448c54af4f569, type: 3}
   texCoin: {fileID: 2800000, guid: 4b15cd5d1f241454c963a580523e5872, type: 3}
   texGnd: {fileID: 2800000, guid: f4a2eee0caff14979b44f9942302f27b, type: 3}
+  texSlope: {fileID: 2800000, guid: 176657d1b3944495dac2e8a5e8514335, type: 3}
+  texSlope2: {fileID: 2800000, guid: d68632f3397f94ba4af3b90bceb79a78, type: 3}
   texGoal: {fileID: 2800000, guid: 0b765ed966fd7499d878aa2f999be5ae, type: 3}
 --- !u!20 &519420031
 Camera:
@@ -742,8 +746,11 @@ MonoBehaviour:
   isAir: 0
   obstacleY: 0
   obstacleY1: 0
+  xCollided: 0
+  moveDir: {x: 0, y: 0}
   prevStomp: -1
   prevEnemy: -1
+  prevEnemy2: -1
   prevSpike: -1
   prevPlatform: -1
   boundBox: {x: 0.5, y: 0.5}
