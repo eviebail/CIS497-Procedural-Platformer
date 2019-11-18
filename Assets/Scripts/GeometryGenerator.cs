@@ -41,6 +41,8 @@ public class GeometryGenerator : MonoBehaviour
 
     public bool ledgesExist = true;
 
+    int offset = 2;
+
     //private Sprite mySprite;
     //private SpriteRenderer sr;
     // gameObject;
@@ -49,6 +51,120 @@ public class GeometryGenerator : MonoBehaviour
     void Awake()
     {
         
+    }
+
+    public void cleanUpSpikyLedges()
+    {
+        List<Vector2> spikeus = new List<Vector2>();
+        int spikeStart = -100;
+        int spikeEnd = -100;
+        for (int i = 1; i < lvl.Count; i++)
+        {
+            Vector3 element = lvl[i];
+            if (element.z == 1 && spikeStart == -100)
+            {
+                spikeStart = i;
+            }
+            if (element.z != 1 && spikeStart != -100)
+            {
+                spikeEnd = i;
+                spikeus.Add(new Vector2(spikeStart, spikeEnd));
+                spikeStart = -100;
+                spikeEnd = -100;
+            }
+        }
+
+        List<GameObject> toDelete = new List<GameObject>();
+
+        for (int k = 0; k < spikeus.Count; k++)
+        {
+            Vector2 range = spikeus[k];
+            if (range.y - range.x < 3)
+            {
+                for (int i = (int)range.x; i < range.y; i++)
+                {
+                    Vector3 slot = lvl[i];
+                    lvl[i] = new Vector3(slot.x, slot.y, 0);
+                    for (int j = 0; j < spikes.Count; j++)
+                    {
+                        if (spikes[j].transform.position.x == slot.x)
+                        {
+                            toDelete.Add(spikes[j]);
+
+                            GameObject cube = new GameObject();
+                            SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                            sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                            cube.transform.position = new Vector3(slot.x, slot.y, 0);
+                            cube.transform.localScale = blockScale;
+                            Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                                     new Vector2(0.5f, 0.5f), 100.0f);
+                            sr.sprite = mySprite;
+                            cube.AddComponent<BoxCollider2D>();
+
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < toDelete.Count; i++)
+        {
+            GameObject sp = toDelete[i];
+            spikes.Remove(sp);
+            Destroy(sp);
+        }
+
+        for (int k = 0; k < spikeus.Count; k++)
+        {
+            Vector2 range = spikeus[k];
+            Vector3 level = lvl[(int)range.x - 1];
+            if (level.z == 0 && level.y == lvl[(int)range.x].y)
+            {
+                //lower the spikes
+                for (int i = (int)range.x; i < range.y; i++)
+                {
+                    for (int j = 0; j < spikes.Count; j++)
+                    {
+                        if (spikes[j].transform.position.x == lvl[i].x)
+                        {
+                            Vector3 pos = spikes[j].transform.position;
+                            spikes[j].transform.position = new Vector3(pos.x, pos.y - 1, pos.z);
+                        }
+                    }
+                }
+            }
+
+            if (level.z == 0 && level.y < lvl[(int)range.x].y)
+            {
+                //lower the spikes
+                for (int i = (int)range.x; i < range.y; i++)
+                {
+                    for (int j = 0; j < spikes.Count; j++)
+                    {
+                        if (spikes[j].transform.position.x == lvl[i].x)
+                        {
+                            Vector3 pos = spikes[j].transform.position;
+                            spikes[j].transform.position = new Vector3(pos.x,
+                                                pos.y + (level.y - lvl[i].y - 1), pos.z);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        //for (int s = 0; s < spikeus.Count; s++)
+        //{
+        //    Debug.Log("SPIKES: " + spikeus[s]);
+        //}
+
+        //for (int i = 0; i < lvl.Count; i++)
+        //{
+        //    if (lvl[i].z == -1)
+        //    {
+
+        //    }
+        //}
     }
 
     public void jumpLedges()
@@ -80,15 +196,14 @@ public class GeometryGenerator : MonoBehaviour
                 gapStart = -100;
             }
         }
-
         //for (int i = 0; i < ledges.Count; i++)
         //{
         //    //Debug.Log("ORIGNAL::: " + lvl[(int)(ledges[i].x - 1)]);
         //}
 
-            //int offset = 0;
-            //int start = 0;
-            for (int i = 0; i < ledges.Count; i++)
+        //int offset = 0;
+        //int start = 0;
+        for (int i = 0; i < ledges.Count; i++)
         {
             Vector3 ps = ledges[i];
             ledges[i] = new Vector3(ps.x + 3*i, ps.y, ps.z);
@@ -168,13 +283,13 @@ public class GeometryGenerator : MonoBehaviour
             for (int j = (int)ranges.x + 4; j < lvl.Count; j++)
             {
                 Vector3 pos = lvl[j];
-                lvl[j] = new Vector3(pos.x + 3, pos.y - 1, pos.z);
+                lvl[j] = new Vector3(pos.x + 3, pos.y - 2, pos.z);
 
                 List<GameObject> gndTexts = ground[j];
                 for (int k = 0; k < gndTexts.Count; k++)
                 {
                     Vector3 p = gndTexts[k].transform.position;
-                    gndTexts[k].transform.position = new Vector3(p.x + 3, p.y - 1, p.z);
+                    gndTexts[k].transform.position = new Vector3(p.x + 3, p.y - 2, p.z);
                 }
             }
             //Debug.Log("CUTOFF: " + (baseX + 4));
@@ -184,7 +299,33 @@ public class GeometryGenerator : MonoBehaviour
                 Vector3 stompPos = stompers[k].transform.position;
                 if (stompPos.x >= (baseX + 4))
                 {
-                    stompers[k].transform.position = new Vector3(stompPos.x + 3, stompPos.y - 1, stompPos.z);
+                    stompers[k].transform.position = new Vector3(stompPos.x + 3, stompPos.y - 2, stompPos.z);
+                }
+            }
+        }
+        cleanUpSpikyLedges();
+        fixPlatforms();
+        
+    }
+
+    public void fixPlatforms()
+    {
+        for (int i = 2; i < lvl.Count - 2; i++)
+        {
+            Vector3 component = lvl[i];
+            if ((int)component.z == 2)
+            {
+                float y = (lvl[i - 2].y + lvl[i+2].y)/2f;
+                lvl[i] = new Vector3(component.x, y, component.z);
+                //how to find platform in platforms array?
+                for (int k = 0; k < platforms.Count; k++)
+                {
+                    Vector3 platPos = platforms[k].transform.position;
+                    if (platPos.x == lvl[i].x)
+                    {
+                        Debug.Log("Platform acquired!");
+                        platforms[k].transform.position = new Vector3(platPos.x, y, platPos.z);
+                    }
                 }
             }
         }
@@ -267,6 +408,31 @@ public class GeometryGenerator : MonoBehaviour
             {
                 for (int j = (int)ranges[i+1].x; j < (int)ranges[i+1].y; j++)
                 {
+                    lvl[j] = new Vector3(lvl[j].x, lvl[j].y - 2, lvl[j].z);
+                    List<GameObject> gndTexts = ground[j];
+                    for (int k = 0; k < gndTexts.Count; k++)
+                    {
+                        Vector3 pos = gndTexts[k].transform.position;
+                        gndTexts[k].transform.position = new Vector3(pos.x, pos.y - 2, pos.z);
+                    }
+                }
+                for (int k = 0; k < stompers.Count; k++)
+                {
+                    Vector3 stompPos = stompers[k].transform.position;
+                    if (stompPos.x > lvl[(int)ranges[i + 1].x].x &&
+                        stompPos.x < lvl[(int)ranges[i + 1].y - 1].x)
+                    {
+                        stompers[k].transform.position = new Vector3(stompPos.x, stompPos.y - 2, stompPos.z);
+                    }
+                }
+
+                //ranges[i] = new Vector2(ranges[i].x, ranges[i].y - 1);
+                //ranges[i + 1] = new Vector2(ranges[i + 1].x, ranges[i + 1].y - 1);
+                //Debug.Log("CHANGE! " + "::: " + lvl[(int)preGap.x] + ", " + lvl[(int)preGap.y - 1]);
+            } else if (preY - postY == 1)
+            {
+                for (int j = (int)ranges[i + 1].x; j < (int)ranges[i + 1].y; j++)
+                {
                     lvl[j] = new Vector3(lvl[j].x, lvl[j].y - 1, lvl[j].z);
                     List<GameObject> gndTexts = ground[j];
                     for (int k = 0; k < gndTexts.Count; k++)
@@ -284,15 +450,15 @@ public class GeometryGenerator : MonoBehaviour
                         stompers[k].transform.position = new Vector3(stompPos.x, stompPos.y - 1, stompPos.z);
                     }
                 }
-                for (int k = 0; k < platforms.Count; k++)
-                {
-                    Vector3 platPos = platforms[k].transform.position;
-                    if (platPos.x > lvl[(int)ranges[i + 1].x].x &&
-                        platPos.x < lvl[(int)ranges[i + 1].y - 1].x)
-                    {
-                        platforms[k].transform.position = new Vector3(platPos.x, platPos.y - 1, platPos.z);
-                    }
-                }
+                //for (int k = 0; k < superEnemies.Count; k++)
+                //{
+                //    Vector3 enemyPos = superEnemies[k].transform.position;
+                //    if (enemyPos.x > lvl[(int)ranges[i + 1].x].x &&
+                //        enemyPos.x < lvl[(int)ranges[i + 1].y - 1].x)
+                //    {
+                //        superEnemies[k].transform.position = new Vector3(enemyPos.x, enemyPos.y - 1, enemyPos.z);
+                //    }
+                //}
                 //ranges[i] = new Vector2(ranges[i].x, ranges[i].y - 1);
                 //ranges[i + 1] = new Vector2(ranges[i + 1].x, ranges[i + 1].y - 1);
                 //Debug.Log("CHANGE! " + "::: " + lvl[(int)preGap.x] + ", " + lvl[(int)preGap.y - 1]);
@@ -471,6 +637,8 @@ public class GeometryGenerator : MonoBehaviour
     public static void reset()
     {
         lvl.Clear();
+        upperLvl.Clear();
+        lowerLvl.Clear();
         enemies.Clear();
         superEnemies.Clear();
         platforms.Clear();
@@ -600,8 +768,11 @@ public class GeometryGenerator : MonoBehaviour
         //Debug.Log("BLOCKS: " + blocks.Count);
         //Debug.Log("STARTX: " + globalX);
         lvl.Add(new Vector3(0,0, -1));
-        upperLvl.Add(new Vector3(0, 0, -1));
-        lowerLvl.Add(new Vector3(0, 0, -1));
+        if (RhythmGenerator.constraints[4] == 1)
+        {
+            upperLvl.Add(new Vector3(0, 0, -1));
+            lowerLvl.Add(new Vector3(0, 0, -1));
+        }
         List<GameObject> l5 = new List<GameObject>();
         ground.Add(l5);
         for (int i = 0; i < blocks.Count; i++)
@@ -627,8 +798,8 @@ public class GeometryGenerator : MonoBehaviour
                     globalY = tempGlobalY;
                 }
             }
-            Debug.Log("GBX: " + globalX + " GBY " + globalY + " TGBX " + tempGlobalX +
-                " TGBY " + tempGlobalY);
+            //Debug.Log("GBX: " + globalX + " GBY " + globalY + " TGBX " + tempGlobalX +
+            //    " TGBY " + tempGlobalY);
             timer = 0;
             int[] rhythm = blocks[i].getRhythmArray();
             List<Vector2> action = blocks[i].getActionArray();
@@ -650,16 +821,16 @@ public class GeometryGenerator : MonoBehaviour
                 if (level == 0)
                 {
                     lvl.Add(new Vector3(globalX, globalY, 0));
-                    if (!pair)
+                    if (!pair && RhythmGenerator.constraints[4] == 1)
                     {
                         upperLvl.Add(new Vector3(0, 0, -1));
                         lowerLvl.Add(new Vector3(0, 0, -1));
                     }
-                } else if (level == 1)
+                } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                 {
                     upperLvl.Add(new Vector3(globalX, globalY, 0));
                 }
-                else
+                else if (RhythmGenerator.constraints[4] == 1)
                 {
                     lowerLvl.Add(new Vector3(globalX, globalY, 0));
                 }
@@ -716,15 +887,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX, globalY + 1, 1));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX, globalY + 1, 1));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX, globalY + 1, 1));
                             }
@@ -761,15 +932,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX, globalY + 1, 3));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX, globalY + 1, 3));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX, globalY + 1, 3));
                             }
@@ -799,15 +970,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX, globalY, 1));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX, globalY, 1));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX, globalY, 1));
                             }
@@ -836,15 +1007,15 @@ public class GeometryGenerator : MonoBehaviour
                                 if (level == 0)
                                 {
                                     lvl.Add(new Vector3(globalX, globalY, 4));
-                                    if (!pair)
+                                    if (!pair && RhythmGenerator.constraints[4] == 1)
                                     {
                                         upperLvl.Add(new Vector3(0, 0, -1));
                                         lowerLvl.Add(new Vector3(0, 0, -1));
                                     }
-                                } else if (level == 1)
+                                } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(globalX, globalY, 4));
-                                } else
+                                } else if (RhythmGenerator.constraints[4] == 1)
                                 {
                                     lowerLvl.Add(new Vector3(globalX, globalY, 4));
                                 }
@@ -868,15 +1039,15 @@ public class GeometryGenerator : MonoBehaviour
                                 if (level == 0)
                                 {
                                     lvl.Add(new Vector3(globalX, globalY, 0));
-                                    if (!pair)
+                                    if (!pair && RhythmGenerator.constraints[4] == 1)
                                     {
                                         upperLvl.Add(new Vector3(0, 0, -1));
                                         lowerLvl.Add(new Vector3(0, 0, -1));
                                     }
-                                } else if (level == 1)
+                                } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(globalX, globalY, 0));
-                                } else
+                                } else if (RhythmGenerator.constraints[4] == 1)
                                 {
                                     lowerLvl.Add(new Vector3(globalX, globalY, 0));
                                 }
@@ -935,15 +1106,15 @@ public class GeometryGenerator : MonoBehaviour
                                 if (level == 0)
                                 {
                                     lvl.Add(new Vector3(globalX, globalY, 0));
-                                    if (!pair)
+                                    if (!pair && RhythmGenerator.constraints[4] == 1)
                                     {
                                         upperLvl.Add(new Vector3(0, 0, -1));
                                         lowerLvl.Add(new Vector3(0, 0, -1));
                                     }
-                                } else if (level == 1)
+                                } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(globalX, globalY, 0));
-                                } else
+                                } else if (RhythmGenerator.constraints[4] == 1)
                                 {
                                     lowerLvl.Add(new Vector3(globalX, globalY, 0));
                                 }
@@ -966,15 +1137,15 @@ public class GeometryGenerator : MonoBehaviour
                                 if (level == 0)
                                 {
                                     lvl.Add(new Vector3(globalX, globalY, 1));
-                                    if (!pair)
+                                    if (!pair && RhythmGenerator.constraints[4] == 1)
                                     {
                                         upperLvl.Add(new Vector3(0, 0, -1));
                                         lowerLvl.Add(new Vector3(0, 0, -1));
                                     }
-                                } else if (level == 1)
+                                } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(globalX, globalY, 1));
-                                } else
+                                } else if (RhythmGenerator.constraints[4] == 1)
                                 {
                                     lowerLvl.Add(new Vector3(globalX, globalY, 1));
                                 }
@@ -989,21 +1160,26 @@ public class GeometryGenerator : MonoBehaviour
                         } else
                         {
                             //Debug.Log("DUrATioN: " + (globalX + 1) + " v " + (globalX + act.y + 2) + " : " + act.y);
-                            for (int k = globalX + 1; k < globalX + act.y + 2; k++)
+                            
+                            if (RhythmGenerator.constraints[0] == 1)
+                            {
+                                offset = 1;
+                            }
+                            for (int k = globalX + 1; k < globalX + act.y + offset; k++)
                             {
                                 //Debug.Log("hI");
                                 if (level == 0)
                                 {
                                     lvl.Add(new Vector3(0, 0, -1));
-                                    if (!pair)
+                                    if (!pair && RhythmGenerator.constraints[4] == 1)
                                     {
                                         upperLvl.Add(new Vector3(0, 0, -1));
                                         lowerLvl.Add(new Vector3(0, 0, -1));
                                     }
-                                } else if (level == 1)
+                                } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
-                                } else
+                                } else if (RhythmGenerator.constraints[4] == 1)
                                 {
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
@@ -1019,7 +1195,7 @@ public class GeometryGenerator : MonoBehaviour
                             }
                         }
 
-                        globalX += (int) (act.y + 1);
+                        globalX += (int) (act.y + (offset - 1));
 
 
                     } else if (System.Math.Abs(act.x - 1) < 0.1)
@@ -1041,15 +1217,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX, globalY, 1));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX, globalY, 1));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX, globalY, 1));
                             }
@@ -1073,15 +1249,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX, globalY, 0));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX, globalY, 0));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX, globalY, 0));
                             }
@@ -1134,15 +1310,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX, globalY, 0));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX, globalY, 0));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX, globalY, 0));
                             }
@@ -1178,15 +1354,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX, globalY, -1));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX, globalY, -1));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX, globalY, -1));
                             }
@@ -1206,15 +1382,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX + 1, globalY, 2));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX + 1, globalY, 2));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX + 1, globalY, 2));
                             }
@@ -1232,15 +1408,15 @@ public class GeometryGenerator : MonoBehaviour
                             if (level == 0)
                             {
                                 lvl.Add(new Vector3(globalX + 2, globalY, -1));
-                                if (!pair)
+                                if (!pair && RhythmGenerator.constraints[4] == 1)
                                 {
                                     upperLvl.Add(new Vector3(0, 0, -1));
                                     lowerLvl.Add(new Vector3(0, 0, -1));
                                 }
-                            } else if (level == 1)
+                            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                             {
                                 upperLvl.Add(new Vector3(globalX + 2, globalY, -1));
-                            } else
+                            } else if (RhythmGenerator.constraints[4] == 1)
                             {
                                 lowerLvl.Add(new Vector3(globalX + 2, globalY, -1));
                             }
@@ -1274,12 +1450,15 @@ public class GeometryGenerator : MonoBehaviour
             if (level == 0)
             {
                 lvl.Add(new Vector3(globalX, globalY, 0));
-                upperLvl.Add(new Vector3(0, 0, -1));
-                lowerLvl.Add(new Vector3(0, 0, -1));
-            } else if (level == 1)
+                if (RhythmGenerator.constraints[4] == 1)
+                {
+                    upperLvl.Add(new Vector3(0, 0, -1));
+                    lowerLvl.Add(new Vector3(0, 0, -1));
+                }
+            } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
             {
                 upperLvl.Add(new Vector3(globalX, globalY, 0));
-            } else
+            } else if (RhythmGenerator.constraints[4] == 1)
             {
                 lowerLvl.Add(new Vector3(globalX, globalY, 0));
             }
@@ -1303,12 +1482,15 @@ public class GeometryGenerator : MonoBehaviour
         if (level == 0)
         {
             lvl.Add(new Vector3(globalX, globalY, 0));
-            upperLvl.Add(new Vector3(0, 0, -1));
-            lowerLvl.Add(new Vector3(0, 0, -1));
-        } else if (level == 1)
+            if (RhythmGenerator.constraints[4] == 1)
+            {
+                upperLvl.Add(new Vector3(0, 0, -1));
+                lowerLvl.Add(new Vector3(0, 0, -1));
+            }
+        } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
         {
             upperLvl.Add(new Vector3(globalX, globalY, 0));
-        } else
+        } else if (RhythmGenerator.constraints[4] == 1)
         {
             lowerLvl.Add(new Vector3(globalX, globalY, 0));
         }
@@ -1338,12 +1520,15 @@ public class GeometryGenerator : MonoBehaviour
         //Debug.Log("ENDX: " + globalX);
         lvl.Add(new Vector3(0, 0, -1));
 
-        upperLvl.Add(new Vector3(0, 0, -1));
-        lowerLvl.Add(new Vector3(0, 0, -1));
-        upperLvl.Add(new Vector3(0, 0, -1));
-        lowerLvl.Add(new Vector3(0, 0, -1));
-        upperLvl.Add(new Vector3(0, 0, -1));
-        lowerLvl.Add(new Vector3(0, 0, -1));
+        if (RhythmGenerator.constraints[4] == 1)
+        {
+            upperLvl.Add(new Vector3(0, 0, -1));
+            lowerLvl.Add(new Vector3(0, 0, -1));
+            upperLvl.Add(new Vector3(0, 0, -1));
+            lowerLvl.Add(new Vector3(0, 0, -1));
+            upperLvl.Add(new Vector3(0, 0, -1));
+            lowerLvl.Add(new Vector3(0, 0, -1));
+        }
 
         List<GameObject> l3 = new List<GameObject>();
         ground.Add(l3);

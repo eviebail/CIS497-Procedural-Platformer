@@ -107,7 +107,10 @@ public class PlayerController : MonoBehaviour
 
         timer = (lvl.Count /*+ upperLvl.Count + lowerLvl.Count*/) / 2 - 5;
 
-        InvokeRepeating("AdvanceTime", 1f, 1f);
+        if (RhythmGenerator.constraints[6] == 1)
+        {
+            InvokeRepeating("AdvanceTime", 1f, 1f);
+        } 
 
         //Debug.Log("sTomPS: " + stompers.Count);
         //for (int i = 0; i < lvl.Count; i++)
@@ -478,7 +481,7 @@ public class PlayerController : MonoBehaviour
                 if (pos.y - enemy.y < 1.0 && pos.y - enemy.y > 0.5)
                 {
                     toDelete.Add(i);
-                    v_y = 2.0f;
+                    v_y = 2.2f;
                 } else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
                     //Debug.Log("Collision with enemy: " + en.name);

@@ -210,8 +210,8 @@ public class RhythmGenerator : MonoBehaviour
         gen.generateGeometry();
         gen.cleanUpEnemies();
         gen.cleanUpStomps();
-        if (constraints[3] == 1) { gen.placeSuperEnemies(); }
         if (constraints[0] == 1) { gen.jumpTerrain(); }
+        if (constraints[3] == 1) { gen.placeSuperEnemies(); }
         Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
         Debug.Log("UPPERLVL COUNT: " + GeometryGenerator.upperLvl.Count);
         Debug.Log("LOWERLVL COUNT: " + GeometryGenerator.lowerLvl.Count);
