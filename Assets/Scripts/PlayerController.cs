@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
 {
     public float speed = 0.1f;
     Vector2 dest = Vector2.zero;
-    private Vector3 start = new Vector3(-9f,2f,0f);
+    private Vector3 start = new Vector3(-9f, 2f, 0f);
     public Texture2D tex;
     private Sprite mySprite;
     private SpriteRenderer sr;
@@ -36,29 +36,40 @@ public class PlayerController : MonoBehaviour
     public static int totalEnemies = 0;
 
     public int prevStomp = -1;
-    public int prevEnemy = -1;
+    public Vector2 prevEnemy = new Vector2(-1, -1);
     public int prevEnemy2 = -1;
     public int prevSpike = -1;
     public int prevPlatform = -1;
 
-    public Vector2 boundBox = new Vector2(0.5f,0.5f);
+    public Vector2 boundBox = new Vector2(0.5f, 0.5f);
+
+    //need to do stomps too!
 
     public static List<GameObject> enemies;
+    public static List<GameObject> lowerEnemies;
+    public static List<GameObject> upperEnemies;
     public static List<GameObject> superEnemies;
     public static List<GameObject> platforms;
     public static List<GameObject> stompers;
     public static List<GameObject> spikes;
     public static List<GameObject> coins;
+    public static List<GameObject> stars;
     public static List<Vector3> lvl;
     public static List<Vector3> upperLvl;
     public static List<Vector3> lowerLvl;
+    public static List<Vector4> ranges;
 
     public static int numLives = 5;
     public static int numCoins = 0;
+    public static int numStars = 0;
+
+    public static int totalStars = 0;
 
     public static int timer = 0;
 
     Vector2 lastValidPos;
+
+    Vector2 preWarpPos;
 
     Vector2 direction = Vector2.right;
 
@@ -88,18 +99,25 @@ public class PlayerController : MonoBehaviour
         dest = transform.position;
         a_x = 0f;// 0.015f;
         lastValidPos = transform.position;
+        preWarpPos = transform.position;
 
         enemies = GeometryGenerator.enemies;
+        upperEnemies = GeometryGenerator.upperEnemies;
+        lowerEnemies = GeometryGenerator.lowerEnemies;
         superEnemies = GeometryGenerator.superEnemies;
         platforms = GeometryGenerator.platforms;
         stompers = GeometryGenerator.stompers;
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
+        stars = GeometryGenerator.stars;
         lvl = GeometryGenerator.lvl;
         upperLvl = GeometryGenerator.upperLvl;
         lowerLvl = GeometryGenerator.lowerLvl;
+        ranges = GeometryGenerator.lvlRanges;
 
-        totalEnemies = enemies.Count + superEnemies.Count;
+        totalEnemies = enemies.Count + superEnemies.Count + lowerEnemies.Count + upperEnemies.Count;
+
+        totalStars = stars.Count;
 
         mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
@@ -110,8 +128,14 @@ public class PlayerController : MonoBehaviour
         if (RhythmGenerator.constraints[6] == 1)
         {
             InvokeRepeating("AdvanceTime", 1f, 1f);
-        } 
+        }
 
+        Debug.Log("PLATFORMS: " + platforms.Count);
+        //Debug.Log("LowEr lEveL");
+        //for (int i = 0; i < lowerLvl.Count; i++)
+        //{
+        //    Debug.Log(lowerLvl[i]);
+        //}
         //Debug.Log("sTomPS: " + stompers.Count);
         //for (int i = 0; i < lvl.Count; i++)
         //{
@@ -130,18 +154,24 @@ public class PlayerController : MonoBehaviour
         }
         numCoins = 0;
         killed = 0;
+        numStars = 0;
         enemies = GeometryGenerator.enemies;
+        upperEnemies = GeometryGenerator.upperEnemies;
+        lowerEnemies = GeometryGenerator.lowerEnemies;
         superEnemies = GeometryGenerator.superEnemies;
         platforms = GeometryGenerator.platforms;
         stompers = GeometryGenerator.stompers;
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
+        stars = GeometryGenerator.stars;
         lvl = GeometryGenerator.lvl;
         upperLvl = GeometryGenerator.upperLvl;
         lowerLvl = GeometryGenerator.lowerLvl;
+        ranges = GeometryGenerator.lvlRanges;
+        totalStars = stars.Count;
         win = false;
         death = false;
-        totalEnemies = enemies.Count + superEnemies.Count;
+        totalEnemies = enemies.Count + superEnemies.Count + lowerEnemies.Count + upperEnemies.Count;
         timer = (lvl.Count /*+ upperLvl.Count + lowerLvl.Count*/) / 2 - 5;
 
     }
@@ -174,7 +204,7 @@ public class PlayerController : MonoBehaviour
             //fext is no longer true when we move up
             //Debug.Log("Dest: " + dest);
         }
-        
+
         Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
         GetComponent<Rigidbody2D>().MovePosition(p);
 
@@ -221,9 +251,10 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.RightArrow))
         {
             Vector2 dir = Vector2.right;
+            //don't care about what's above range?
             if (lvl[(int)(transform.position.x + 10)].z == 3)
             {
-                dir = new Vector2(1,1);
+                dir = new Vector2(1, 1);
             }
             if (lvl[(int)(transform.position.x + 10)].z == 4)
             {
@@ -235,7 +266,7 @@ public class PlayerController : MonoBehaviour
                 direction.x = 1;
                 transform.parent = null;
             }
-            
+
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
@@ -259,11 +290,46 @@ public class PlayerController : MonoBehaviour
                 direction.x = -1;
                 transform.parent = null;
             }
-            
+
         } else
         {
             f_x = 0;
             v_x = 0;
+        }
+
+        if (Input.GetKey(KeyCode.DownArrow) && overPipe())
+        {
+            Debug.Log("DOWNARRRAOOWOAFEOKSG");
+            //warp to destination
+            if (upperLvl.Count > 0)
+            {
+                int pos = (int)Mathf.Round(transform.position.x - ranges[1].x);
+                Debug.Log("WJOOOOOO " + pos + " , " + upperLvl.Count);
+                if (pos >= 0 && pos < upperLvl.Count)
+                {
+                    Vector3 obstacle = upperLvl[pos];
+                    Debug.Log("HIIIII " + obstacle.x + " , " + transform.position.x);
+                    if (obstacle.x == (int)Mathf.Round(transform.position.x))
+                    {
+                        preWarpPos = lvl[(int)Mathf.Round(transform.position.x) + 10];
+                        transform.position = new Vector3(obstacle.x, obstacle.y + 4, 0);
+                    }
+                }
+            }
+            if (lowerLvl.Count > 0)
+            {
+                int pos = (int)Mathf.Round(transform.position.x - ranges[2].x);
+                if (pos >= 0 && pos < lowerLvl.Count)
+                {
+                    Vector3 obstacle = lowerLvl[pos];
+                    Debug.Log("HIIIII " + obstacle.x + " , " + transform.position.x);
+                    if (obstacle.x == (int)Mathf.Round(transform.position.x))
+                    {
+                        preWarpPos = lvl[(int)Mathf.Round(transform.position.x) + 10];
+                        transform.position = new Vector3(obstacle.x, obstacle.y + 4, 0);
+                    }
+                }
+            }
         }
 
         Move();
@@ -272,6 +338,7 @@ public class PlayerController : MonoBehaviour
         onCollideWithSmasher();
         //onCollideWithSpike();
         onCollideWithCoin();
+        onCollideWithStar();
         onFallOfCliff();
 
         if (numCoins >= 5)
@@ -296,11 +363,18 @@ public class PlayerController : MonoBehaviour
             Reloader.win = true;
             Debug.Log("hello??" + win);
             end();
+        } else if (RhythmGenerator.constraints[4] == 1
+            && (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4)
+            && numStars == totalStars)
+        {
+            Reloader.win = true;
+            Debug.Log("hello??" + win);
+            end();
         }
-        else if (RhythmGenerator.constraints[1] == 0
+        else if (RhythmGenerator.constraints[1] == 0 && RhythmGenerator.constraints[4] == 0
             && (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4))
         {
-            
+
             Reloader.win = true;
             Debug.Log("hello??" + win);
             end();
@@ -312,16 +386,70 @@ public class PlayerController : MonoBehaviour
         SceneManager.LoadScene("Death");
     }
 
-        bool isAirborne(Vector2 pos)
+    bool isAirborne(Vector2 pos)
     {
-        return !yCollide();
+        bool yCollided = yCollide();
+        yCollided = yCollideUpper() || yCollided;
+        yCollided = yCollideLower() || yCollided;
+        return (!yCollided);
     }
 
     bool valid(Vector2 dir)
     {
-        xCollided = xCollide(dir); //FOR TESTING
-        return !xCollided;
+        xCollided = xCollide(dir);
+        xCollided = xCollideUpper(dir) && xCollided;
+        xCollided = xCollideLower(dir) && xCollided;
+        //I want each function to be called to update LastValidPos!
+        return (!xCollided);
     }
+
+    bool overPipe()
+    {
+        int pos = (int)Mathf.Round(transform.position.x + 10);
+        if (pos < 0 || pos >= lvl.Count)
+        {
+            return false;
+        }
+
+        Vector3 obstacle = lvl[pos];
+        if (obstacle.z == 5)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    //bool overPipeLower()
+    //{
+    //    int pos = (int)Mathf.Round(transform.position.x - ranges[1].x);
+    //    if (pos < 0 || pos >= upperLvl.Count)
+    //    {
+    //        return false;
+    //    }
+
+    //    Vector3 obstacle = upperLvl[pos];
+    //    if (obstacle.z == 5)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
+    //bool overPipeUpper()
+    //{
+    //    int pos = (int)Mathf.Round(transform.position.x - ranges[2].x);
+    //    if (pos < 0 || pos >= lowerLvl.Count)
+    //    {
+    //        return false;
+    //    }
+
+    //    Vector3 obstacle = lowerLvl[pos];
+    //    if (obstacle.z == 5)
+    //    {
+    //        return true;
+    //    }
+    //    return false;
+    //}
 
     bool xCollide(Vector2 dir)
     {
@@ -331,12 +459,17 @@ public class PlayerController : MonoBehaviour
         int posNow = (int)Mathf.Round(pos.x + 10);
         int posFtr = (int)Mathf.Round(posFuture.x + 10);
 
+        if (pos.y < ranges[0].z)
+        {
+            return false;
+        }
+
         //is there anything between curr x,y and future x,y?
         if (pos.x < posFuture.x)
         {
             for (int i = posNow + 1; i < posFtr + 1; i++)
             {
-                if (lvl[i-1].z == 3)
+                if (lvl[i - 1].z == 3)
                 {
                     if ((pos.y - 0.3) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
                     {
@@ -345,12 +478,12 @@ public class PlayerController : MonoBehaviour
                 } else
                 {
                     if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
-                        && lvl[i].z !=3 && lvl[i+1].z != 3)
+                        && lvl[i].z != 3 && lvl[i + 1].z != 3)
                     {
                         return true;
                     }
                 }
-                
+
                 if (System.Math.Abs(lvl[i].z - -1) < 0.01)
                 {
                     //==-1
@@ -375,7 +508,7 @@ public class PlayerController : MonoBehaviour
                 else
                 {
                     if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
-                        && lvl[i].z != 3 && lvl[i+1].z != 3)
+                        && lvl[i].z != 3 && lvl[i + 1].z != 3)
                     {
                         return true;
                     }
@@ -391,7 +524,175 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        
+
+
+        return false;
+    }
+
+    bool xCollideUpper(Vector2 dir)
+    {
+        Vector2 pos = transform.position;
+        Vector2 posFuture = pos + dir;
+
+        int posNow = (int)(Mathf.Round(pos.x - ranges[1].x));
+        int posFtr = (int)(Mathf.Round(posFuture.x - ranges[1].x));
+
+        if (posNow < 0 || posNow >= upperLvl.Count || posFtr < 0 || posFtr >= upperLvl.Count
+            || pos.y < ranges[1].z)
+        {
+            return false;
+        }
+
+        //is there anything between curr x,y and future x,y?
+        if (pos.x < posFuture.x)
+        {
+            for (int i = posNow + 1; i < (int) Mathf.Min(posFtr + 1, upperLvl.Count); i++)
+            {
+                if (upperLvl[i - 1].z == 3)
+                {
+                    if ((pos.y - 0.3) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1
+                        && upperLvl[i].z != 3 && upperLvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
+
+                if (System.Math.Abs(upperLvl[i].z - -1) < 0.01)
+                {
+                    //==-1
+                    if (upperLvl[posNow].z != -1)
+                    {
+                        lastValidPos = upperLvl[posNow];//new Vector2(posNow, pos.y);
+                        //Debug.Log("LAST VALID: " + lastValidPos);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (int i = (int)Mathf.Max(posFtr, 1); i < posNow; i++)
+            {
+                if (upperLvl[i - 1].z == 3)
+                {
+                    if ((pos.y - 0.4) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1
+                        && upperLvl[i].z != 3 && upperLvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
+                if (System.Math.Abs(upperLvl[i].z - -1) < 0.01)
+                {
+                    //==-1
+                    if (upperLvl[posNow].z != -1)
+                    {
+                        lastValidPos = upperLvl[posNow];//new Vector2(posNow, pos.y);
+                        //Debug.Log("LAST VALID: " + lastValidPos);
+                    }
+                }
+            }
+        }
+
+
+        return false;
+    }
+
+    bool xCollideLower(Vector2 dir)
+    {
+        Vector2 pos = transform.position;
+        Vector2 posFuture = pos + dir;
+
+        int posNow = (int)(Mathf.Round(pos.x - ranges[2].x));
+        int posFtr = (int)(Mathf.Round(posFuture.x - ranges[2].x));
+
+        //Debug.Log("::x's " + posNow + " , " + posFtr);
+        //Debug.Log("::range " + ranges[2].x + " , " + ranges[2].y);
+
+        if (posNow < 0 || posNow >= lowerLvl.Count || posFtr < 0 || posFtr >= lowerLvl.Count
+            || pos.y < ranges[2].z)
+        {
+            return false;
+        }
+
+        //Debug.Log("now vs ftr: " + pos.x + " , " + posFuture.x);
+
+        //is there anything between curr x,y and future x,y?
+        if (pos.x < posFuture.x)
+        {
+            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, lowerLvl.Count); i++)
+            {
+                if (lowerLvl[i - 1].z == 3)
+                {
+                    if ((pos.y - 0.3) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1
+                        && lowerLvl[i].z != 3 && lowerLvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
+                
+                if (System.Math.Abs(lowerLvl[i].z - -1) < 0.01)
+                {
+                    //==-1
+                    if (lowerLvl[posNow].z != -1)
+                    {
+                        lastValidPos = lowerLvl[posNow];//new Vector2(posNow, pos.y);
+                        //Debug.Log("LAST VALID: " + lastValidPos);
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (int i = (int)Mathf.Max(posFtr, 1); i < posNow; i++)
+            {
+                if (lowerLvl[i - 1].z == 3)
+                {
+                    if ((pos.y - 0.4) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1
+                        && lowerLvl[i].z != 3 && lowerLvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
+                if (System.Math.Abs(lowerLvl[i].z - -1) < 0.01)
+                {
+                    //==-1
+                    Debug.Log("Am I -1??? " + lowerLvl[i].z);
+                    if (lowerLvl[posNow].z != -1)
+                    {
+                        lastValidPos = lowerLvl[posNow];//new Vector2(posNow, pos.y);
+                        //Debug.Log("LAST VALID: " + lastValidPos);
+                    }
+                }
+            }
+        }
+
 
         return false;
     }
@@ -461,6 +762,137 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
+    bool yCollideUpper()
+    {
+        int pos = (int)Mathf.Round(transform.position.x - ranges[1].x); //DOESNT WORK BECAUSE SIZE IS TOO SMALL
+                                                               //NEED TO ADJUST FOR SIZE DIFF
+        if (pos < 0 || pos >= upperLvl.Count)
+        {
+            //Debug.Log("ERRRRRRR at pos " + pos + " , " + (pos - ranges[1].x));
+            //Debug.Log("RANGES " + (ranges[1].x) + " , " + ranges[1].y);
+            return false;
+        }
+
+        Vector3 obstacle = upperLvl[pos];
+        if (System.Math.Abs(obstacle.z - -1) < 0.01)
+        {
+            //cliff!
+            return false;
+        }
+        if (obstacle.z == 3)
+        {
+            float x = transform.position.x - (obstacle.x - 0.5f);
+            float b = (obstacle.y - 0.5f);
+            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            if (transform.position.y > (x + b) && transform.position.y < (x + b + 0.5)) //y=mx + b
+            {
+                v_y = v_x;
+                return true;
+            }
+            //change direction which we move
+            return false;
+        }
+        if (obstacle.z == 4)
+        {
+            float x = transform.position.x - (obstacle.x - 0.5f);
+            float b = (obstacle.y + 0.5f);
+            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            if (transform.position.y > (-x + b) && transform.position.y < (-x + b + 0.5)) //y=mx + b
+            {
+                v_y = -v_x;
+                return true;
+            }
+            //change direction which we move
+            return false;
+        }
+        if (System.Math.Abs(obstacle.z - 2) < 0.1) //this means its a moving platform
+        {
+
+            for (int i = 0; i < platforms.Count; i++)
+            {
+                Vector2 playerPos = transform.position;
+                Vector2 platPos = platforms[i].transform.position;
+                if (playerPos.x < platPos.x + 0.5f && playerPos.x > platPos.x - 0.5f &&
+                (playerPos.y - 1) > (platPos.y - 0.1) && (playerPos.y - 1) < (platPos.y + 0.1))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        //Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
+        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool yCollideLower()
+    {
+        int pos = (int)Mathf.Round(transform.position.x - ranges[2].x);
+        if (pos < 0 || pos >= lowerLvl.Count)
+        {
+            //Debug.Log("ERRRRRRR");
+            return false;
+        }
+
+        Vector3 obstacle = lowerLvl[pos];
+        if (System.Math.Abs(obstacle.z - -1) < 0.01)
+        {
+            //cliff!
+            //Debug.Log("-1!!!!!!!");
+            return false;
+        }
+        if (obstacle.z == 3)
+        {
+            float x = transform.position.x - (obstacle.x - 0.5f);
+            float b = (obstacle.y - 0.5f);
+            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            if (transform.position.y > (x + b) && transform.position.y < (x + b + 0.5)) //y=mx + b
+            {
+                v_y = v_x;
+                return true;
+            }
+            //change direction which we move
+            return false;
+        }
+        if (obstacle.z == 4)
+        {
+            float x = transform.position.x - (obstacle.x - 0.5f);
+            float b = (obstacle.y + 0.5f);
+            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            if (transform.position.y > (-x + b) && transform.position.y < (-x + b + 0.5)) //y=mx + b
+            {
+                v_y = -v_x;
+                return true;
+            }
+            //change direction which we move
+            return false;
+        }
+        if (System.Math.Abs(obstacle.z - 2) < 0.1) //this means its a moving platform
+        {
+
+            for (int i = 0; i < platforms.Count; i++)
+            {
+                Vector2 playerPos = transform.position;
+                Vector2 platPos = platforms[i].transform.position;
+                if (playerPos.x < platPos.x + 0.5f && playerPos.x > platPos.x - 0.5f &&
+                (playerPos.y - 1) > (platPos.y - 0.1) && (playerPos.y - 1) < (platPos.y + 0.1))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        //Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
+        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
+        {
+            return true;
+        }
+        return false;
+    }
+
     /// <summary>
     /// guys randomly move out of bounds now??? , kill count seems ok now
     /// </summary>
@@ -485,19 +917,21 @@ public class PlayerController : MonoBehaviour
                 } else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
                     //Debug.Log("Collision with enemy: " + en.name);
-                    if (prevEnemy != i)
+                    if (prevEnemy.x != i || prevEnemy.y != 0)
                     {
                         numLives -= 1;
                         v_x = -0.5f * v_x;
-                        prevEnemy = i;
+                        prevEnemy.x = i;
+                        prevEnemy.y = 0;
                     }
                 }
             }
             else
             {
-                if (prevEnemy == i)
+                if (prevEnemy.x == i && prevEnemy.y == 0)
                 {
-                    prevEnemy = -1;
+                    prevEnemy.x = -1;
+                    prevEnemy.y = -1;
                 }
             }
         }
@@ -510,6 +944,102 @@ public class PlayerController : MonoBehaviour
             Destroy(en);
         }
         toDelete.Clear();
+
+
+        //FOR LOWER ENEMIES
+        List<int> toDeleteL = new List<int>();
+        for (int i = 0; i < lowerEnemies.Count; i++)
+        {
+            GameObject en = lowerEnemies[i];
+            Vector2 pos = transform.position;
+            Vector2 enemy = en.transform.position;
+            //want to know if transform.pos is in the bounding box of the enemy position
+            //pos.x < enemy.x + 1 && pos.x > enemy.x - 1
+            if (pos.x < (enemy.x + 0.7) && pos.x > (enemy.x - 0.7) /*&&
+                pos.y < (enemy.y + 1) && pos.y >= (enemy.y - 1)*/)
+            {
+                if (pos.y - enemy.y < 1.0 && pos.y - enemy.y > 0.5)
+                {
+                    toDeleteL.Add(i);
+                    v_y = 2.2f;
+                }
+                else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
+                {
+                    //Debug.Log("Collision with enemy: " + en.name);
+                    if (prevEnemy.x != i || prevEnemy.y != 1)
+                    {
+                        numLives -= 1;
+                        v_x = -0.5f * v_x;
+                        prevEnemy.x = i;
+                        prevEnemy.y = 1;
+                    }
+                }
+            }
+            else
+            {
+                if (prevEnemy.x == i && prevEnemy.y == 1)
+                {
+                    prevEnemy.x = -1;
+                    prevEnemy.y = -1;
+                }
+            }
+        }
+        //Debug.Log("To delete count: " + toDelete.Count);
+        killed += toDeleteL.Count;
+        for (int j = 0; j < toDeleteL.Count; j++)
+        {
+            GameObject en = lowerEnemies[toDeleteL[j]];
+            lowerEnemies.RemoveAt(toDeleteL[j]);
+            Destroy(en);
+        }
+        toDeleteL.Clear();
+
+        //FOR UPPER ENEMIES
+        List<int> toDeleteU = new List<int>();
+        for (int i = 0; i < upperEnemies.Count; i++)
+        {
+            GameObject en = upperEnemies[i];
+            Vector2 pos = transform.position;
+            Vector2 enemy = en.transform.position;
+            //want to know if transform.pos is in the bounding box of the enemy position
+            //pos.x < enemy.x + 1 && pos.x > enemy.x - 1
+            if (pos.x < (enemy.x + 0.7) && pos.x > (enemy.x - 0.7) /*&&
+                pos.y < (enemy.y + 1) && pos.y >= (enemy.y - 1)*/)
+            {
+                if (pos.y - enemy.y < 1.0 && pos.y - enemy.y > 0.5)
+                {
+                    toDeleteU.Add(i);
+                    v_y = 2.2f;
+                }
+                else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
+                {
+                    if (prevEnemy.x != i || prevEnemy.y != 2)
+                    {
+                        numLives -= 1;
+                        v_x = -0.5f * v_x;
+                        prevEnemy.x = i;
+                        prevEnemy.y = 2;
+                    }
+                }
+            }
+            else
+            {
+                if (prevEnemy.x == i && prevEnemy.y == 2)
+                {
+                    prevEnemy.x = -1;
+                    prevEnemy.y = -1;
+                }
+            }
+        }
+        //Debug.Log("To delete count: " + toDelete.Count);
+        killed += toDeleteU.Count;
+        for (int j = 0; j < toDeleteU.Count; j++)
+        {
+            GameObject en = upperEnemies[toDeleteU[j]];
+            upperEnemies.RemoveAt(toDeleteU[j]);
+            Destroy(en);
+        }
+        toDeleteU.Clear();
 
         //FOR SUPERENEMIES
 
@@ -562,7 +1092,7 @@ public class PlayerController : MonoBehaviour
 
     void onFallOfCliff()
     {
-        if (transform.position.y < -16)
+        if (transform.position.y < ranges[2].z - 5)
         {
             numLives -= 1;
             transform.position = lastValidPos + 4f*Vector2.up;
@@ -684,4 +1214,36 @@ public class PlayerController : MonoBehaviour
         }
         toDelete.Clear();
     }
+
+    void onCollideWithStar()
+    {
+        List<int> toDelete = new List<int>();
+        for (int i = 0; i < stars.Count; i++)
+        {
+            GameObject s = stars[i];
+            Vector2 pos = transform.position;
+            Vector2 star = s.transform.position;
+            //want to know if transform.pos is in the bounding box of the enemy position
+            //pos.x < enemy.x + 1 && pos.x > enemy.x - 1
+            if (pos.x < (star.x + 0.5) && pos.x > (star.x - 0.5) &&
+                pos.y < (star.y + 0.5) && pos.y > (star.y - 0.5))
+            {
+                transform.position = preWarpPos + 4f * Vector2.up;
+                numStars += 1;
+                toDelete.Add(i);
+            }
+        }
+        //Debug.Log("To delete count: " + toDelete.Count);
+        for (int j = 0; j < toDelete.Count; j++)
+        {
+            GameObject s = stars[toDelete[j]];
+            stars.Remove(s);
+            Destroy(s);
+        }
+        toDelete.Clear();
+    }
 }
+
+//warp between areas
+//place star in main level?
+//integrate with other constraints

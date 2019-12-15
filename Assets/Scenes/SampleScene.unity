@@ -272,6 +272,7 @@ MonoBehaviour:
   texSlope: {fileID: 0}
   texSlope2: {fileID: 0}
   texGoal: {fileID: 0}
+  texPipe: {fileID: 0}
 --- !u!1 &146488863
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,6 +439,7 @@ MonoBehaviour:
   texSlope: {fileID: 2800000, guid: 176657d1b3944495dac2e8a5e8514335, type: 3}
   texSlope2: {fileID: 2800000, guid: d68632f3397f94ba4af3b90bceb79a78, type: 3}
   texGoal: {fileID: 2800000, guid: 0b765ed966fd7499d878aa2f999be5ae, type: 3}
+  texPipe: {fileID: 2800000, guid: 63899db3a453048ac9448632040b58a2, type: 3}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0

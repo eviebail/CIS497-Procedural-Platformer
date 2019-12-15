@@ -12,6 +12,8 @@ public class EnemyController : MonoBehaviour
     public float v_y = 0;
     public float a_y = 0;
 
+    public int level = 0;
+
     public int state = 0;
 
     public Vector2 xRange = new Vector2(-100,0);
@@ -51,13 +53,13 @@ public class EnemyController : MonoBehaviour
 
         if (xRange.x != -100)
         {
-            if (!valid(1f * Vector2.right) || transform.position.x + 1 > xRange.y + 1)
+            if (!valid(1f * Vector2.right) || transform.position.x + 1 >= xRange.y + 1)
             {
                 state = 1;
                 //Debug.Log("YO 1");
                 //v_x = 0.15f;
             }
-            else if (!valid(-1f * Vector2.right) || transform.position.x - 1 < xRange.x - 1)
+            else if (!valid(-1f * Vector2.right) || transform.position.x - 1 <= xRange.x - 1)
             {
                 state = 0;
                 //Debug.Log("YO 2");
@@ -99,30 +101,55 @@ public class EnemyController : MonoBehaviour
 
     bool valid(Vector2 dir)
     {
-        return !xCollide(dir);
+        //return !xCollide(dir);
+        bool xCollided = xCollide(dir);
+        if (level == 1)
+        {
+            xCollided = xCollideUpper(dir);
+        } else if (level == 2)
+        {
+            xCollided = xCollideLower(dir);
+        }
+        //xCollided = xCollideUpper(dir) || xCollided;
+        //xCollided = xCollideLower(dir) || xCollided;
+        //I want each function to be called to update LastValidPos!
+        return (!xCollided);
     }
 
-    //_want to return false if posFuture is over a cliff
     bool xCollide(Vector2 dir)
     {
         List<Vector3> lvl = GeometryGenerator.lvl;
+        List<Vector4> ranges = GeometryGenerator.lvlRanges;
         Vector2 pos = transform.position;
         Vector2 posFuture = pos + dir;
 
         int posNow = (int)Mathf.Round(pos.x + 10);
         int posFtr = (int)Mathf.Round(posFuture.x + 10);
 
+        if (pos.y < ranges[0].z)
+        {
+            return false;
+        }
+
         //is there anything between curr x,y and future x,y?
         if (pos.x < posFuture.x)
         {
             for (int i = posNow + 1; i < posFtr + 1; i++)
             {
-                //if current y level is less than future position y and future position is not a cliff
-                //return true
-
-                if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+                if (lvl[i - 1].z == 3)
                 {
-                    return true;
+                    if ((pos.y - 0.3) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
+                        && lvl[i].z != 3 && lvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
                 }
                 //if future position is over cliff, return true
                 if (System.Math.Abs(lvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
@@ -139,12 +166,21 @@ public class EnemyController : MonoBehaviour
         {
             for (int i = posFtr; i < posNow; i++)
             {
-                //if block is a cliff, want xCollide = true
-                if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+                if (lvl[i - 1].z == 3)
                 {
-                    return true;
+                    if ((pos.y - 0.4) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
                 }
-                //if future position is over cliff, return true
+                else
+                {
+                    if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
+                        && lvl[i].z != 3 && lvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
                 if (System.Math.Abs(lvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
                 {
                     return true;
@@ -156,8 +192,237 @@ public class EnemyController : MonoBehaviour
             }
         }
 
+
         return false;
     }
+
+    bool xCollideUpper(Vector2 dir)
+    {
+        List<Vector4> ranges = GeometryGenerator.lvlRanges;
+        List<Vector3> upperLvl = GeometryGenerator.upperLvl;
+        Vector2 pos = transform.position;
+        Vector2 posFuture = pos + dir;
+
+        int posNow = (int)(Mathf.Round(pos.x - ranges[1].x));
+        int posFtr = (int)(Mathf.Round(posFuture.x - ranges[1].x));
+
+        if (posNow < 0 || posNow >= upperLvl.Count || posFtr < 0 || posFtr >= upperLvl.Count
+            || pos.y < ranges[1].z)
+        {
+            return false;
+        }
+
+        //is there anything between curr x,y and future x,y?
+        if (pos.x < posFuture.x)
+        {
+            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, upperLvl.Count); i++)
+            {
+                if (upperLvl[i - 1].z == 3)
+                {
+                    if ((pos.y - 0.3) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1
+                        && upperLvl[i].z != 3 && upperLvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
+
+                //if future position is over cliff, return true
+                if (System.Math.Abs(upperLvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                {
+                    return true;
+                }
+                if ((pos.y - 1) > upperLvl[i].y) //isAirborneCondition
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            for (int i = (int)Mathf.Max(posFtr, 1); i < posNow; i++)
+            {
+                if (upperLvl[i - 1].z == 3)
+                {
+                    if ((pos.y - 0.4) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1
+                        && upperLvl[i].z != 3 && upperLvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
+                //if future position is over cliff, return true
+                if (System.Math.Abs(upperLvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                {
+                    return true;
+                }
+                if ((pos.y - 1) > upperLvl[i].y) //isAirborneCondition
+                {
+                    return true;
+                }
+            }
+        }
+
+
+        return false;
+    }
+
+    bool xCollideLower(Vector2 dir)
+    {
+        List<Vector4> ranges = GeometryGenerator.lvlRanges;
+        List<Vector3> lowerLvl = GeometryGenerator.lowerLvl;
+        Vector2 pos = transform.position;
+        Vector2 posFuture = pos + dir;
+
+        int posNow = (int)(Mathf.Round(pos.x - ranges[2].x));
+        int posFtr = (int)(Mathf.Round(posFuture.x - ranges[2].x));
+
+        //Debug.Log("::x's " + posNow + " , " + posFtr);
+        //Debug.Log("::range " + ranges[2].x + " , " + ranges[2].y);
+
+        if (posNow < 0 || posNow >= lowerLvl.Count || posFtr < 0 || posFtr >= lowerLvl.Count
+            || pos.y < ranges[2].z)
+        {
+            return false;
+        }
+
+        //Debug.Log("now vs ftr: " + pos.x + " , " + posFuture.x);
+
+        //is there anything between curr x,y and future x,y?
+        if (pos.x < posFuture.x)
+        {
+            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, lowerLvl.Count); i++)
+            {
+                if (lowerLvl[i - 1].z == 3)
+                {
+                    if ((pos.y - 0.3) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1
+                        && lowerLvl[i].z != 3 && lowerLvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
+
+                //if future position is over cliff, return true
+                if (System.Math.Abs(lowerLvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                {
+                    return true;
+                }
+                if ((pos.y - 1) > lowerLvl[i].y) //isAirborneCondition
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            for (int i = (int)Mathf.Max(posFtr, 1); i < posNow; i++)
+            {
+                if (lowerLvl[i - 1].z == 3)
+                {
+                    if ((pos.y - 0.4) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if ((pos.y - 1) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1
+                        && lowerLvl[i].z != 3 && lowerLvl[i + 1].z != 3)
+                    {
+                        return true;
+                    }
+                }
+                //if future position is over cliff, return true
+                if (System.Math.Abs(lowerLvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                {
+                    return true;
+                }
+                if ((pos.y - 1) > lowerLvl[i].y) //isAirborneCondition
+                {
+                    return true;
+                }
+            }
+        }
+
+
+        return false;
+    }
+
+    //_want to return false if posFuture is over a cliff
+    //bool xCollide(Vector2 dir)
+    //{
+    //    List<Vector3> lvl = GeometryGenerator.lvl;
+    //    Vector2 pos = transform.position;
+    //    Vector2 posFuture = pos + dir;
+
+    //    int posNow = (int)Mathf.Round(pos.x + 10);
+    //    int posFtr = (int)Mathf.Round(posFuture.x + 10);
+
+    //    //is there anything between curr x,y and future x,y?
+    //    if (pos.x < posFuture.x)
+    //    {
+    //        for (int i = posNow + 1; i < posFtr + 1; i++)
+    //        {
+    //            //if current y level is less than future position y and future position is not a cliff
+    //            //return true
+
+    //            if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+    //            {
+    //                return true;
+    //            }
+    //            //if future position is over cliff, return true
+    //            if (System.Math.Abs(lvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+    //            {
+    //                return true;
+    //            }
+    //            if ((pos.y - 1) > lvl[i].y) //isAirborneCondition
+    //            {
+    //                return true;
+    //            }
+    //        }
+    //    }
+    //    else
+    //    {
+    //        for (int i = posFtr; i < posNow; i++)
+    //        {
+    //            //if block is a cliff, want xCollide = true
+    //            if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
+    //            {
+    //                return true;
+    //            }
+    //            //if future position is over cliff, return true
+    //            if (System.Math.Abs(lvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+    //            {
+    //                return true;
+    //            }
+    //            if ((pos.y - 1) > lvl[i].y) //isAirborneCondition
+    //            {
+    //                return true;
+    //            }
+    //        }
+    //    }
+
+    //    return false;
+    //}
 
     bool yCollide()
     {

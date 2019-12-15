@@ -17,6 +17,10 @@ public class CameraController : MonoBehaviour
         {
             text.text += "      Enemies: " + PlayerController.killed + " / " + PlayerController.totalEnemies;
         }
+        if (RhythmGenerator.constraints[4] == 1)
+        {
+            text.text += "      Stars: " + PlayerController.numStars + " / " + PlayerController.totalStars;
+        }
     }
 
     // Update is called once per frame
@@ -29,6 +33,11 @@ public class CameraController : MonoBehaviour
         if (RhythmGenerator.constraints[1] == 1)
         {
             text.text += "      Enemies: " + PlayerController.killed + " / " + PlayerController.totalEnemies;
+        }
+
+        if (RhythmGenerator.constraints[4] == 1)
+        {
+            text.text += "      Stars: " + PlayerController.numStars + " / " + PlayerController.stars.Count;
         }
 
         if (RhythmGenerator.constraints[6] == 1)

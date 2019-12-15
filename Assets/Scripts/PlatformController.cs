@@ -15,6 +15,8 @@ public class PlatformController : MonoBehaviour
 
     public bool start = true;
 
+    public float offset = 4;
+
     //x = x_0 + vxt
     //y = y_0 + vyt + -ayt^2;
     //in fixedupdate, change_t should always be 1
@@ -32,15 +34,15 @@ public class PlatformController : MonoBehaviour
         {
             if (state == 0 && start)
             {
-                dest += 2 * Vector2.up;
+                dest += (offset/2) * Vector2.up;
                 state = 1;
                 start = false;
             } else if (state == 0) {
-                dest += 4 * Vector2.up;
+                dest += offset * Vector2.up;
                 state = 1;
             } else
             {
-                dest += -4 * Vector2.up;
+                dest += -offset * Vector2.up;
                 state = 0;
             }
         }

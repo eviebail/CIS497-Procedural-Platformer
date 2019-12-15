@@ -73,7 +73,7 @@ public class RhythmBlock : MonoBehaviour, Block
             otp += rhythm[i] + ", ";
         }
         otp += "]";
-        Debug.Log(otp);
+        //Debug.Log(otp);
 
         loadActionBlock();
     }
@@ -214,6 +214,6 @@ public class RhythmBlock : MonoBehaviour, Block
             otp += action[i] + ", ";
         }
         otp += "]";
-        Debug.Log(otp);
+        //Debug.Log(otp);
     }
 }

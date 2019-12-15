@@ -22,8 +22,12 @@ public class RhythmGenerator : MonoBehaviour
     public Texture2D texSlope;
     public Texture2D texSlope2;
     public Texture2D texGoal;
+    public Texture2D texPipe;
 
     public static int[] constraints = new int[7];
+
+    bool upper = false;
+    bool lower = false;
 
     //private Sprite mySprite;
     //private SpriteRenderer sr;
@@ -58,7 +62,7 @@ public class RhythmGenerator : MonoBehaviour
                 type = rType.test;
                 break;
         }
-        Debug.Log("Type: " + type);
+        //Debug.Log("Type: " + type);
     }
 
     protected int selectLength()
@@ -115,9 +119,7 @@ public class RhythmGenerator : MonoBehaviour
     {
         selectType();
         int length = selectLength();
-        Debug.Log("Length: " + length);
-        int density = selectDensity(length / 2);
-        Debug.Log("Density: " + density);
+        //Debug.Log("Length: " + length);
         int offset = 0;
         if (constraints[3] == 1)
         {
@@ -125,9 +127,13 @@ public class RhythmGenerator : MonoBehaviour
         }
         if (value.Equals("hr"))
         {
-            return new RhythmBlock(type, length, density, (constraints[1] == 1), offset, level, true);
+            int density = selectDensity(32 / 2);
+            //Debug.Log("Density: " + density);
+            return new RhythmBlock(type, 32, density, (constraints[1] == 1), offset, level, true);
         } else
         {
+            int density = selectDensity(length / 2);
+            //Debug.Log("Density: " + density);
             return new RhythmBlock(type, length, density, (constraints[1] == 1), offset, level, false);
         }
         
@@ -146,8 +152,28 @@ public class RhythmGenerator : MonoBehaviour
                 }
                 else if (Random.value < 0.66)
                 {
-                    levelLayout.Add("hr"); //TEST levelLayout.Add("p");
+                    if (!upper)
+                    {
+                        levelLayout.Add("hr");
+                        upper = true;
+                    } else
+                    {
+                        levelLayout.Add("r");
+                    }
+                    
                 } else
+                {
+                    if (!lower)
+                    {
+                        levelLayout.Add("rh");
+                        lower = true;
+                    }
+                    else
+                    {
+                        levelLayout.Add("r");
+                    }
+                }
+                if (i == length - 1 && !upper && !lower)
                 {
                     levelLayout.Add("rh");
                 }
@@ -162,7 +188,7 @@ public class RhythmGenerator : MonoBehaviour
             otp += levelLayout[i] + ", ";
         }
         otp += "]";
-        Debug.Log(otp);
+        //Debug.Log(otp);
     }
 
     // Start is called before the first frame update
@@ -171,17 +197,18 @@ public class RhythmGenerator : MonoBehaviour
         difficulty = StateController.option;
         //fill in the layout array
         generateLevel(LEVEL_DURATION);
-
+        bool empty = true;
         //populate the blocks array with the appropriate block type
         for (int i = 0; i < levelLayout.Count; i++)
         {
             if (levelLayout[i].Equals("r"))
             {
                 levelBlocks.Add(generateRhythmBlock(0, "r"));
-            } else if (levelLayout[i].Equals("hr"))
+            } else if (levelLayout[i].Equals("hr") && constraints[4] == 1)
             {
                 if (i != 0 && i != levelLayout.Count - 1)
                 {
+                    empty = false;
                     levelBlocks.Add(generateRhythmBlock(1, "hr"));
                     levelBlocks.Add(generateRhythmBlock(0, "hr"));
                 } else
@@ -190,10 +217,11 @@ public class RhythmGenerator : MonoBehaviour
                 }
                 
                 //levelBlocks.Add(generatePuzzleBlock());
-            } else
+            } else if (constraints[4] == 1)
             {
                 if (i != 0 && i != levelLayout.Count - 1)
                 {
+                    empty = false;
                     levelBlocks.Add(generateRhythmBlock(-1, "hr"));
                     levelBlocks.Add(generateRhythmBlock(0, "hr"));
                 }
@@ -202,19 +230,23 @@ public class RhythmGenerator : MonoBehaviour
                     levelBlocks.Add(generateRhythmBlock(0, "r"));
                 }
             }
+            if (i == levelLayout.Count - 1 && empty && constraints[4] == 1)
+            {
+                levelBlocks.Add(generateRhythmBlock(1, "hr"));
+                levelBlocks.Add(generateRhythmBlock(0, "hr"));
+            }
         }
 
         //place geometry based on the blocks generated
-        Debug.Log("START X: " + startX);
-        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin, texGnd, texSlope, texSlope2, texGoal);
+        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin, texGnd, texSlope, texSlope2, texGoal, texPipe);
         gen.generateGeometry();
         gen.cleanUpEnemies();
         gen.cleanUpStomps();
         if (constraints[0] == 1) { gen.jumpTerrain(); }
         if (constraints[3] == 1) { gen.placeSuperEnemies(); }
-        Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
-        Debug.Log("UPPERLVL COUNT: " + GeometryGenerator.upperLvl.Count);
-        Debug.Log("LOWERLVL COUNT: " + GeometryGenerator.lowerLvl.Count);
+        //Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
+        //Debug.Log("UPPERLVL COUNT: " + GeometryGenerator.upperLvl.Count);
+        //Debug.Log("LOWERLVL COUNT: " + GeometryGenerator.lowerLvl.Count);
         //mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),
         //                         new Vector2(0.5f, 0.5f), 100.0f);
         //sr.sprite = mySprite;
