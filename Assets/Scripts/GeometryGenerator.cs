@@ -37,6 +37,9 @@ public class GeometryGenerator : MonoBehaviour
 
     public Texture2D texGround;
     public Texture2D texEnemy;
+    public Texture2D texEnemy2;
+    public Texture2D texEnemy3;
+    public Texture2D texEnemy4;
     public Texture2D texSpike;
     public Texture2D texCoin;
     public Texture2D texGnd;
@@ -44,6 +47,8 @@ public class GeometryGenerator : MonoBehaviour
     public Texture2D texSlope2;
     public Texture2D texGoal;
     public Texture2D texPipe;
+    public Texture2D texUnderGnd;
+    public Texture2D texMoveGnd;
 
     public int enemyID = 0;
 
@@ -71,7 +76,8 @@ public class GeometryGenerator : MonoBehaviour
 
     public GeometryGenerator(List<Block> blocks, int startX, int startY, Texture2D ground,
     Texture2D enemy, Texture2D spike, Texture2D coin, Texture2D gnd, Texture2D slope,
-    Texture2D slope2, Texture2D goal, Texture2D pipe)
+    Texture2D slope2, Texture2D goal, Texture2D pipe, Texture2D texUnderGnd, Texture2D texMoveGnd,
+    Texture2D texEnemy2, Texture2D texEnemy3, Texture2D texEnemy4)
     {
         this.blocks = blocks;
         globalX = -9;
@@ -91,6 +97,11 @@ public class GeometryGenerator : MonoBehaviour
         texSlope2 = slope2;
         texGoal = goal;
         texPipe = pipe;
+        this.texUnderGnd = texUnderGnd;
+        this.texMoveGnd = texMoveGnd;
+        this.texEnemy2 = texEnemy2;
+        this.texEnemy3 = texEnemy3;
+        this.texEnemy4 = texEnemy4;
     }
 
     public void cleanUpSpikyLedges()
@@ -312,6 +323,10 @@ public class GeometryGenerator : MonoBehaviour
             enemy.GetComponent<Rigidbody2D>().isKinematic = true;
             enemy.name = "" + enemyID;//enemy.GetComponent<BoxCollider2D>().isTrigger = true;
             enemy.AddComponent<EnemyController>();
+            enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
+            enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
+            enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
+            enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
             enemyID += 1;
             enemies.Add(enemy);
 
@@ -690,6 +705,103 @@ public class GeometryGenerator : MonoBehaviour
         }
     }
 
+    public void cosmetics()
+    {
+        float lowestY = 100;
+        for (int i = 0; i < lvl.Count; i++)
+        {
+            if (lvl[i].y < lowestY)
+            {
+                lowestY = lvl[i].y;
+            }
+        }
+
+        for (int i = 0; i < lvl.Count - 3; i++)
+        {
+            for (int j = (int)lvl[i].y - 1; j > lowestY - 1; j--)
+            {
+                if (lvl[i].z == -1 || lvl[i].z == 2)
+                {
+                    continue;
+                }
+                GameObject cube = new GameObject();
+                SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                cube.transform.localScale = blockScale;
+                Sprite mySprite = Sprite.Create(texUnderGnd, new Rect(0.0f, 0.0f, texUnderGnd.width, texUnderGnd.height),
+                         new Vector2(0.5f, 0.5f), 100.0f);
+                sr.sprite = mySprite;
+                cube.AddComponent<BoxCollider2D>();
+                cube.transform.position = new Vector3(lvl[i].x, j, 0);
+            }
+        }
+        cosmetics2();
+        cosmetics3();
+    }
+    public void cosmetics2()
+    {
+        float lowestY = 100;
+        for (int i = 0; i < upperLvl.Count; i++)
+        {
+            if (upperLvl[i].y < lowestY)
+            {
+                lowestY = upperLvl[i].y;
+            }
+        }
+
+        for (int i = 0; i < upperLvl.Count; i++)
+        {
+            for (int j = (int)upperLvl[i].y - 1; j > lowestY - 1; j--)
+            {
+                if (upperLvl[i].z == -1 || upperLvl[i].z == 2)
+                {
+                    continue;
+                }
+                GameObject cube = new GameObject();
+                SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                cube.transform.localScale = blockScale;
+                Sprite mySprite = Sprite.Create(texUnderGnd, new Rect(0.0f, 0.0f, texUnderGnd.width, texUnderGnd.height),
+                         new Vector2(0.5f, 0.5f), 100.0f);
+                sr.sprite = mySprite;
+                cube.AddComponent<BoxCollider2D>();
+                cube.transform.position = new Vector3(upperLvl[i].x, j, 0);
+            }
+        }
+    }
+
+    public void cosmetics3()
+    {
+        float lowestY = 100;
+        for (int i = 0; i < lowerLvl.Count; i++)
+        {
+            if (lowerLvl[i].y < lowestY)
+            {
+                lowestY = lowerLvl[i].y;
+            }
+        }
+
+        for (int i = 0; i < lowerLvl.Count; i++)
+        {
+            for (int j = (int)lowerLvl[i].y - 1; j > lowestY - 1; j--)
+            {
+                if (lowerLvl[i].z == -1 || lowerLvl[i].z == 2)
+                {
+                    continue;
+                }
+                GameObject cube = new GameObject();
+                SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                cube.transform.localScale = blockScale;
+                Sprite mySprite = Sprite.Create(texUnderGnd, new Rect(0.0f, 0.0f, texUnderGnd.width, texUnderGnd.height),
+                         new Vector2(0.5f, 0.5f), 100.0f);
+                sr.sprite = mySprite;
+                cube.AddComponent<BoxCollider2D>();
+                cube.transform.position = new Vector3(lowerLvl[i].x, j, 0);
+            }
+        }
+    }
+
     //searches through enemies list and throws away anyone whose path is in
     //too small or on the beginning stretch
     public void cleanUpEnemies()
@@ -993,6 +1105,10 @@ public class GeometryGenerator : MonoBehaviour
 
                     //Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
+                    enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
+                    enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
+                    enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
+                    enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
                     superEnemies.Add(enemy);
                     dir = !dir;
                 }
@@ -1084,6 +1200,10 @@ public class GeometryGenerator : MonoBehaviour
 
                     //Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
+                    enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
+                    enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
+                    enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
+                    enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
                     superEnemies.Add(enemy);
                     dir = !dir;
                 }
@@ -1175,6 +1295,10 @@ public class GeometryGenerator : MonoBehaviour
 
                     //Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
+                    enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
+                    enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
+                    enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
+                    enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
                     superEnemies.Add(enemy);
                     dir = !dir;
                 }
@@ -1434,7 +1558,7 @@ public class GeometryGenerator : MonoBehaviour
                             sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
                             
                             cube.transform.localScale = blockScale;
-                            Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                            Sprite mySprite = Sprite.Create(texGnd, new Rect(0.0f, 0.0f, texGnd.width, texGnd.height),
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr.sprite = mySprite;
                             cube.AddComponent<BoxCollider2D>();//BoxCollider2D bc = cube.AddComponent<BoxCollider2D>() as BoxCollider2D;
@@ -1862,6 +1986,10 @@ public class GeometryGenerator : MonoBehaviour
                         enemy.GetComponent<Rigidbody2D>().isKinematic = true;
                         enemy.name = "" + enemyID;//enemy.GetComponent<BoxCollider2D>().isTrigger = true;
                         enemy.AddComponent<EnemyController>();
+                        enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
+                        enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
+                        enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
+                        enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
                         enemyID += 1;
                         
 
@@ -1912,7 +2040,7 @@ public class GeometryGenerator : MonoBehaviour
                             SpriteRenderer sr2 = cube2.AddComponent<SpriteRenderer>() as SpriteRenderer;
                             sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
                             cube2.transform.localScale = blockScale;
-                            Sprite mySprite2 = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                            Sprite mySprite2 = Sprite.Create(texMoveGnd, new Rect(0.0f, 0.0f, texMoveGnd.width, texMoveGnd.height),
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr2.sprite = mySprite2;
                             cube2.AddComponent<BoxCollider2D>();
@@ -1983,7 +2111,7 @@ public class GeometryGenerator : MonoBehaviour
                             SpriteRenderer sr = cube.AddComponent<SpriteRenderer>() as SpriteRenderer;
                             sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
                             cube.transform.localScale = blockScale;
-                            Sprite mySprite = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
+                            Sprite mySprite = Sprite.Create(texMoveGnd, new Rect(0.0f, 0.0f, texMoveGnd.width, texMoveGnd.height),
                                      new Vector2(0.5f, 0.5f), 100.0f);
                             sr.sprite = mySprite;
 

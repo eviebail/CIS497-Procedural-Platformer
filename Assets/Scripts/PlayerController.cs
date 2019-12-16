@@ -91,7 +91,8 @@ public class PlayerController : MonoBehaviour
         if (RhythmGenerator.constraints[2] == 1)
         {
             numLives = 1;
-        } else
+        }
+        else
         {
             numLives = 5;
         }
@@ -148,7 +149,8 @@ public class PlayerController : MonoBehaviour
         if (RhythmGenerator.constraints[2] == 1)
         {
             numLives = 1;
-        } else
+        }
+        else
         {
             numLives = 5;
         }
@@ -192,7 +194,8 @@ public class PlayerController : MonoBehaviour
         if (!f_ext)
         {
             dest = new Vector2(transform.position.x + v_x, transform.position.y + v_y - a_y);
-        } else
+        }
+        else
         {
             obstacleY = platforms[pIndex].transform.position.y;
             obstacleY1 = obstacleY + 1;
@@ -231,7 +234,8 @@ public class PlayerController : MonoBehaviour
             //dest = new Vector2(dest.x, dest.y - 0.1f);
 
             a_y = 0.1f;
-        } else
+        }
+        else
         {
             a_y = 0;
         }
@@ -291,7 +295,8 @@ public class PlayerController : MonoBehaviour
                 transform.parent = null;
             }
 
-        } else
+        }
+        else
         {
             f_x = 0;
             v_x = 0;
@@ -363,9 +368,10 @@ public class PlayerController : MonoBehaviour
             Reloader.win = true;
             Debug.Log("hello??" + win);
             end();
-        } else if (RhythmGenerator.constraints[4] == 1
-            && (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4)
-            && numStars == totalStars)
+        }
+        else if (RhythmGenerator.constraints[4] == 1
+          && (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4)
+          && numStars == totalStars)
         {
             Reloader.win = true;
             Debug.Log("hello??" + win);
@@ -475,7 +481,8 @@ public class PlayerController : MonoBehaviour
                     {
                         return true;
                     }
-                } else
+                }
+                else
                 {
                     if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
                         && lvl[i].z != 3 && lvl[i + 1].z != 3)
@@ -494,7 +501,8 @@ public class PlayerController : MonoBehaviour
                     }
                 }
             }
-        } else
+        }
+        else
         {
             for (int i = posFtr; i < posNow; i++)
             {
@@ -546,7 +554,7 @@ public class PlayerController : MonoBehaviour
         //is there anything between curr x,y and future x,y?
         if (pos.x < posFuture.x)
         {
-            for (int i = posNow + 1; i < (int) Mathf.Min(posFtr + 1, upperLvl.Count); i++)
+            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, upperLvl.Count); i++)
             {
                 if (upperLvl[i - 1].z == 3)
                 {
@@ -649,7 +657,7 @@ public class PlayerController : MonoBehaviour
                         return true;
                     }
                 }
-                
+
                 if (System.Math.Abs(lowerLvl[i].z - -1) < 0.01)
                 {
                     //==-1
@@ -699,7 +707,7 @@ public class PlayerController : MonoBehaviour
 
     bool yCollide()
     {
-        int pos = (int) Mathf.Round(transform.position.x + 10);
+        int pos = (int)Mathf.Round(transform.position.x + 10);
         if (pos < 0 || pos >= lvl.Count)
         {
             //Debug.Log("ERRRRRRR");
@@ -718,7 +726,7 @@ public class PlayerController : MonoBehaviour
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y - 0.5f);
             //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
-            if (transform.position.y > (x+b) && transform.position.y < (x + b + 0.5)) //y=mx + b
+            if (transform.position.y > (x + b) && transform.position.y < (x + b + 0.5)) //y=mx + b
             {
                 v_y = v_x;
                 return true;
@@ -755,7 +763,7 @@ public class PlayerController : MonoBehaviour
             return false;
         }
         //Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
-        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
+        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.05)
         {
             return true;
         }
@@ -765,7 +773,7 @@ public class PlayerController : MonoBehaviour
     bool yCollideUpper()
     {
         int pos = (int)Mathf.Round(transform.position.x - ranges[1].x); //DOESNT WORK BECAUSE SIZE IS TOO SMALL
-                                                               //NEED TO ADJUST FOR SIZE DIFF
+                                                                        //NEED TO ADJUST FOR SIZE DIFF
         if (pos < 0 || pos >= upperLvl.Count)
         {
             //Debug.Log("ERRRRRRR at pos " + pos + " , " + (pos - ranges[1].x));
@@ -914,7 +922,8 @@ public class PlayerController : MonoBehaviour
                 {
                     toDelete.Add(i);
                     v_y = 2.2f;
-                } else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
+                }
+                else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
                     //Debug.Log("Collision with enemy: " + en.name);
                     if (prevEnemy.x != i || prevEnemy.y != 0)
@@ -1095,7 +1104,7 @@ public class PlayerController : MonoBehaviour
         if (transform.position.y < ranges[2].z - 5)
         {
             numLives -= 1;
-            transform.position = lastValidPos + 4f*Vector2.up;
+            transform.position = lastValidPos + 4f * Vector2.up;
             v_y = 0;
             a_y = 0;
             v_x = 0;
@@ -1141,17 +1150,19 @@ public class PlayerController : MonoBehaviour
     {
         for (int i = 0; i < stompers.Count; i++)
         {
-            Vector2 stp= stompers[i].transform.position;
+            Vector2 stp = stompers[i].transform.position;
             Vector2 cp = transform.position;
             if (cp.x < stp.x + 0.5f && cp.x > stp.x - 0.5f &&
                 cp.y < stp.y + 0.5f && cp.y > stp.y - 0.5f)
             {
-                if (prevStomp != i) {
+                if (prevStomp != i)
+                {
                     //Debug.Log(i + " OUCH FROM BLOCK");
                     numLives -= 1;
                     prevStomp = i;
                 }
-            } else
+            }
+            else
             {
                 if (prevStomp == i)
                 {
@@ -1169,7 +1180,7 @@ public class PlayerController : MonoBehaviour
             Vector2 cp = transform.position;
             //Debug.Log("You: " + (cp.y - 1) + " , spike: " + (spike.y + 0.5f));
             if (cp.x < spike.x + 0.5f && cp.x > spike.x - 0.5f &&
-                (cp.y-1) < (spike.y + 0.5f) /*&& (cp.y-1) > spike.y + 0.5f*/)
+                (cp.y - 1) < (spike.y + 0.5f) /*&& (cp.y-1) > spike.y + 0.5f*/)
             {
                 if (prevSpike != i)
                 {

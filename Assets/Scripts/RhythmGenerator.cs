@@ -19,10 +19,15 @@ public class RhythmGenerator : MonoBehaviour
     public Texture2D texSpike;
     public Texture2D texCoin;
     public Texture2D texGnd;
+    public Texture2D texUnderGnd;
+    public Texture2D texMoveGnd;
     public Texture2D texSlope;
     public Texture2D texSlope2;
     public Texture2D texGoal;
     public Texture2D texPipe;
+    public Texture2D texEnemy2;
+    public Texture2D texEnemy3;
+    public Texture2D texEnemy4;
 
     public static int[] constraints = new int[7];
 
@@ -238,10 +243,11 @@ public class RhythmGenerator : MonoBehaviour
         }
 
         //place geometry based on the blocks generated
-        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin, texGnd, texSlope, texSlope2, texGoal, texPipe);
+        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin, texGnd, texSlope, texSlope2, texGoal, texPipe, texUnderGnd, texMoveGnd, texEnemy2, texEnemy3, texEnemy4);
         gen.generateGeometry();
         gen.cleanUpEnemies();
         gen.cleanUpStomps();
+        gen.cosmetics();
         if (constraints[0] == 1) { gen.jumpTerrain(); }
         if (constraints[3] == 1) { gen.placeSuperEnemies(); }
         //Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);

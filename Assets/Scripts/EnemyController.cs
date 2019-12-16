@@ -16,7 +16,21 @@ public class EnemyController : MonoBehaviour
 
     public int state = 0;
 
+    public int srState = 2;
+
+    public Texture2D texEnemy;
+    public Texture2D texEnemy2;
+    public Texture2D texEnemy3;
+    public Texture2D texEnemy4;
+
+    Sprite mySprite4;
+    Sprite mySprite3;
+    Sprite mySprite2;
+    Sprite mySprite1;
+
     public Vector2 xRange = new Vector2(-100,0);
+
+    SpriteRenderer sr; //= enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
 
     //x = x_0 + vxt
     //y = y_0 + vyt + -ayt^2;
@@ -25,7 +39,19 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Vector3 pos = transform.position;
+        transform.position = new Vector3(pos.x, pos.y, -1);
         dest = transform.position;
+        sr = GetComponent<SpriteRenderer>();
+        mySprite4 = Sprite.Create(texEnemy4, new Rect(0.0f, 0.0f, texEnemy4.width, texEnemy4.height),
+              new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite3 = Sprite.Create(texEnemy3, new Rect(0.0f, 0.0f, texEnemy3.width, texEnemy3.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite2 = Sprite.Create(texEnemy2, new Rect(0.0f, 0.0f, texEnemy2.width, texEnemy2.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite1 = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
+                             new Vector2(0.5f, 0.5f), 100.0f);
+        InvokeRepeating("SwitchSprites", 0f, 0.1f);
     }
 
     private void Move()
@@ -36,6 +62,34 @@ public class EnemyController : MonoBehaviour
         Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
         GetComponent<Rigidbody2D>().MovePosition(p);
         //Debug.Log("vx: " + v_x);
+    }
+
+    void SwitchSprites()
+    {
+        if (srState == 1)
+        {
+            srState = 3;
+            sr.sprite = mySprite1;
+            return;
+        }
+        else if (srState == 2)
+        {
+            srState = 4;
+            sr.sprite = mySprite2;
+            return;
+        }
+        else if (srState == 3)
+        {
+            srState = 1;
+            sr.sprite = mySprite3;
+            return;
+        }
+        else if (srState == 4)
+        {
+            srState = 2;
+            sr.sprite = mySprite4;
+            return;
+        }
     }
 
     // Update is called once per frame
@@ -58,10 +112,12 @@ public class EnemyController : MonoBehaviour
                 state = 1;
                 //Debug.Log("YO 1");
                 //v_x = 0.15f;
+                srState = 1;
             }
             else if (!valid(-1f * Vector2.right) || transform.position.x - 1 <= xRange.x - 1)
             {
                 state = 0;
+                srState = 2;
                 //Debug.Log("YO 2");
                 //v_x = -0.15f;
             }
@@ -70,12 +126,14 @@ public class EnemyController : MonoBehaviour
             if (!valid(1f * Vector2.right))
             {
                 state = 1;
+                srState = 1;
                 //Debug.Log("YO 1");
                 //v_x = 0.15f;
             }
             else if (!valid(-1f * Vector2.right))
             {
                 state = 0;
+                srState = 2;
                 //Debug.Log("YO 2");
                 //v_x = -0.15f;
             }
@@ -86,12 +144,17 @@ public class EnemyController : MonoBehaviour
         if (state == 0)
         {
             v_x = 0.15f;
+            //sr.sprite = mySprite2;
+            //srState = 2;
         } else if (state == 1)
         {
             v_x = -0.15f;
+            //srState = 1;
+            //sr.sprite = mySprite1;
         }
 
         Move();
+
     }
 
     bool isAirborne(Vector2 pos)

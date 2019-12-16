@@ -269,10 +269,15 @@ MonoBehaviour:
   texSpike: {fileID: 0}
   texCoin: {fileID: 0}
   texGnd: {fileID: 0}
+  texUnderGnd: {fileID: 0}
+  texMoveGnd: {fileID: 0}
   texSlope: {fileID: 0}
   texSlope2: {fileID: 0}
   texGoal: {fileID: 0}
   texPipe: {fileID: 0}
+  texEnemy2: {fileID: 0}
+  texEnemy3: {fileID: 0}
+  texEnemy4: {fileID: 0}
 --- !u!1 &146488863
 GameObject:
   m_ObjectHideFlags: 0
@@ -388,6 +393,98 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &426574391
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 426574392}
+  - component: {fileID: 426574393}
+  - component: {fileID: 426574394}
+  m_Layer: 8
+  m_Name: GameObject (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &426574392
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 426574391}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalScale: {x: 1.5, y: 2, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1053247022}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &426574393
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 426574391}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: 8e160a2a620644cd6afef9119dad1093, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 3.84, y: 2.4}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!114 &426574394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 426574391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11d50a0a2baf14dc490ea0f0c0f710be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -432,14 +529,19 @@ MonoBehaviour:
   startX: -5
   startY: 0
   texGround: {fileID: 2800000, guid: b30ee38608bac4370a9ea2b83e09e5ec, type: 3}
-  texEnemy: {fileID: 2800000, guid: a4fe30a1ef6b44e7f90bbbb2598a63cc, type: 3}
+  texEnemy: {fileID: 2800000, guid: a5302483f08ca4290908ca400dcd9404, type: 3}
   texSpike: {fileID: 2800000, guid: 2c048898f26ae4477ae448c54af4f569, type: 3}
   texCoin: {fileID: 2800000, guid: 4b15cd5d1f241454c963a580523e5872, type: 3}
   texGnd: {fileID: 2800000, guid: f4a2eee0caff14979b44f9942302f27b, type: 3}
+  texUnderGnd: {fileID: 2800000, guid: 4ef2bfb1799d44fb8baebebe4aea1634, type: 3}
+  texMoveGnd: {fileID: 2800000, guid: 561fb5af7d009401b857248d08debda7, type: 3}
   texSlope: {fileID: 2800000, guid: 176657d1b3944495dac2e8a5e8514335, type: 3}
   texSlope2: {fileID: 2800000, guid: d68632f3397f94ba4af3b90bceb79a78, type: 3}
   texGoal: {fileID: 2800000, guid: 0b765ed966fd7499d878aa2f999be5ae, type: 3}
   texPipe: {fileID: 2800000, guid: 63899db3a453048ac9448632040b58a2, type: 3}
+  texEnemy2: {fileID: 2800000, guid: ad690aeb4b43a4e7482f82333fcaad75, type: 3}
+  texEnemy3: {fileID: 2800000, guid: 15ccb171c5fd84c968863b2abccd528b, type: 3}
+  texEnemy4: {fileID: 2800000, guid: 57e7d72ac09d84437b4058c54d5dea0d, type: 3}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -495,7 +597,7 @@ Transform:
   m_Children:
   - {fileID: 1742529260}
   m_Father: {fileID: 1053247022}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &519420033
 MeshRenderer:
@@ -751,7 +853,7 @@ MonoBehaviour:
   xCollided: 0
   moveDir: {x: 0, y: 0}
   prevStomp: -1
-  prevEnemy: -1
+  prevEnemy: {x: -1, y: -1}
   prevEnemy2: -1
   prevSpike: -1
   prevPlatform: -1
@@ -767,6 +869,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 426574392}
   - {fileID: 519420032}
   m_Father: {fileID: 0}
   m_RootOrder: 2
