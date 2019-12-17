@@ -3,6 +3,28 @@ DMD Senior Design Project
 
 Evelyn Bailey
 
+Final Visuals
+
+![](images/start_screen.png)
+<p align="center">
+  Start Screen of the game.
+</p>
+
+![](images/starting_pos.png)
+<p align="center">
+  Sample level visuals.
+</p>
+
+![](images/hard.png)
+<p align="center">
+  Layout of the level using the Hard difficulty level.
+</p>
+
+![](images/spikes_stars.png)
+<p align="center">
+  A sample level with both the spiky floor and find stars constraint.
+</p>
+
 Beta Progress:
 
 -Implemented a user interface so the player can choose which difficulty and constraints they want to use. These parameters adjust the procedural generation of the level and the level completion rules.
