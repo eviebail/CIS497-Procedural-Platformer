@@ -227,7 +227,13 @@ public class RhythmGenerator : MonoBehaviour
                 if (i != 0 && i != levelLayout.Count - 1)
                 {
                     empty = false;
-                    levelBlocks.Add(generateRhythmBlock(-1, "hr"));
+                    if (constraints[0] == 1)
+                    {
+                        levelBlocks.Add(generateRhythmBlock(1, "hr"));
+                    } else
+                    {
+                        levelBlocks.Add(generateRhythmBlock(-1, "hr"));
+                    }
                     levelBlocks.Add(generateRhythmBlock(0, "hr"));
                 }
                 else
@@ -247,15 +253,19 @@ public class RhythmGenerator : MonoBehaviour
         gen.generateGeometry();
         gen.cleanUpEnemies();
         gen.cleanUpStomps();
-        gen.cosmetics();
+        
         if (constraints[0] == 1) { gen.jumpTerrain(); }
+        if (constraints[3] == 1 && constraints[0] != 1) { gen.cleanUpSpikes(); }
         if (constraints[3] == 1) { gen.placeSuperEnemies(); }
+
+        gen.cosmetics();
         //Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
         //Debug.Log("UPPERLVL COUNT: " + GeometryGenerator.upperLvl.Count);
         //Debug.Log("LOWERLVL COUNT: " + GeometryGenerator.lowerLvl.Count);
         //mySprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height),
         //                         new Vector2(0.5f, 0.5f), 100.0f);
         //sr.sprite = mySprite;
+
     }
 
     //void Awake()

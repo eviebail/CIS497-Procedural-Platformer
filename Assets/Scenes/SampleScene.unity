@@ -836,6 +836,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a510702c6fea14d2d95482c7def988b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  texIdle1: {fileID: 2800000, guid: cdbf60bb88ec04c588eda7dff4472ea2, type: 3}
+  texIdle2: {fileID: 2800000, guid: 310c38a4f7e0e453dbade72b7bce79cf, type: 3}
+  texIdle3: {fileID: 2800000, guid: bd95d19c633454578bf7762056851cc4, type: 3}
+  texIdle4: {fileID: 2800000, guid: a747890eb6a804d3dbaabdeb0bda1905, type: 3}
+  texIdle5: {fileID: 2800000, guid: 1bc997846c00b4411a79f5452b8cffcf, type: 3}
+  texIdle6: {fileID: 2800000, guid: 4be75440ea1774c0585cb6a1a4400c91, type: 3}
+  texIdle7: {fileID: 2800000, guid: b144e8bee22254ffcb814f6827e3dc7a, type: 3}
+  texIdle8: {fileID: 2800000, guid: fd5dd76a22742431ca3ca3234fa06a20, type: 3}
+  texRun1R: {fileID: 2800000, guid: 7a79b8a52a51b4717bf664c63967a75c, type: 3}
+  texRun2R: {fileID: 2800000, guid: 35bac704900854f63a744917cbba64e9, type: 3}
+  texRun1L: {fileID: 2800000, guid: 9b4b2580dd01e4abb8dc09ee66e0a4d3, type: 3}
+  texRun2L: {fileID: 2800000, guid: a51f879d14f0c4d5cb5350c026eaa8c7, type: 3}
+  texCrouch1R: {fileID: 2800000, guid: 5880f3d74758b4b15a3af6f117b305fb, type: 3}
+  texCrouch2R: {fileID: 2800000, guid: cab68e71610914c47bcdab51eb0e3e3d, type: 3}
+  texCrouch1L: {fileID: 2800000, guid: 19bb6229c76894454ad2757a02de96a2, type: 3}
+  texCrouch2L: {fileID: 2800000, guid: 4dcfc29dd66f54d9ebd4133d19f38c84, type: 3}
+  texJumpL: {fileID: 2800000, guid: 8fc0874bddbfe40bd9b9e7ab14d02af5, type: 3}
+  texJumpR: {fileID: 2800000, guid: 96ed8a47bfee743ca848bc189252fdd1, type: 3}
+  texFallL: {fileID: 2800000, guid: e73d57d77dadc4f98976d71a87429816, type: 3}
+  texFallR: {fileID: 2800000, guid: 2e440ad93a1504ed0ab691ddee4cc753, type: 3}
   speed: 0.3
   tex: {fileID: 2800000, guid: c2e4bbc82501143948c8ef1d47768c0a, type: 3}
   v_x: 0
@@ -858,6 +878,7 @@ MonoBehaviour:
   prevSpike: -1
   prevPlatform: -1
   boundBox: {x: 0.5, y: 0.5}
+  srState: 1
 --- !u!4 &1053247022
 Transform:
   m_ObjectHideFlags: 0
@@ -1603,8 +1624,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4282761319
+  m_fontColor: {r: 0.4039216, g: 0.75294125, b: 0.27058825, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

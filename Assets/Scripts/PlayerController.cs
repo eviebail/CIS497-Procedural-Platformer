@@ -7,9 +7,57 @@ using UnityEngine.SceneManagement;
 //and tweak linecasting function to ensure it works
 public class PlayerController : MonoBehaviour
 {
+
+    public Texture2D texIdle1;
+    public Texture2D texIdle2;
+    public Texture2D texIdle3;
+    public Texture2D texIdle4;
+    public Texture2D texIdle5;
+    public Texture2D texIdle6;
+    public Texture2D texIdle7;
+    public Texture2D texIdle8;
+
+    public Texture2D texRun1R;
+    public Texture2D texRun2R;
+    public Texture2D texRun1L;
+    public Texture2D texRun2L;
+
+    public Texture2D texCrouch1R;
+    public Texture2D texCrouch2R;
+    public Texture2D texCrouch1L;
+    public Texture2D texCrouch2L;
+
+    public Texture2D texJumpL;
+    public Texture2D texJumpR;
+    public Texture2D texFallL;
+    public Texture2D texFallR;
+
+    Sprite mySprite4;
+    Sprite mySprite3;
+    Sprite mySprite2;
+    Sprite mySprite1;
+    Sprite mySprite5;
+    Sprite mySprite6;
+    Sprite mySprite7;
+    Sprite mySprite8;
+    Sprite mySprite9;
+    Sprite mySprite10;
+    Sprite mySprite11;
+    Sprite mySprite12;
+
+    Sprite mySprite13;
+    Sprite mySprite14;
+    Sprite mySprite15;
+    Sprite mySprite16;
+
+    Sprite mySprite17;
+    Sprite mySprite18;
+    Sprite mySprite19;
+    Sprite mySprite20;
+
     public float speed = 0.1f;
     Vector2 dest = Vector2.zero;
-    private Vector3 start = new Vector3(-9f, 2f, 0f);
+    private Vector3 start = new Vector3(-9f, 2f, -3f);
     public Texture2D tex;
     private Sprite mySprite;
     private SpriteRenderer sr;
@@ -79,15 +127,194 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
+        Vector3 pos = transform.position;
+        transform.position = new Vector3(pos.x, pos.y, -3);
         sr = this.gameObject.AddComponent<SpriteRenderer>() as SpriteRenderer;
         sr.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
         this.gameObject.transform.position = start;
         this.gameObject.transform.localScale = new Vector3(4f, 4f, 4f);
+
+        mySprite4 = Sprite.Create(texIdle4, new Rect(0.0f, 0.0f, texIdle4.width, texIdle4.height),
+              new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite3 = Sprite.Create(texIdle3, new Rect(0.0f, 0.0f, texIdle3.width, texIdle3.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite2 = Sprite.Create(texIdle2, new Rect(0.0f, 0.0f, texIdle2.width, texIdle2.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite1 = Sprite.Create(texIdle1, new Rect(0.0f, 0.0f, texIdle1.width, texIdle1.height),
+                             new Vector2(0.5f, 0.5f), 100.0f);
+
+        mySprite5 = Sprite.Create(texIdle5, new Rect(0.0f, 0.0f, texIdle5.width, texIdle5.height),
+              new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite6 = Sprite.Create(texIdle6, new Rect(0.0f, 0.0f, texIdle3.width, texIdle3.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite7 = Sprite.Create(texIdle7, new Rect(0.0f, 0.0f, texIdle2.width, texIdle2.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite8 = Sprite.Create(texIdle8, new Rect(0.0f, 0.0f, texIdle1.width, texIdle1.height),
+                             new Vector2(0.5f, 0.5f), 100.0f);
+
+        mySprite9 = Sprite.Create(texRun1R, new Rect(0.0f, 0.0f, texRun1R.width, texRun1R.height),
+              new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite10 = Sprite.Create(texRun2R, new Rect(0.0f, 0.0f, texRun2R.width, texRun2R.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite11 = Sprite.Create(texRun1L, new Rect(0.0f, 0.0f, texRun1L.width, texRun1L.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite12 = Sprite.Create(texRun2L, new Rect(0.0f, 0.0f, texRun2L.width, texRun2L.height),
+                             new Vector2(0.5f, 0.5f), 100.0f);
+
+        mySprite13 = Sprite.Create(texCrouch1R, new Rect(0.0f, 0.0f, texCrouch1R.width, texCrouch1R.height),
+              new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite14 = Sprite.Create(texCrouch2R, new Rect(0.0f, 0.0f, texRun2R.width, texRun2R.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite15 = Sprite.Create(texCrouch1L, new Rect(0.0f, 0.0f, texRun1L.width, texRun1L.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite16 = Sprite.Create(texCrouch2L, new Rect(0.0f, 0.0f, texRun2L.width, texRun2L.height),
+                             new Vector2(0.5f, 0.5f), 100.0f);
+
+        mySprite17 = Sprite.Create(texJumpL, new Rect(0.0f, 0.0f, texJumpL.width, texJumpL.height),
+              new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite18 = Sprite.Create(texJumpR, new Rect(0.0f, 0.0f, texJumpR.width, texJumpR.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite19 = Sprite.Create(texFallL, new Rect(0.0f, 0.0f, texFallL.width, texFallL.height),
+                      new Vector2(0.5f, 0.5f), 100.0f);
+        mySprite20 = Sprite.Create(texFallR, new Rect(0.0f, 0.0f, texFallR.width, texFallR.height),
+                             new Vector2(0.5f, 0.5f), 100.0f);
+
+    }
+    public int srState = 1;
+
+    void SwitchSprites()
+    {
+        if (srState == 1)
+        {
+            srState = 2;
+            sr.sprite = mySprite1;
+            return;
+        }
+        else if (srState == 2)
+        {
+            srState = 3;
+            sr.sprite = mySprite2;
+            return;
+        }
+        else if (srState == 3)
+        {
+            srState = 4;
+            sr.sprite = mySprite3;
+            return;
+        }
+        else if (srState == 4)
+        {
+            srState = 1;
+            sr.sprite = mySprite4;
+            return;
+        }
+        if (srState == 5)
+        {
+            srState = 6;
+            sr.sprite = mySprite5;
+            return;
+        }
+        else if (srState == 6)
+        {
+            srState = 7;
+            sr.sprite = mySprite6;
+            return;
+        }
+        else if (srState == 7)
+        {
+            srState = 8;
+            sr.sprite = mySprite7;
+            return;
+        }
+        else if (srState == 8)
+        {
+            srState = 5;
+            sr.sprite = mySprite8;
+            return;
+        }
+        if (srState == 9)
+        {
+            srState = 10;
+            sr.sprite = mySprite9;
+            return;
+        }
+        else if (srState == 10)
+        {
+            srState = 9;
+            sr.sprite = mySprite10;
+            return;
+        }
+        else if (srState == 11)
+        {
+            srState = 12;
+            sr.sprite = mySprite11;
+            return;
+        }
+        else if (srState == 12)
+        {
+            srState = 11;
+            sr.sprite = mySprite12;
+            return;
+        }
+        if (srState == 13)
+        {
+            srState = 14;
+            sr.sprite = mySprite13;
+            return;
+        }
+        else if (srState == 14)
+        {
+            srState = 13;
+            sr.sprite = mySprite14;
+            return;
+        }
+        else if (srState == 15)
+        {
+            srState = 16;
+            sr.sprite = mySprite15;
+            return;
+        }
+        else if (srState == 16)
+        {
+            srState = 15;
+            sr.sprite = mySprite16;
+            return;
+        }
+        else if (srState == 17)
+        {
+            sr.sprite = mySprite17;
+            //if (v_y < 0)
+            //{
+            //    srState = 19;
+            //}
+            return;
+        }
+        else if (srState == 18)
+        {
+            sr.sprite = mySprite18;
+            //if (v_y < 0)
+            //{
+            //    srState = 20;
+            //}
+            return;
+        }
+        else if (srState == 19)
+        {
+            sr.sprite = mySprite19;
+            return;
+        }
+        else if (srState == 20)
+        {
+            sr.sprite = mySprite20;
+            return;
+        }
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        InvokeRepeating("SwitchSprites", 0f, 0.1f);
+
         if (RhythmGenerator.constraints[2] == 1)
         {
             numLives = 1;
@@ -225,6 +452,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    int prevSrState = 0;
+
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -243,6 +472,23 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.Space) && valid(Vector2.up)
                             && !isAirborne(transform.position))
         {
+            if (direction.x == 1)
+            {
+                if (prevSrState != 18)
+                {
+                    prevSrState = 18;
+                    srState = 18;
+                }
+            } else if (direction.x == -1)
+            {
+                if (prevSrState != 17)
+                {
+                    prevSrState = 17;
+                    srState = 17;
+                }
+            }
+
+            Debug.Log(srState + " <<<<<< ");
             if (RhythmGenerator.constraints[0] == 1)
             {
                 death = true;
@@ -254,6 +500,12 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
+            if (prevSrState != 9 && !isAir)
+            {
+                prevSrState = 9;
+                srState = 9;
+            }
+            
             Vector2 dir = Vector2.right;
             //don't care about what's above range?
             if (lvl[(int)(transform.position.x + 10)].z == 3)
@@ -274,6 +526,11 @@ public class PlayerController : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
+            if (prevSrState != 11 && !isAir)
+            {
+                prevSrState = 11;
+                srState = 11;
+            }
             if (RhythmGenerator.constraints[5] == 1)
             {
                 death = true;
@@ -298,8 +555,44 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            if (direction.x == -1)
+            {
+                if (prevSrState != 5 && !isAir)
+                {
+                    prevSrState = 5;
+                    srState = 5;
+                }
+            } else if (direction.x == 1)
+            {
+                if (prevSrState != 1 && !isAir)
+                {
+                    prevSrState = 1;
+                    srState = 1;
+                }
+            }
             f_x = 0;
             v_x = 0;
+            Debug.Log(srState + " <<<<< ");
+        }
+
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            if (direction.x == 1)
+            {
+                if (prevSrState != 13 && !isAir)
+                {
+                    prevSrState = 13;
+                    srState = 13;
+                }
+            }
+            else if (direction.x == -1)
+            {
+                if (prevSrState != 15 && !isAir)
+                {
+                    prevSrState = 15;
+                    srState = 15;
+                }
+            }
         }
 
         if (Input.GetKey(KeyCode.DownArrow) && overPipe())
@@ -317,7 +610,7 @@ public class PlayerController : MonoBehaviour
                     if (obstacle.x == (int)Mathf.Round(transform.position.x))
                     {
                         preWarpPos = lvl[(int)Mathf.Round(transform.position.x) + 10];
-                        transform.position = new Vector3(obstacle.x, obstacle.y + 4, 0);
+                        transform.position = new Vector3(obstacle.x, obstacle.y + 4, -3);
                     }
                 }
             }
@@ -331,7 +624,7 @@ public class PlayerController : MonoBehaviour
                     if (obstacle.x == (int)Mathf.Round(transform.position.x))
                     {
                         preWarpPos = lvl[(int)Mathf.Round(transform.position.x) + 10];
-                        transform.position = new Vector3(obstacle.x, obstacle.y + 4, 0);
+                        transform.position = new Vector3(obstacle.x, obstacle.y + 4, -3);
                     }
                 }
             }
@@ -763,7 +1056,7 @@ public class PlayerController : MonoBehaviour
             return false;
         }
         //Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
-        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.05)
+        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
         {
             return true;
         }
