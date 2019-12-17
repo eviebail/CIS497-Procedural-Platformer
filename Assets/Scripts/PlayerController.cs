@@ -358,16 +358,16 @@ public class PlayerController : MonoBehaviour
             InvokeRepeating("AdvanceTime", 1f, 1f);
         }
 
-        Debug.Log("PLATFORMS: " + platforms.Count);
-        //Debug.Log("LowEr lEveL");
+        //Debug.Log("PLATFORMS: " + platforms.Count);
+        ////Debug.Log("LowEr lEveL");
         //for (int i = 0; i < lowerLvl.Count; i++)
         //{
-        //    Debug.Log(lowerLvl[i]);
+        //    //Debug.Log(lowerLvl[i]);
         //}
-        //Debug.Log("sTomPS: " + stompers.Count);
+        ////Debug.Log("sTomPS: " + stompers.Count);
         //for (int i = 0; i < lvl.Count; i++)
         //{
-        //    Debug.Log(lvl[i]);
+        //    //Debug.Log(lvl[i]);
         //}
     }
 
@@ -432,7 +432,7 @@ public class PlayerController : MonoBehaviour
                 dest = new Vector2(transform.position.x + v_x, transform.position.y + v_y - a_y);
             }
             //fext is no longer true when we move up
-            //Debug.Log("Dest: " + dest);
+            ////Debug.Log("Dest: " + dest);
         }
 
         Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
@@ -488,7 +488,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
-            Debug.Log(srState + " <<<<<< ");
+            //Debug.Log(srState + " <<<<<< ");
             if (RhythmGenerator.constraints[0] == 1)
             {
                 death = true;
@@ -572,7 +572,7 @@ public class PlayerController : MonoBehaviour
             }
             f_x = 0;
             v_x = 0;
-            Debug.Log(srState + " <<<<< ");
+            //Debug.Log(srState + " <<<<< ");
         }
 
         if (Input.GetKey(KeyCode.DownArrow))
@@ -597,16 +597,16 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.DownArrow) && overPipe())
         {
-            Debug.Log("DOWNARRRAOOWOAFEOKSG");
+            //Debug.Log("DOWNARRRAOOWOAFEOKSG");
             //warp to destination
             if (upperLvl.Count > 0)
             {
                 int pos = (int)Mathf.Round(transform.position.x - ranges[1].x);
-                Debug.Log("WJOOOOOO " + pos + " , " + upperLvl.Count);
+                //Debug.Log("WJOOOOOO " + pos + " , " + upperLvl.Count);
                 if (pos >= 0 && pos < upperLvl.Count)
                 {
                     Vector3 obstacle = upperLvl[pos];
-                    Debug.Log("HIIIII " + obstacle.x + " , " + transform.position.x);
+                    //Debug.Log("HIIIII " + obstacle.x + " , " + transform.position.x);
                     if (obstacle.x == (int)Mathf.Round(transform.position.x))
                     {
                         preWarpPos = lvl[(int)Mathf.Round(transform.position.x) + 10];
@@ -620,7 +620,7 @@ public class PlayerController : MonoBehaviour
                 if (pos >= 0 && pos < lowerLvl.Count)
                 {
                     Vector3 obstacle = lowerLvl[pos];
-                    Debug.Log("HIIIII " + obstacle.x + " , " + transform.position.x);
+                    ////Debug.Log("HIIIII " + obstacle.x + " , " + transform.position.x);
                     if (obstacle.x == (int)Mathf.Round(transform.position.x))
                     {
                         preWarpPos = lvl[(int)Mathf.Round(transform.position.x) + 10];
@@ -634,7 +634,7 @@ public class PlayerController : MonoBehaviour
         onCollideWithEnemy();
         onCollideWithPlatform();
         onCollideWithSmasher();
-        //onCollideWithSpike();
+        onCollideWithSpike();
         onCollideWithCoin();
         onCollideWithStar();
         onFallOfCliff();
@@ -659,7 +659,7 @@ public class PlayerController : MonoBehaviour
             (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4))
         {
             Reloader.win = true;
-            Debug.Log("hello??" + win);
+            //Debug.Log("hello??" + win);
             end();
         }
         else if (RhythmGenerator.constraints[4] == 1
@@ -667,7 +667,7 @@ public class PlayerController : MonoBehaviour
           && numStars == totalStars)
         {
             Reloader.win = true;
-            Debug.Log("hello??" + win);
+            //Debug.Log("hello??" + win);
             end();
         }
         else if (RhythmGenerator.constraints[1] == 0 && RhythmGenerator.constraints[4] == 0
@@ -675,7 +675,7 @@ public class PlayerController : MonoBehaviour
         {
 
             Reloader.win = true;
-            Debug.Log("hello??" + win);
+            //Debug.Log("hello??" + win);
             end();
         }
     }
@@ -790,7 +790,7 @@ public class PlayerController : MonoBehaviour
                     if (lvl[posNow].z != -1)
                     {
                         lastValidPos = lvl[posNow];//new Vector2(posNow, pos.y);
-                        //Debug.Log("LAST VALID: " + lastValidPos);
+                        ////Debug.Log("LAST VALID: " + lastValidPos);
                     }
                 }
             }
@@ -820,7 +820,7 @@ public class PlayerController : MonoBehaviour
                     if (lvl[posNow].z != -1)
                     {
                         lastValidPos = lvl[posNow];//new Vector2(posNow, pos.y);
-                        //Debug.Log("LAST VALID: " + lastValidPos);
+                        ////Debug.Log("LAST VALID: " + lastValidPos);
                     }
                 }
             }
@@ -871,7 +871,7 @@ public class PlayerController : MonoBehaviour
                     if (upperLvl[posNow].z != -1)
                     {
                         lastValidPos = upperLvl[posNow];//new Vector2(posNow, pos.y);
-                        //Debug.Log("LAST VALID: " + lastValidPos);
+                        ////Debug.Log("LAST VALID: " + lastValidPos);
                     }
                 }
             }
@@ -901,7 +901,7 @@ public class PlayerController : MonoBehaviour
                     if (upperLvl[posNow].z != -1)
                     {
                         lastValidPos = upperLvl[posNow];//new Vector2(posNow, pos.y);
-                        //Debug.Log("LAST VALID: " + lastValidPos);
+                        ////Debug.Log("LAST VALID: " + lastValidPos);
                     }
                 }
             }
@@ -919,8 +919,8 @@ public class PlayerController : MonoBehaviour
         int posNow = (int)(Mathf.Round(pos.x - ranges[2].x));
         int posFtr = (int)(Mathf.Round(posFuture.x - ranges[2].x));
 
-        //Debug.Log("::x's " + posNow + " , " + posFtr);
-        //Debug.Log("::range " + ranges[2].x + " , " + ranges[2].y);
+        ////Debug.Log("::x's " + posNow + " , " + posFtr);
+        ////Debug.Log("::range " + ranges[2].x + " , " + ranges[2].y);
 
         if (posNow < 0 || posNow >= lowerLvl.Count || posFtr < 0 || posFtr >= lowerLvl.Count
             || pos.y < ranges[2].z)
@@ -928,7 +928,7 @@ public class PlayerController : MonoBehaviour
             return false;
         }
 
-        //Debug.Log("now vs ftr: " + pos.x + " , " + posFuture.x);
+        ////Debug.Log("now vs ftr: " + pos.x + " , " + posFuture.x);
 
         //is there anything between curr x,y and future x,y?
         if (pos.x < posFuture.x)
@@ -957,7 +957,7 @@ public class PlayerController : MonoBehaviour
                     if (lowerLvl[posNow].z != -1)
                     {
                         lastValidPos = lowerLvl[posNow];//new Vector2(posNow, pos.y);
-                        //Debug.Log("LAST VALID: " + lastValidPos);
+                        ////Debug.Log("LAST VALID: " + lastValidPos);
                     }
                 }
             }
@@ -984,11 +984,11 @@ public class PlayerController : MonoBehaviour
                 if (System.Math.Abs(lowerLvl[i].z - -1) < 0.01)
                 {
                     //==-1
-                    Debug.Log("Am I -1??? " + lowerLvl[i].z);
+                    //Debug.Log("Am I -1??? " + lowerLvl[i].z);
                     if (lowerLvl[posNow].z != -1)
                     {
                         lastValidPos = lowerLvl[posNow];//new Vector2(posNow, pos.y);
-                        //Debug.Log("LAST VALID: " + lastValidPos);
+                        ////Debug.Log("LAST VALID: " + lastValidPos);
                     }
                 }
             }
@@ -1003,7 +1003,7 @@ public class PlayerController : MonoBehaviour
         int pos = (int)Mathf.Round(transform.position.x + 10);
         if (pos < 0 || pos >= lvl.Count)
         {
-            //Debug.Log("ERRRRRRR");
+            ////Debug.Log("ERRRRRRR");
             return false;
         }
 
@@ -1011,14 +1011,14 @@ public class PlayerController : MonoBehaviour
         if (System.Math.Abs(obstacle.z - -1) < 0.01)
         {
             //cliff!
-            //Debug.Log("-1!!!!!!!");
+            ////Debug.Log("-1!!!!!!!");
             return false;
         }
         if (obstacle.z == 3)
         {
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y - 0.5f);
-            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
             if (transform.position.y > (x + b) && transform.position.y < (x + b + 0.5)) //y=mx + b
             {
                 v_y = v_x;
@@ -1031,7 +1031,7 @@ public class PlayerController : MonoBehaviour
         {
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y + 0.5f);
-            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
             if (transform.position.y > (-x + b) && transform.position.y < (-x + b + 0.5)) //y=mx + b
             {
                 v_y = -v_x;
@@ -1055,7 +1055,7 @@ public class PlayerController : MonoBehaviour
             }
             return false;
         }
-        //Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
+        ////Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
         if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
         {
             return true;
@@ -1069,8 +1069,8 @@ public class PlayerController : MonoBehaviour
                                                                         //NEED TO ADJUST FOR SIZE DIFF
         if (pos < 0 || pos >= upperLvl.Count)
         {
-            //Debug.Log("ERRRRRRR at pos " + pos + " , " + (pos - ranges[1].x));
-            //Debug.Log("RANGES " + (ranges[1].x) + " , " + ranges[1].y);
+            ////Debug.Log("ERRRRRRR at pos " + pos + " , " + (pos - ranges[1].x));
+            ////Debug.Log("RANGES " + (ranges[1].x) + " , " + ranges[1].y);
             return false;
         }
 
@@ -1084,7 +1084,7 @@ public class PlayerController : MonoBehaviour
         {
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y - 0.5f);
-            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
             if (transform.position.y > (x + b) && transform.position.y < (x + b + 0.5)) //y=mx + b
             {
                 v_y = v_x;
@@ -1097,7 +1097,7 @@ public class PlayerController : MonoBehaviour
         {
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y + 0.5f);
-            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
             if (transform.position.y > (-x + b) && transform.position.y < (-x + b + 0.5)) //y=mx + b
             {
                 v_y = -v_x;
@@ -1121,7 +1121,7 @@ public class PlayerController : MonoBehaviour
             }
             return false;
         }
-        //Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
+        ////Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
         if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
         {
             return true;
@@ -1134,7 +1134,7 @@ public class PlayerController : MonoBehaviour
         int pos = (int)Mathf.Round(transform.position.x - ranges[2].x);
         if (pos < 0 || pos >= lowerLvl.Count)
         {
-            //Debug.Log("ERRRRRRR");
+            ////Debug.Log("ERRRRRRR");
             return false;
         }
 
@@ -1142,14 +1142,14 @@ public class PlayerController : MonoBehaviour
         if (System.Math.Abs(obstacle.z - -1) < 0.01)
         {
             //cliff!
-            //Debug.Log("-1!!!!!!!");
+            ////Debug.Log("-1!!!!!!!");
             return false;
         }
         if (obstacle.z == 3)
         {
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y - 0.5f);
-            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
             if (transform.position.y > (x + b) && transform.position.y < (x + b + 0.5)) //y=mx + b
             {
                 v_y = v_x;
@@ -1162,7 +1162,7 @@ public class PlayerController : MonoBehaviour
         {
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y + 0.5f);
-            //Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
+            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
             if (transform.position.y > (-x + b) && transform.position.y < (-x + b + 0.5)) //y=mx + b
             {
                 v_y = -v_x;
@@ -1186,7 +1186,7 @@ public class PlayerController : MonoBehaviour
             }
             return false;
         }
-        //Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
+        ////Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
         if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
         {
             return true;
@@ -1218,7 +1218,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
-                    //Debug.Log("Collision with enemy: " + en.name);
+                    ////Debug.Log("Collision with enemy: " + en.name);
                     if (prevEnemy.x != i || prevEnemy.y != 0)
                     {
                         numLives -= 1;
@@ -1237,7 +1237,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("To delete count: " + toDelete.Count);
+        ////Debug.Log("To delete count: " + toDelete.Count);
         killed += toDelete.Count;
         for (int j = 0; j < toDelete.Count; j++)
         {
@@ -1267,7 +1267,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
-                    //Debug.Log("Collision with enemy: " + en.name);
+                    ////Debug.Log("Collision with enemy: " + en.name);
                     if (prevEnemy.x != i || prevEnemy.y != 1)
                     {
                         numLives -= 1;
@@ -1286,7 +1286,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("To delete count: " + toDelete.Count);
+        ////Debug.Log("To delete count: " + toDelete.Count);
         killed += toDeleteL.Count;
         for (int j = 0; j < toDeleteL.Count; j++)
         {
@@ -1333,7 +1333,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("To delete count: " + toDelete.Count);
+        ////Debug.Log("To delete count: " + toDelete.Count);
         killed += toDeleteU.Count;
         for (int j = 0; j < toDeleteU.Count; j++)
         {
@@ -1363,7 +1363,7 @@ public class PlayerController : MonoBehaviour
                 }
                 else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
-                    //Debug.Log("Collision with enemy: " + en.name);
+                    ////Debug.Log("Collision with enemy: " + en.name);
                     if (prevEnemy2 != i)
                     {
                         numLives -= 1;
@@ -1380,7 +1380,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("To delete count: " + toDelete.Count);
+        ////Debug.Log("To delete count: " + toDelete.Count);
         killed += toDeleteSuper.Count;
         for (int j = 0; j < toDeleteSuper.Count; j++)
         {
@@ -1450,7 +1450,7 @@ public class PlayerController : MonoBehaviour
             {
                 if (prevStomp != i)
                 {
-                    //Debug.Log(i + " OUCH FROM BLOCK");
+                    ////Debug.Log(i + " OUCH FROM BLOCK");
                     numLives -= 1;
                     prevStomp = i;
                 }
@@ -1471,13 +1471,13 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 spike = spikes[i].transform.position;
             Vector2 cp = transform.position;
-            //Debug.Log("You: " + (cp.y - 1) + " , spike: " + (spike.y + 0.5f));
+            ////Debug.Log("You: " + (cp.y - 1) + " , spike: " + (spike.y + 0.5f));
             if (cp.x < spike.x + 0.5f && cp.x > spike.x - 0.5f &&
                 (cp.y - 1) < (spike.y + 0.5f) /*&& (cp.y-1) > spike.y + 0.5f*/)
             {
                 if (prevSpike != i)
                 {
-                    //Debug.Log(i + " OUCH FROM SPIKE");
+                    ////Debug.Log(i + " OUCH FROM SPIKE");
                     numLives -= 1;
                     prevSpike = i;
                 }
@@ -1509,7 +1509,7 @@ public class PlayerController : MonoBehaviour
                 numCoins += 1;
             }
         }
-        //Debug.Log("To delete count: " + toDelete.Count);
+        ////Debug.Log("To delete count: " + toDelete.Count);
         for (int j = 0; j < toDelete.Count; j++)
         {
             GameObject c = coins[toDelete[j]];
@@ -1537,7 +1537,7 @@ public class PlayerController : MonoBehaviour
                 toDelete.Add(i);
             }
         }
-        //Debug.Log("To delete count: " + toDelete.Count);
+        ////Debug.Log("To delete count: " + toDelete.Count);
         for (int j = 0; j < toDelete.Count; j++)
         {
             GameObject s = stars[toDelete[j]];

@@ -237,7 +237,7 @@ public class GeometryGenerator : MonoBehaviour
 
         //for (int s = 0; s < spikeus.Count; s++)
         //{
-        //    Debug.Log("SPIKES: " + spikeus[s]);
+        //    //Debug.Log("SPIKES: " + spikeus[s]);
         //}
 
         //for (int i = 0; i < lvl.Count; i++)
@@ -542,7 +542,7 @@ public class GeometryGenerator : MonoBehaviour
             upperEnemies.Add(enemy);
             enemy.GetComponent<EnemyController>().xRange = new Vector2(baseX + 1, baseX + 3);
 
-            //Debug.Log("::: " + (ranges.x + 4) + " vs " + (baseX + 4));
+            ////Debug.Log("::: " + (ranges.x + 4) + " vs " + (baseX + 4));
 
             //offset += 3;
             //start = baseX + 4;
@@ -560,10 +560,10 @@ public class GeometryGenerator : MonoBehaviour
                     gndTexts[k].transform.position = new Vector3(p.x + 3, p.y - 2, p.z);
                 }
             }
-            //Debug.Log("CUTOFF: " + (baseX + 4));
+            ////Debug.Log("CUTOFF: " + (baseX + 4));
             for (int k = 0; k < upperStompers.Count; k++)
             {
-                //Debug.Log("STOMPS: " + stompers[k].transform.position);
+                ////Debug.Log("STOMPS: " + stompers[k].transform.position);
                 Vector3 stompPos = upperStompers[k].transform.position;
                 if (stompPos.x >= (baseX + 4))
                 {
@@ -604,7 +604,7 @@ public class GeometryGenerator : MonoBehaviour
         }
         //for (int i = 0; i < ledges.Count; i++)
         //{
-        //    //Debug.Log("ORIGNAL::: " + lvl[(int)(ledges[i].x - 1)]);
+        //    ////Debug.Log("ORIGNAL::: " + lvl[(int)(ledges[i].x - 1)]);
         //}
 
         //int offset = 0;
@@ -615,7 +615,7 @@ public class GeometryGenerator : MonoBehaviour
             ledges[i] = new Vector3(ps.x + 3*i, ps.y, ps.z);
             Vector3 ranges = ledges[i];
 
-            //Debug.Log("NEW::: " + lvl[(int)(ledges[i].x - 1)]);
+            ////Debug.Log("NEW::: " + lvl[(int)(ledges[i].x - 1)]);
 
             int baseX = (int)lvl[(int)ledges[i].x - 1].x;
             int baseY = (int)lvl[(int)ledges[i].x - 1].y; //ranges.y;
@@ -687,7 +687,7 @@ public class GeometryGenerator : MonoBehaviour
             enemies.Add(enemy);
             enemy.GetComponent<EnemyController>().xRange = new Vector2(baseX + 1, baseX + 3);
 
-            //Debug.Log("::: " + (ranges.x + 4) + " vs " + (baseX + 4));
+            ////Debug.Log("::: " + (ranges.x + 4) + " vs " + (baseX + 4));
 
             //offset += 3;
             //start = baseX + 4;
@@ -704,10 +704,10 @@ public class GeometryGenerator : MonoBehaviour
                     gndTexts[k].transform.position = new Vector3(p.x + 3, p.y - 2, p.z);
                 }
             }
-            //Debug.Log("CUTOFF: " + (baseX + 4));
+            ////Debug.Log("CUTOFF: " + (baseX + 4));
             for (int k = 0; k < stompers.Count; k++)
             {
-                //Debug.Log("STOMPS: " + stompers[k].transform.position);
+                ////Debug.Log("STOMPS: " + stompers[k].transform.position);
                 Vector3 stompPos = stompers[k].transform.position;
                 if (stompPos.x >= (baseX + 4))
                 {
@@ -736,7 +736,7 @@ public class GeometryGenerator : MonoBehaviour
                     Vector3 platPos = platforms[k].transform.position;
                     if (platPos.x == upperLvl[i].x)
                     {
-                        Debug.Log("Platform acquired!");
+                        //Debug.Log("Platform acquired!");
                         platforms[k].transform.position = new Vector3(platPos.x, y, platPos.z);
                     }
                 }
@@ -759,7 +759,7 @@ public class GeometryGenerator : MonoBehaviour
                     Vector3 platPos = platforms[k].transform.position;
                     if (platPos.x == lvl[i].x)
                     {
-                        Debug.Log("Platform acquired!");
+                        //Debug.Log("Platform acquired!");
                         platforms[k].transform.position = new Vector3(platPos.x, y, platPos.z);
                     }
                 }
@@ -875,9 +875,9 @@ public class GeometryGenerator : MonoBehaviour
 
     public void jumpTerrain()
     {
-        Debug.Log("Upper Lvl: " + upperLvl.Count + " , " + upperGround.Count);
-        Debug.Log("Middle Lvl: " + lvl.Count + " , " + ground.Count);
-        Debug.Log("Lower Lvl: " + lowerLvl.Count + " , " + lowerGround.Count);
+        //Debug.Log("Upper Lvl: " + upperLvl.Count + " , " + upperGround.Count);
+        //Debug.Log("Middle Lvl: " + lvl.Count + " , " + ground.Count);
+        //Debug.Log("Lower Lvl: " + lowerLvl.Count + " , " + lowerGround.Count);
         //loop over level and change accordingly
         //Vector3 terrain = new Vector3(); //prevY, currY, switchStart, 
         List<Vector2> ranges = new List<Vector2>();
@@ -1031,7 +1031,7 @@ public class GeometryGenerator : MonoBehaviour
                             sr2.sortingLayerName = "coin";
                             coins.Add(coin);
 
-                            //Debug.Log("(" + lvl[i].z);// + " , " + lvl[i].x + ")");
+                            ////Debug.Log("(" + lvl[i].z);// + " , " + lvl[i].x + ")");
                         }
                     }
                     start = end + 1;
@@ -1058,10 +1058,10 @@ public class GeometryGenerator : MonoBehaviour
             {
                 end = lvl.Count - 1;
             }
-            //Debug.Log("HI " + start + " , " + end + " , " + position + " , count " + stompers.Count);
+            ////Debug.Log("HI " + start + " , " + end + " , " + position + " , count " + stompers.Count);
             for (int j = start; j < end + 1; j++)
             {
-                //Debug.Log(lvl[j].y + " , " + stompers[i].transform.position.y);
+                ////Debug.Log(lvl[j].y + " , " + stompers[i].transform.position.y);
                 if (System.Math.Abs(lvl[j].z - -1) > 0.1)
                 {
                     if ((lvl[j].y) >= stompers[i].transform.position.y)
@@ -1077,7 +1077,7 @@ public class GeometryGenerator : MonoBehaviour
             GameObject stomps = toDelete[j];
             bool success = stompers.Remove(toDelete[j]);
             Destroy(stomps);
-            //Debug.Log("Success? " + success); 
+            ////Debug.Log("Success? " + success); 
         }
         cleanUpUpperStomps();
         cleanUpLowerStomps();
@@ -1100,10 +1100,10 @@ public class GeometryGenerator : MonoBehaviour
             {
                 end = upperLvl.Count - 1;
             }
-            //Debug.Log("HI " + start + " , " + end + " , " + position + " , count " + stompers.Count);
+            ////Debug.Log("HI " + start + " , " + end + " , " + position + " , count " + stompers.Count);
             for (int j = start; j < end + 1; j++)
             {
-                //Debug.Log(lvl[j].y + " , " + stompers[i].transform.position.y);
+                ////Debug.Log(lvl[j].y + " , " + stompers[i].transform.position.y);
                 if (System.Math.Abs(upperLvl[j].z - -1) > 0.1)
                 {
                     if ((upperLvl[j].y) >= upperStompers[i].transform.position.y)
@@ -1119,7 +1119,7 @@ public class GeometryGenerator : MonoBehaviour
             GameObject stomps = toDelete[j];
             bool success = upperStompers.Remove(toDelete[j]);
             Destroy(stomps);
-            //Debug.Log("Success? " + success); 
+            ////Debug.Log("Success? " + success); 
         }
     }
 
@@ -1140,10 +1140,10 @@ public class GeometryGenerator : MonoBehaviour
             {
                 end = lowerLvl.Count - 1;
             }
-            //Debug.Log("HI " + start + " , " + end + " , " + position + " , count " + stompers.Count);
+            ////Debug.Log("HI " + start + " , " + end + " , " + position + " , count " + stompers.Count);
             for (int j = start; j < end + 1; j++)
             {
-                //Debug.Log(lvl[j].y + " , " + stompers[i].transform.position.y);
+                ////Debug.Log(lvl[j].y + " , " + stompers[i].transform.position.y);
                 if (System.Math.Abs(lowerLvl[j].z - -1) > 0.1)
                 {
                     if ((lowerLvl[j].y) >= lowerStompers[i].transform.position.y)
@@ -1159,7 +1159,7 @@ public class GeometryGenerator : MonoBehaviour
             GameObject stomps = toDelete[j];
             bool success = lowerStompers.Remove(toDelete[j]);
             Destroy(stomps);
-            //Debug.Log("Success? " + success); 
+            ////Debug.Log("Success? " + success); 
         }
     }
 
@@ -1206,7 +1206,7 @@ public class GeometryGenerator : MonoBehaviour
                 lowestY = upperLvl[i].y;
             }
         }
-        Debug.Log("LowestY: " + lowestY);
+        //Debug.Log("LowestY: " + lowestY);
         for (int i = 0; i < upperLvl.Count; i++)
         {
             for (int j = (int)upperLvl[i].y - 1; j > lowestY - 1; j--)
@@ -1274,7 +1274,7 @@ public class GeometryGenerator : MonoBehaviour
             {
                 if (System.Math.Abs(lvl[j].z - -1) > 0.1)
                 {
-                    //Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
+                    ////Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
                     if (System.Math.Abs((lvl[j].y + 1) - enemies[i].transform.position.y) > 0.1)
                     {
                         break;
@@ -1290,13 +1290,13 @@ public class GeometryGenerator : MonoBehaviour
             {
                 if (j == 0) //if j is the beginning at any point, delete this guy cause his range reaches the beginning
                 {
-                    //Debug.Log("DEATH!");
+                    ////Debug.Log("DEATH!");
                     death = true;
                 }
-                //Debug.Log("j: " + j);
+                ////Debug.Log("j: " + j);
                 if (System.Math.Abs(lvl[j].z - -1) > 0.1)
                 {
-                    //Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
+                    ////Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
                     if (System.Math.Abs((lvl[j].y + 1) - enemies[i].transform.position.y) > 0.1)
                     {
                         break;
@@ -1308,20 +1308,20 @@ public class GeometryGenerator : MonoBehaviour
                     break;
                 }
             }
-            //Debug.Log("Enemy " + i + " platformSize is " + platformSize);
+            ////Debug.Log("Enemy " + i + " platformSize is " + platformSize);
             if (platformSize - 1 <= 2 || death) //double counted position in forloops
             {
                 toDelete.Add(enemies[i]);
             }
         }
-        //Debug.Log("Deleted: " + toDelete.Count + "total: " + enemies.Count);
+        ////Debug.Log("Deleted: " + toDelete.Count + "total: " + enemies.Count);
         for (int j = 0; j < toDelete.Count; j++)
         {
 
             GameObject en = toDelete[j];
             bool success = enemies.Remove(toDelete[j]);
             Destroy(en);
-            //Debug.Log("Success? " + success); 
+            ////Debug.Log("Success? " + success); 
         }
         cleanUpUpperEnemies();
         cleanUpLowerEnemies();
@@ -1335,13 +1335,13 @@ public class GeometryGenerator : MonoBehaviour
         {
             bool death = false;
             int position = (int)Mathf.Round(upperEnemies[i].transform.position.x - lvlRanges[1].x);
-            Debug.Log("Position " + i + " " + position);
+            //Debug.Log("Position " + i + " " + position);
             int platformSize = 0;
             for (int j = position; j < upperLvl.Count; j++)
             {
                 if (System.Math.Abs(upperLvl[j].z - -1) > 0.1)
                 {
-                    //Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
+                    ////Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
                     if (System.Math.Abs((upperLvl[j].y + 1) - upperEnemies[i].transform.position.y) > 0.1)
                     {
                         break;
@@ -1357,13 +1357,13 @@ public class GeometryGenerator : MonoBehaviour
             {
                 if (j == 0) //if j is the beginning at any point, delete this guy cause his range reaches the beginning
                 {
-                    //Debug.Log("DEATH!");
+                    ////Debug.Log("DEATH!");
                     death = true;
                 }
-                //Debug.Log("j: " + j);
+                ////Debug.Log("j: " + j);
                 if (System.Math.Abs(upperLvl[j].z - -1) > 0.1)
                 {
-                    //Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
+                    ////Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
                     if (System.Math.Abs((upperLvl[j].y + 1) - upperEnemies[i].transform.position.y) > 0.1)
                     {
                         break;
@@ -1375,20 +1375,20 @@ public class GeometryGenerator : MonoBehaviour
                     break;
                 }
             }
-            //Debug.Log("Enemy " + i + " platformSize is " + platformSize);
+            ////Debug.Log("Enemy " + i + " platformSize is " + platformSize);
             if (platformSize - 1 <= 2 || death) //double counted position in forloops
             {
                 toDelete.Add(upperEnemies[i]);
             }
         }
-        //Debug.Log("Deleted: " + toDelete.Count + "total: " + enemies.Count);
+        ////Debug.Log("Deleted: " + toDelete.Count + "total: " + enemies.Count);
         for (int j = 0; j < toDelete.Count; j++)
         {
 
             GameObject en = toDelete[j];
             bool success = upperEnemies.Remove(toDelete[j]);
             Destroy(en);
-            //Debug.Log("Success? " + success); 
+            ////Debug.Log("Success? " + success); 
         }
 
     }
@@ -1406,7 +1406,7 @@ public class GeometryGenerator : MonoBehaviour
             {
                 if (System.Math.Abs(lowerLvl[j].z - -1) > 0.1)
                 {
-                    //Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
+                    ////Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
                     if (System.Math.Abs((lowerLvl[j].y + 1) - lowerEnemies[i].transform.position.y) > 0.1)
                     {
                         break;
@@ -1422,13 +1422,13 @@ public class GeometryGenerator : MonoBehaviour
             {
                 if (j == 0) //if j is the beginning at any point, delete this guy cause his range reaches the beginning
                 {
-                    //Debug.Log("DEATH!");
+                    ////Debug.Log("DEATH!");
                     death = true;
                 }
-                //Debug.Log("j: " + j);
+                ////Debug.Log("j: " + j);
                 if (System.Math.Abs(lowerLvl[j].z - -1) > 0.1)
                 {
-                    //Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
+                    ////Debug.Log(lvl[j].y + " , " + enemies[i].transform.position.y);
                     if (System.Math.Abs((lowerLvl[j].y + 1) - lowerEnemies[i].transform.position.y) > 0.1)
                     {
                         break;
@@ -1440,20 +1440,20 @@ public class GeometryGenerator : MonoBehaviour
                     break;
                 }
             }
-            //Debug.Log("Enemy " + i + " platformSize is " + platformSize);
+            ////Debug.Log("Enemy " + i + " platformSize is " + platformSize);
             if (platformSize - 1 <= 2 || death) //double counted position in forloops
             {
                 toDelete.Add(lowerEnemies[i]);
             }
         }
-        //Debug.Log("Deleted: " + toDelete.Count + "total: " + enemies.Count);
+        ////Debug.Log("Deleted: " + toDelete.Count + "total: " + enemies.Count);
         for (int j = 0; j < toDelete.Count; j++)
         {
 
             GameObject en = toDelete[j];
             bool success = lowerEnemies.Remove(toDelete[j]);
             Destroy(en);
-            //Debug.Log("Success? " + success); 
+            ////Debug.Log("Success? " + success); 
         }
 
     }
@@ -1510,7 +1510,7 @@ public class GeometryGenerator : MonoBehaviour
             float x2 = spikes[i + 1].transform.position.x;
             float y1 = spikes[i].transform.position.y;
             float y2 = spikes[i + 1].transform.position.y;
-            //Debug.Log(y1 + " : " + y2 + " - " + (y1-y2));
+            ////Debug.Log(y1 + " : " + y2 + " - " + (y1-y2));
             if (System.Math.Abs(x2 - x1 - 1) < 0.1 &&
                 System.Math.Abs(System.Math.Abs(y2 - y1)) < 0.1)
             {
@@ -1533,7 +1533,7 @@ public class GeometryGenerator : MonoBehaviour
 
         for (int i = 0; i < ranges.Count; i++)
         {
-            //Debug.Log("Range" + i + " : " + ranges[i]);
+            ////Debug.Log("Range" + i + " : " + ranges[i]);
             Vector4 block = ranges[i];
             if (block.w >= 2)
             {
@@ -1563,7 +1563,7 @@ public class GeometryGenerator : MonoBehaviour
                     enemy.GetComponent<Rigidbody2D>().isKinematic = true;
                     enemy.AddComponent<EnemyController>();
                     enemy.GetComponent<EnemyController>().level = 0;
-                    //Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
+                    ////Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
                     if (j == numEnemies - 1)
                     {
                         enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 2, block.y);
@@ -1573,7 +1573,7 @@ public class GeometryGenerator : MonoBehaviour
                         enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 2, block.x + j * 2 + 2);
                     }
 
-                    //Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
+                    ////Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
                     enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
                     enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
@@ -1584,7 +1584,7 @@ public class GeometryGenerator : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("Num: " + superEnemies.Count);
+        ////Debug.Log("Num: " + superEnemies.Count);
         placeSuperEnemiesUp();
         placeSuperEnemiesLow();
     }
@@ -1604,7 +1604,7 @@ public class GeometryGenerator : MonoBehaviour
             float x2 = upperSpikes[i + 1].transform.position.x;
             float y1 = upperSpikes[i].transform.position.y;
             float y2 = upperSpikes[i + 1].transform.position.y;
-            //Debug.Log(y1 + " : " + y2 + " - " + (y1-y2));
+            ////Debug.Log(y1 + " : " + y2 + " - " + (y1-y2));
             if (System.Math.Abs(x2 - x1 - 1) < 0.1 &&
                 System.Math.Abs(System.Math.Abs(y2 - y1)) < 0.1)
             {
@@ -1628,7 +1628,7 @@ public class GeometryGenerator : MonoBehaviour
 
         for (int i = 0; i < ranges.Count; i++)
         {
-            //Debug.Log("Range" + i + " : " + ranges[i]);
+            ////Debug.Log("Range" + i + " : " + ranges[i]);
             Vector4 block = ranges[i];
             if (block.w >= 2)
             {
@@ -1658,7 +1658,7 @@ public class GeometryGenerator : MonoBehaviour
                     enemy.GetComponent<Rigidbody2D>().isKinematic = true;
                     enemy.AddComponent<EnemyController>();
                     enemy.GetComponent<EnemyController>().level = 1;
-                    //Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
+                    ////Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
                     if (j == numEnemies - 1)
                     {
                         enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 2, block.y);
@@ -1668,7 +1668,7 @@ public class GeometryGenerator : MonoBehaviour
                         enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 2, block.x + j * 2 + 2);
                     }
 
-                    //Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
+                    ////Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
                     enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
                     enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
@@ -1679,7 +1679,7 @@ public class GeometryGenerator : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("Num: " + superEnemies.Count);
+        ////Debug.Log("Num: " + superEnemies.Count);
 
     }
 
@@ -1699,7 +1699,7 @@ public class GeometryGenerator : MonoBehaviour
             float x2 = lowerSpikes[i + 1].transform.position.x;
             float y1 = lowerSpikes[i].transform.position.y;
             float y2 = lowerSpikes[i + 1].transform.position.y;
-            //Debug.Log(y1 + " : " + y2 + " - " + (y1-y2));
+            ////Debug.Log(y1 + " : " + y2 + " - " + (y1-y2));
             if (System.Math.Abs(x2 - x1 - 1) < 0.1 &&
                 System.Math.Abs(System.Math.Abs(y2 - y1)) < 0.1)
             {
@@ -1723,7 +1723,7 @@ public class GeometryGenerator : MonoBehaviour
 
         for (int i = 0; i < ranges.Count; i++)
         {
-            //Debug.Log("Range" + i + " : " + ranges[i]);
+            ////Debug.Log("Range" + i + " : " + ranges[i]);
             Vector4 block = ranges[i];
             if (block.w >= 2)
             {
@@ -1753,7 +1753,7 @@ public class GeometryGenerator : MonoBehaviour
                     enemy.GetComponent<Rigidbody2D>().isKinematic = true;
                     enemy.AddComponent<EnemyController>();
                     enemy.GetComponent<EnemyController>().level = 2;
-                    //Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
+                    ////Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
                     if (j == numEnemies - 1)
                     {
                         enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 2, block.y);
@@ -1763,7 +1763,7 @@ public class GeometryGenerator : MonoBehaviour
                         enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 2, block.x + j * 2 + 2);
                     }
 
-                    //Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
+                    ////Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
                     enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
                     enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
@@ -1774,7 +1774,7 @@ public class GeometryGenerator : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("Num: " + superEnemies.Count);
+        ////Debug.Log("Num: " + superEnemies.Count);
 
     }
 
@@ -1787,8 +1787,8 @@ public class GeometryGenerator : MonoBehaviour
 
         //loops over rhythm array in block to place geometry according
         //to the state machine
-        //Debug.Log("BLOCKS: " + blocks.Count);
-        //Debug.Log("STARTX: " + globalX);
+        ////Debug.Log("BLOCKS: " + blocks.Count);
+        ////Debug.Log("STARTX: " + globalX);
         lvl.Add(new Vector3(0,0, -1));
         Vector4 lvlRange = new Vector4();
         Vector4 upRange = new Vector4();
@@ -1816,7 +1816,7 @@ public class GeometryGenerator : MonoBehaviour
             //bool pair = blocks[i].isPair();
             if (!startLower)
             {
-                //Debug.Log("ㅇㅏㄴㅣㅇㅛ??");
+                ////Debug.Log("ㅇㅏㄴㅣㅇㅛ??");
                 lowGlobalX = globalX;
                 lowRange.x = globalX;
             }
@@ -1828,19 +1828,19 @@ public class GeometryGenerator : MonoBehaviour
             if (level == 1 && !startUpper)
             {
                 startUpper = true;
-                Debug.Log("Start upper: " + upGlobalX);
+                //Debug.Log("Start upper: " + upGlobalX);
             }
             if (level == -1 && !startLower)
             {
                 startLower = true;
-                Debug.Log("Start lower: " + lowGlobalX);
+                //Debug.Log("Start lower: " + lowGlobalX);
             }
 
             timer = 0;
             int[] rhythm = blocks[i].getRhythmArray();
             List<Vector2> action = blocks[i].getActionArray();
             int s = state.getNextState();
-            //Debug.Log("GENERATOR RHYTHM LENGTH: " + rhythm.Length);
+            ////Debug.Log("GENERATOR RHYTHM LENGTH: " + rhythm.Length);
 
             //Break area:
             for (int k = 0; k < 4; k++)
@@ -1971,7 +1971,7 @@ public class GeometryGenerator : MonoBehaviour
                     state.resetClock();
                 }
 
-                //Debug.Log("S: " + s);
+                ////Debug.Log("S: " + s);
 
                 if (rhythm[j] == 0)
                 {
@@ -2395,7 +2395,7 @@ public class GeometryGenerator : MonoBehaviour
                                 {
                                     upperLvl.Add(new Vector3(upGlobalX, upGlobalY, 1));
                                     spike.transform.position = new Vector3(upGlobalX, upGlobalY, 0);
-                                    Debug.Log("AM I UPPPP HERE?");
+                                    //Debug.Log("AM I UPPPP HERE?");
                                     upperSpikes.Add(spike);
                                     List<GameObject> l = new List<GameObject>();
                                     l.Add(spike);
@@ -2413,7 +2413,7 @@ public class GeometryGenerator : MonoBehaviour
                             
                         } else
                         {
-                            //Debug.Log("DUrATioN: " + (globalX + 1) + " v " + (globalX + act.y + 2) + " : " + act.y);
+                            ////Debug.Log("DUrATioN: " + (globalX + 1) + " v " + (globalX + act.y + 2) + " : " + act.y);
                             
                             if (RhythmGenerator.constraints[0] == 1)
                             {
@@ -2430,7 +2430,7 @@ public class GeometryGenerator : MonoBehaviour
                             }
                             for (int k = startingX + 1; k < startingX + act.y + offset; k++)
                             {
-                                //Debug.Log("hI");
+                                ////Debug.Log("hI");
                                 if (level == 0)
                                 {
                                     lvl.Add(new Vector3(0, 0, -1));
@@ -2553,11 +2553,11 @@ public class GeometryGenerator : MonoBehaviour
                         } else if (level == 1 && RhythmGenerator.constraints[4] == 1)
                         {
                             enemy.transform.position = new Vector3(upGlobalX, upGlobalY + 1f, 0);
-                            Debug.Log("AM I UP HERE?? ");
+                            //Debug.Log("AM I UP HERE?? ");
                         } else if (RhythmGenerator.constraints[4] == 1)
                         {
                             enemy.transform.position = new Vector3(lowGlobalX, lowGlobalY + 1f, 0);
-                            Debug.Log("AM I DOWN HERE?? ");
+                            //Debug.Log("AM I DOWN HERE?? ");
                         }
                         
 
@@ -2577,7 +2577,7 @@ public class GeometryGenerator : MonoBehaviour
                         enemyID += 1;
                         
 
-                        //Debug.Log("!!!!!ENEMY!!!!");
+                        ////Debug.Log("!!!!!ENEMY!!!!");
 
                         if (level == 0)
                         {
@@ -2603,7 +2603,7 @@ public class GeometryGenerator : MonoBehaviour
                         {
 
                             // globalX + [X+1 - m] + [X + 2 - space] + newGlobalX
-                            //Debug.Log("!!!!!WAIT!!!!");
+                            ////Debug.Log("!!!!!WAIT!!!!");
                             //WAIT - either a moving platform or stomper
                             //place a block and add a platformcontroller to it so it moves up and down
 
@@ -2851,12 +2851,12 @@ public class GeometryGenerator : MonoBehaviour
         }
         //else if (level == 1 && RhythmGenerator.constraints[4] == 1)
         //{
-        //    Debug.Log("Hello?????");
+        //    //Debug.Log("Hello?????");
         //    upperLvl.Add(new Vector3(upGlobalX, upGlobalY, 0));
         //    lastCube.transform.position = new Vector3(upGlobalX, upGlobalY, 0);
         //} else if (RhythmGenerator.constraints[4] == 1)
         //{
-        //    Debug.Log("Halllo?????");
+        //    //Debug.Log("Halllo?????");
         //    lowerLvl.Add(new Vector3(lowGlobalX, lowGlobalY, 0));
         //    lastCube.transform.position = new Vector3(lowGlobalX, lowGlobalY, 0);
         //}
@@ -2941,16 +2941,16 @@ public class GeometryGenerator : MonoBehaviour
         lvl.Add(new Vector3(globalX, globalY + 3, 0));
         lvl.Add(new Vector3(globalX, globalY + 4, 0));
 
-        //Debug.Log("ENDX: " + globalX);
+        ////Debug.Log("ENDX: " + globalX);
         lvl.Add(new Vector3(0, 0, -1));
         List<GameObject> l3 = new List<GameObject>();
         ground.Add(l3);
         ground.Add(l3);
         ground.Add(l3);
 
-        Debug.Log("LVL RANGES: " + lvlRange);
-        Debug.Log("          : " + upRange);
-        Debug.Log("          : " + lowRange);
+        //Debug.Log("LVL RANGES: " + lvlRange);
+        //Debug.Log("          : " + upRange);
+        //Debug.Log("          : " + lowRange);
 
         //addCoins();
     }
