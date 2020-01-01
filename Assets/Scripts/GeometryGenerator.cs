@@ -533,11 +533,7 @@ public class GeometryGenerator : MonoBehaviour
             enemy.GetComponent<Rigidbody2D>().isKinematic = true;
             enemy.name = "" + enemyID;//enemy.GetComponent<BoxCollider2D>().isTrigger = true;
             enemy.AddComponent<EnemyController>();
-            enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
             enemy.GetComponent<EnemyController>().level = 1;
-            enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
-            enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
-            enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
             enemyID += 1;
             upperEnemies.Add(enemy);
             enemy.GetComponent<EnemyController>().xRange = new Vector2(baseX + 1, baseX + 3);
@@ -678,11 +674,7 @@ public class GeometryGenerator : MonoBehaviour
             enemy.GetComponent<Rigidbody2D>().isKinematic = true;
             enemy.name = "" + enemyID;//enemy.GetComponent<BoxCollider2D>().isTrigger = true;
             enemy.AddComponent<EnemyController>();
-            enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
             enemy.GetComponent<EnemyController>().level = 0;
-            enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
-            enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
-            enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
             enemyID += 1;
             enemies.Add(enemy);
             enemy.GetComponent<EnemyController>().xRange = new Vector2(baseX + 1, baseX + 3);
@@ -1575,10 +1567,6 @@ public class GeometryGenerator : MonoBehaviour
 
                     ////Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
-                    enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
-                    enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
-                    enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
-                    enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
                     superEnemies.Add(enemy);
                     dir = !dir;
                 }
@@ -1670,10 +1658,6 @@ public class GeometryGenerator : MonoBehaviour
 
                     ////Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
-                    enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
-                    enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
-                    enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
-                    enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
                     superEnemies.Add(enemy);
                     dir = !dir;
                 }
@@ -1765,10 +1749,6 @@ public class GeometryGenerator : MonoBehaviour
 
                     ////Debug.Log("(" + (block.x + j * 3) + ", " + (block.x + j * 3 + 2) + ")");
                     //enemy.GetComponent<EnemyController>().state = 1;
-                    enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
-                    enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
-                    enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
-                    enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
                     superEnemies.Add(enemy);
                     dir = !dir;
                 }
@@ -2570,10 +2550,6 @@ public class GeometryGenerator : MonoBehaviour
                         enemy.GetComponent<Rigidbody2D>().isKinematic = true;
                         enemy.name = "" + enemyID;//enemy.GetComponent<BoxCollider2D>().isTrigger = true;
                         enemy.AddComponent<EnemyController>();
-                        enemy.GetComponent<EnemyController>().texEnemy = texEnemy;
-                        enemy.GetComponent<EnemyController>().texEnemy2 = texEnemy2;
-                        enemy.GetComponent<EnemyController>().texEnemy3 = texEnemy3;
-                        enemy.GetComponent<EnemyController>().texEnemy4 = texEnemy4;
                         enemyID += 1;
                         
 

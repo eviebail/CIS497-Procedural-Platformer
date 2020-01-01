@@ -24,6 +24,12 @@ public class SpriteLoader : MonoBehaviour
     public Texture2D texCrouch1L;
     public Texture2D texCrouch2L;
 
+    public Texture2D texDashL;
+    public Texture2D texDashR;
+
+    public Texture2D texHurt1;
+    public Texture2D texHurt2;
+
     public Texture2D texJumpL;
     public Texture2D texJumpR;
     public Texture2D texFallL;
@@ -43,6 +49,13 @@ public class SpriteLoader : MonoBehaviour
     public Texture2D texEnemy2;
     public Texture2D texEnemy3;
     public Texture2D texEnemy4;
+
+    public Texture2D texEnemyDeath1;
+    public Texture2D texEnemyDeath2;
+    public Texture2D texEnemyDeath3;
+    public Texture2D texEnemyDeath4;
+    public Texture2D texEnemyDeath5;
+    public Texture2D texEnemyDeath6;
 
     public static Sprite spriteIdle1;
     public static Sprite spriteIdle2;
@@ -83,6 +96,19 @@ public class SpriteLoader : MonoBehaviour
     public static Sprite spriteEnemy3;
     public static Sprite spriteEnemy4;
 
+    public static Sprite spriteDashL;
+    public static Sprite spriteDashR;
+
+    public static Sprite spriteHurt1;
+    public static Sprite spriteHurt2;
+
+    public static Sprite spriteEnemyDeath1;
+    public static Sprite spriteEnemyDeath2;
+    public static Sprite spriteEnemyDeath3;
+    public static Sprite spriteEnemyDeath4;
+    public static Sprite spriteEnemyDeath5;
+    public static Sprite spriteEnemyDeath6;
+
     void Start()
     {
         spriteIdle1 = Sprite.Create(texIdle1, new Rect(0.0f, 0.0f, texIdle1.width, texIdle1.height),
@@ -118,6 +144,16 @@ public class SpriteLoader : MonoBehaviour
         spriteCrouch1L = Sprite.Create(texCrouch1L, new Rect(0.0f, 0.0f, texCrouch1L.width, texCrouch1L.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
         spriteCrouch2L = Sprite.Create(texCrouch2L, new Rect(0.0f, 0.0f, texCrouch2L.width, texCrouch2L.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+
+        spriteDashL = Sprite.Create(texDashL, new Rect(0.0f, 0.0f, texDashL.width, texDashL.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteDashR = Sprite.Create(texDashR, new Rect(0.0f, 0.0f, texDashR.width, texDashR.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+
+        spriteHurt1 = Sprite.Create(texHurt1, new Rect(0.0f, 0.0f, texHurt1.width, texHurt1.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteHurt2 = Sprite.Create(texHurt2, new Rect(0.0f, 0.0f, texHurt2.width, texHurt2.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
 
         spriteJumpL = Sprite.Create(texJumpL, new Rect(0.0f, 0.0f, texJumpL.width, texJumpL.height),
@@ -157,6 +193,19 @@ public class SpriteLoader : MonoBehaviour
         spriteEnemy3 = Sprite.Create(texEnemy3, new Rect(0.0f, 0.0f, texEnemy3.width, texEnemy3.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
         spriteEnemy4 = Sprite.Create(texEnemy4, new Rect(0.0f, 0.0f, texEnemy4.width, texEnemy4.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+
+        spriteEnemyDeath1 = Sprite.Create(texEnemyDeath1, new Rect(0.0f, 0.0f, texEnemyDeath1.width, texEnemyDeath1.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyDeath2 = Sprite.Create(texEnemyDeath2, new Rect(0.0f, 0.0f, texEnemyDeath2.width, texEnemyDeath2.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyDeath3 = Sprite.Create(texEnemyDeath3, new Rect(0.0f, 0.0f, texEnemyDeath3.width, texEnemyDeath3.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyDeath4 = Sprite.Create(texEnemyDeath4, new Rect(0.0f, 0.0f, texEnemyDeath4.width, texEnemyDeath4.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyDeath5 = Sprite.Create(texEnemyDeath5, new Rect(0.0f, 0.0f, texEnemyDeath5.width, texEnemyDeath5.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyDeath6 = Sprite.Create(texEnemyDeath6, new Rect(0.0f, 0.0f, texEnemyDeath6.width, texEnemyDeath6.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
     }
 

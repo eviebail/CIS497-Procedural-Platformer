@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-//TODO: Channel inner minecraft phyiscs to get parabolic motion for jump
-//and tweak linecasting function to ensure it works
+//TODO:
+//fix hill issue
+//add a_x??
 public class PlayerController : MonoBehaviour
 {
     public float speed = 0.1f;
-    Vector2 dest = Vector2.zero;
+    public Vector2 dest = Vector2.zero;
     private Vector3 start = new Vector3(-9f, 2f, -3f);
     public Texture2D tex;
     private Sprite mySprite;
@@ -17,10 +18,13 @@ public class PlayerController : MonoBehaviour
     public static bool win = false;
     public static bool death = false;
 
+    public bool hit = false;
+    public bool prevHit = false;
+
     public float v_x = 0;
     public float max_vx = 0.15f;
     public float v_y = 0;
-    public float a_y = 0.1f;
+    public float a_y = 0.2f;
     public float a_x = 0.01f;
     public float f_x = 0;
     public bool f_ext = false;
@@ -42,6 +46,8 @@ public class PlayerController : MonoBehaviour
     public int prevPlatform = -1;
 
     public Vector2 boundBox = new Vector2(0.5f, 0.5f);
+
+    public int spriteState = 0;
 
     //need to do stomps too!
 
@@ -73,6 +79,8 @@ public class PlayerController : MonoBehaviour
 
     Vector2 direction = Vector2.right;
 
+    bool DISABLE_CONTROLS = false;
+
     //x = x_0 + vxt
     //y = y_0 + vyt + -ayt^2;
     //in fixedupdate, change_t should always be 1
@@ -91,6 +99,23 @@ public class PlayerController : MonoBehaviour
 
     void SwitchSprites()
     {
+        if (DISABLE_CONTROLS && direction.x == 1)
+        {
+            srState = 22;
+        } else if (DISABLE_CONTROLS)
+        {
+            srState = 21;
+        }
+
+        if (hit)
+        {
+            if (prevSrState != 23)
+            {
+                srState = 23;
+                prevSrState = 23;
+            }
+        }
+
         if (srState == 1)
         {
             srState = 2;
@@ -215,6 +240,28 @@ public class PlayerController : MonoBehaviour
             sr.sprite = SpriteLoader.spriteFallR;
             return;
         }
+        else if (srState == 21)
+        {
+            sr.sprite = SpriteLoader.spriteDashL;
+            return;
+        }
+        else if (srState == 22)
+        {
+            sr.sprite = SpriteLoader.spriteDashR;
+            return;
+        }
+        else if (srState == 23)
+        {
+            srState = 24;
+            sr.sprite = SpriteLoader.spriteHurt1;
+            return;
+        }
+        else if (srState == 24)
+        {
+            srState = 23;
+            sr.sprite = SpriteLoader.spriteHurt2;
+            return;
+        }
     }
 
     // Start is called before the first frame update
@@ -228,7 +275,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            numLives = 5;
+            numLives = 15;
         }
 
         dest = transform.position;
@@ -311,28 +358,98 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    bool prevDisable = false;
+
+    float xDest = 0;
+
     private void Move()
     {
         // Move closer to Destination
-        if (!f_ext)
+        if (!DISABLE_CONTROLS && !hit)
         {
-            dest = new Vector2(transform.position.x + v_x, transform.position.y + v_y - a_y);
-        }
-        else
-        {
-            obstacleY = platforms[pIndex].transform.position.y;
-            obstacleY1 = obstacleY + 1;
-            dest = new Vector2(transform.position.x + v_x, platforms[pIndex].transform.position.y + 1 + v_y);
-            if (isAir)
+            if (!f_ext)
             {
                 dest = new Vector2(transform.position.x + v_x, transform.position.y + v_y - a_y);
             }
-            //fext is no longer true when we move up
-            ////Debug.Log("Dest: " + dest);
+            else
+            {
+                obstacleY = platforms[pIndex].transform.position.y;
+                obstacleY1 = obstacleY + 1;
+                dest = new Vector2(transform.position.x + v_x, platforms[pIndex].transform.position.y + 1 + v_y);
+                if (isAir)
+                {
+                    dest = new Vector2(transform.position.x + v_x, transform.position.y + v_y - a_y);
+                }
+                //fext is no longer true when we move up
+                ////Debug.Log("Dest: " + dest);
+            }
+        }
+        
+
+        if (DISABLE_CONTROLS && !prevDisable)
+        {
+            prevDisable = true;
+            dest = transform.position;
+            if (direction.x == 1)
+            {
+                dest = new Vector2(dest.x + 3, dest.y);
+            } else
+            {
+                dest = new Vector2(dest.x - 3, dest.y);
+            }
+        }
+
+        if (hit)
+        {
+            if (prevHit)
+            {
+                dest = new Vector2(xDest, transform.position.y + v_y - a_y);
+                if (!isAirborne(dest))
+                {
+                    prevHit = false;
+                    hit = false;
+                    v_x = 0;
+                    v_y = 0;
+                    if (direction.x == 1)
+                    {
+                        srState = 1;
+                    } else
+                    {
+                        srState = 5;
+                    }
+                }
+            } else
+            {
+                dest = transform.position;
+                if (direction.x == 1)
+                {
+                    xDest = dest.x - 1;
+                    dest = new Vector2(xDest, dest.y + v_y - a_y);
+                }
+                else
+                {
+                    xDest = dest.x + 1;
+                    dest = new Vector2(xDest, dest.y + v_y - a_y);
+                }
+            }
+            
+            prevHit = true;
         }
 
         Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
         GetComponent<Rigidbody2D>().MovePosition(p);
+
+        if (DISABLE_CONTROLS && transform.position.x == dest.x && transform.position.y == dest.y)
+        {
+            DISABLE_CONTROLS = false;
+            if (direction.x == 1) {
+                srState = 1;
+            }
+            if (direction.x == -1)
+            {
+                srState = 5;
+            }
+        }
 
         v_y = Mathf.Max(v_y - a_y * 2f, 0);
 
@@ -358,7 +475,7 @@ public class PlayerController : MonoBehaviour
         {
             //dest = new Vector2(dest.x, dest.y - 0.1f);
 
-            a_y = 0.1f;
+            a_y = 0.125f;
         }
         else
         {
@@ -366,7 +483,8 @@ public class PlayerController : MonoBehaviour
         }
 
         if (Input.GetKey(KeyCode.Space) && valid(Vector2.up)
-                            && !isAirborne(transform.position))
+                            && !isAirborne(transform.position)
+                            && !DISABLE_CONTROLS && !hit)
         {
             //Debug.Log(srState + " <<<<<< ");
             if (RhythmGenerator.constraints[0] == 1)
@@ -380,7 +498,7 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) && !DISABLE_CONTROLS && !hit)
         {
             Vector2 dir = Vector2.right;
             //don't care about what's above range?
@@ -400,7 +518,7 @@ public class PlayerController : MonoBehaviour
             }
 
         }
-        else if (Input.GetKey(KeyCode.LeftArrow))
+        else if (Input.GetKey(KeyCode.LeftArrow) && !DISABLE_CONTROLS && !hit)
         {
             if (RhythmGenerator.constraints[5] == 1)
             {
@@ -426,12 +544,16 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            f_x = 0;
-            v_x = 0;
+            if (!DISABLE_CONTROLS && !hit)
+            {
+                f_x = 0;
+                v_x = 0;
+            }
+            
             //Debug.Log(srState + " <<<<< ");
         }
 
-        if (Input.GetKey(KeyCode.DownArrow) && overPipe())
+        if (Input.GetKey(KeyCode.DownArrow) && overPipe() && !DISABLE_CONTROLS && !hit)
         {
             //Debug.Log("DOWNARRRAOOWOAFEOKSG");
             //warp to destination
@@ -467,6 +589,8 @@ public class PlayerController : MonoBehaviour
         }
 
         animateSprite();
+        //Invoke("animateDash", waitTimeDash);
+        spriteState = srState;
         Move();
         onCollideWithEnemy();
         onCollideWithPlatform();
@@ -569,6 +693,28 @@ public class PlayerController : MonoBehaviour
                 {
                     prevSrState = 1;
                     srState = 1;
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.Z) && !isAir)
+        {
+            DISABLE_CONTROLS = true;
+            prevDisable = false;
+
+            if (direction.x == 1)
+            {
+                if (prevSrState != 22)
+                {
+                    prevSrState = 22;
+                    srState = 22;
+                }
+            }
+            else if (direction.x == -1)
+            {
+                if (prevSrState != 21)
+                {
+                    prevSrState = 21;
+                    srState = 21;
                 }
             }
         }
@@ -1173,13 +1319,24 @@ public class PlayerController : MonoBehaviour
                 else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
                     ////Debug.Log("Collision with enemy: " + en.name);
-                    if (prevEnemy.x != i || prevEnemy.y != 0)
+                    if (!DISABLE_CONTROLS)
                     {
-                        numLives -= 1;
-                        v_x = -0.5f * v_x;
-                        prevEnemy.x = i;
-                        prevEnemy.y = 0;
+                        if (prevEnemy.x != i || prevEnemy.y != 0)
+                        {
+                            hit = true;
+                            prevHit = false;
+                            numLives -= 1;
+                            en.GetComponent<EnemyController>().state = (en.GetComponent<EnemyController>().state + 1) % 2;
+                            v_y = 1f;
+                            v_x = 0f; // -0.5f * v_x;
+                            prevEnemy.x = i;
+                            prevEnemy.y = 0;
+                        }
+                    } else
+                    {
+                        toDelete.Add(i);
                     }
+                    
                 }
             }
             else
@@ -1197,7 +1354,9 @@ public class PlayerController : MonoBehaviour
         {
             GameObject en = enemies[toDelete[j]];
             enemies.RemoveAt(toDelete[j]);
-            Destroy(en);
+            EnemyController guide = en.GetComponent<EnemyController>();
+            guide.death = true;
+            guide.srState = 5;
         }
         toDelete.Clear();
 
@@ -1222,12 +1381,23 @@ public class PlayerController : MonoBehaviour
                 else if (pos.y < (enemy.y + 0.5) && pos.y > (enemy.y - 0.5))
                 {
                     ////Debug.Log("Collision with enemy: " + en.name);
-                    if (prevEnemy.x != i || prevEnemy.y != 1)
+                    if (!DISABLE_CONTROLS)
                     {
-                        numLives -= 1;
-                        v_x = -0.5f * v_x;
-                        prevEnemy.x = i;
-                        prevEnemy.y = 1;
+                        if (prevEnemy.x != i || prevEnemy.y != 1)
+                        {
+                            hit = true;
+                            prevHit = false;
+                            numLives -= 1;
+                            en.GetComponent<EnemyController>().state = (en.GetComponent<EnemyController>().state + 1) % 2;
+                            v_y = 1f;
+                            v_x = 0f;
+                            prevEnemy.x = i;
+                            prevEnemy.y = 1;
+                        }
+                    }
+                    else
+                    {
+                        toDelete.Add(i);
                     }
                 }
             }
@@ -1246,7 +1416,9 @@ public class PlayerController : MonoBehaviour
         {
             GameObject en = lowerEnemies[toDeleteL[j]];
             lowerEnemies.RemoveAt(toDeleteL[j]);
-            Destroy(en);
+            EnemyController guide = en.GetComponent<EnemyController>();
+            guide.death = true;
+            guide.srState = 5;
         }
         toDeleteL.Clear();
 
@@ -1271,8 +1443,12 @@ public class PlayerController : MonoBehaviour
                 {
                     if (prevEnemy.x != i || prevEnemy.y != 2)
                     {
+                        hit = true;
+                        prevHit = false;
                         numLives -= 1;
-                        v_x = -0.5f * v_x;
+                        en.GetComponent<EnemyController>().state = (en.GetComponent<EnemyController>().state + 1) % 2;
+                        v_y = 1f;
+                        v_x = 0f;
                         prevEnemy.x = i;
                         prevEnemy.y = 2;
                     }
@@ -1293,7 +1469,9 @@ public class PlayerController : MonoBehaviour
         {
             GameObject en = upperEnemies[toDeleteU[j]];
             upperEnemies.RemoveAt(toDeleteU[j]);
-            Destroy(en);
+            EnemyController guide = en.GetComponent<EnemyController>();
+            guide.death = true;
+            guide.srState = 5;
         }
         toDeleteU.Clear();
 
@@ -1320,8 +1498,12 @@ public class PlayerController : MonoBehaviour
                     ////Debug.Log("Collision with enemy: " + en.name);
                     if (prevEnemy2 != i)
                     {
+                        hit = true;
+                        prevHit = false;
                         numLives -= 1;
-                        v_x = -0.5f * v_x;
+                        en.GetComponent<EnemyController>().state = (en.GetComponent<EnemyController>().state + 1) % 2;
+                        v_y = 1f;
+                        v_x = 0f;
                         prevEnemy2 = i;
                     }
                 }
@@ -1340,7 +1522,9 @@ public class PlayerController : MonoBehaviour
         {
             GameObject en = superEnemies[toDeleteSuper[j]];
             superEnemies.RemoveAt(toDeleteSuper[j]);
-            Destroy(en);
+            EnemyController guide = en.GetComponent<EnemyController>();
+            guide.death = true;
+            guide.srState = 5;
         }
         toDeleteSuper.Clear();
 
@@ -1405,7 +1589,11 @@ public class PlayerController : MonoBehaviour
                 if (prevStomp != i)
                 {
                     ////Debug.Log(i + " OUCH FROM BLOCK");
+                    hit = true;
+                    prevHit = false;
                     numLives -= 1;
+                    v_y = 0.5f;
+                    v_x = 0f;
                     prevStomp = i;
                 }
             }
@@ -1427,12 +1615,16 @@ public class PlayerController : MonoBehaviour
             Vector2 cp = transform.position;
             ////Debug.Log("You: " + (cp.y - 1) + " , spike: " + (spike.y + 0.5f));
             if (cp.x < spike.x + 0.5f && cp.x > spike.x - 0.5f &&
-                (cp.y - 1) < (spike.y + 0.5f) /*&& (cp.y-1) > spike.y + 0.5f*/)
+                (cp.y - 1) < (spike.y + 0.5f) && !DISABLE_CONTROLS /*&& (cp.y-1) > spike.y + 0.5f*/)
             {
                 if (prevSpike != i)
                 {
                     ////Debug.Log(i + " OUCH FROM SPIKE");
+                    hit = true;
+                    prevHit = false;
                     numLives -= 1;
+                    v_y = 1f;
+                    v_x = 0f;
                     prevSpike = i;
                 }
             }

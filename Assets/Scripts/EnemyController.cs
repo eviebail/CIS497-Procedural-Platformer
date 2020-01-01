@@ -18,15 +18,7 @@ public class EnemyController : MonoBehaviour
 
     public int srState = 2;
 
-    public Texture2D texEnemy;
-    public Texture2D texEnemy2;
-    public Texture2D texEnemy3;
-    public Texture2D texEnemy4;
-
-    Sprite mySprite4;
-    Sprite mySprite3;
-    Sprite mySprite2;
-    Sprite mySprite1;
+    public bool death = false;
 
     public Vector2 xRange = new Vector2(-100,0);
 
@@ -43,14 +35,6 @@ public class EnemyController : MonoBehaviour
         transform.position = new Vector3(pos.x, pos.y, -1);
         dest = transform.position;
         sr = GetComponent<SpriteRenderer>();
-        mySprite4 = Sprite.Create(texEnemy4, new Rect(0.0f, 0.0f, texEnemy4.width, texEnemy4.height),
-              new Vector2(0.5f, 0.5f), 100.0f);
-        mySprite3 = Sprite.Create(texEnemy3, new Rect(0.0f, 0.0f, texEnemy3.width, texEnemy3.height),
-                      new Vector2(0.5f, 0.5f), 100.0f);
-        mySprite2 = Sprite.Create(texEnemy2, new Rect(0.0f, 0.0f, texEnemy2.width, texEnemy2.height),
-                      new Vector2(0.5f, 0.5f), 100.0f);
-        mySprite1 = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
-                             new Vector2(0.5f, 0.5f), 100.0f);
         InvokeRepeating("SwitchSprites", 0f, 0.1f);
     }
 
@@ -69,25 +53,67 @@ public class EnemyController : MonoBehaviour
         if (srState == 1)
         {
             srState = 3;
-            sr.sprite = mySprite1;
+            sr.sprite = SpriteLoader.spriteEnemy;
             return;
         }
         else if (srState == 2)
         {
             srState = 4;
-            sr.sprite = mySprite2;
+            sr.sprite = SpriteLoader.spriteEnemy2;
             return;
         }
         else if (srState == 3)
         {
             srState = 1;
-            sr.sprite = mySprite3;
+            sr.sprite = SpriteLoader.spriteEnemy3;
             return;
         }
         else if (srState == 4)
         {
             srState = 2;
-            sr.sprite = mySprite4;
+            sr.sprite = SpriteLoader.spriteEnemy4;
+            return;
+        }
+        else if (srState == 5)
+        {
+            srState = 6;
+            sr.sprite = SpriteLoader.spriteEnemyDeath1;
+            return;
+        }
+        else if (srState == 6)
+        {
+            srState = 7;
+            sr.sprite = SpriteLoader.spriteEnemyDeath2;
+            return;
+        }
+        else if (srState == 7)
+        {
+            srState = 8;
+            sr.sprite = SpriteLoader.spriteEnemyDeath3;
+            return;
+        }
+        else if (srState == 8)
+        {
+            srState = 9;
+            sr.sprite = SpriteLoader.spriteEnemyDeath4;
+            return;
+        }
+        else if (srState == 9)
+        {
+            srState = 10;
+            sr.sprite = SpriteLoader.spriteEnemyDeath5;
+            return;
+        }
+        else if (srState == 10)
+        {
+            srState = 11;
+            sr.sprite = SpriteLoader.spriteEnemyDeath6;
+            return;
+        }
+        else if (srState == 11)
+        {
+            sr.sprite = null;
+            Destroy(this);
             return;
         }
     }
@@ -104,56 +130,60 @@ public class EnemyController : MonoBehaviour
         //    a_y = 0;
         //}
         // Check for Input if not moving
+        if (!death)
+        {
+            if (xRange.x != -100)
+            {
+                if (!valid(1f * Vector2.right) || transform.position.x + 1 >= xRange.y + 1)
+                {
+                    state = 1;
+                    //Debug.Log("YO 1");
+                    //v_x = 0.15f;
+                    srState = 1;
+                }
+                else if (!valid(-1f * Vector2.right) || transform.position.x - 1 <= xRange.x - 1)
+                {
+                    state = 0;
+                    srState = 2;
+                    //Debug.Log("YO 2");
+                    //v_x = -0.15f;
+                }
+            }
+            else
+            {
+                if (!valid(1f * Vector2.right))
+                {
+                    state = 1;
+                    srState = 1;
+                    //Debug.Log("YO 1");
+                    //v_x = 0.15f;
+                }
+                else if (!valid(-1f * Vector2.right))
+                {
+                    state = 0;
+                    srState = 2;
+                    //Debug.Log("YO 2");
+                    //v_x = -0.15f;
+                }
+            }
 
-        if (xRange.x != -100)
-        {
-            if (!valid(1f * Vector2.right) || transform.position.x + 1 >= xRange.y + 1)
+
+
+            if (state == 0)
             {
-                state = 1;
-                //Debug.Log("YO 1");
-                //v_x = 0.15f;
-                srState = 1;
+                v_x = 0.15f;
+                //sr.sprite = mySprite2;
+                //srState = 2;
             }
-            else if (!valid(-1f * Vector2.right) || transform.position.x - 1 <= xRange.x - 1)
+            else if (state == 1)
             {
-                state = 0;
-                srState = 2;
-                //Debug.Log("YO 2");
-                //v_x = -0.15f;
+                v_x = -0.15f;
+                //srState = 1;
+                //sr.sprite = mySprite1;
             }
-        } else
-        {
-            if (!valid(1f * Vector2.right))
-            {
-                state = 1;
-                srState = 1;
-                //Debug.Log("YO 1");
-                //v_x = 0.15f;
-            }
-            else if (!valid(-1f * Vector2.right))
-            {
-                state = 0;
-                srState = 2;
-                //Debug.Log("YO 2");
-                //v_x = -0.15f;
-            }
+
+            Move();
         }
-        
-        
-
-        if (state == 0)
-        {
-            v_x = 0.15f;
-            //sr.sprite = mySprite2;
-            //srState = 2;
-        } else if (state == 1)
-        {
-            v_x = -0.15f;
-            //srState = 1;
-            //sr.sprite = mySprite1;
-        }
-
-        Move();
 
     }
 
