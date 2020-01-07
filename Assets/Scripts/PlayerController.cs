@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 //TODO:
-//fix hill issue
+//fix hill issue and level ending conditions <-
 //add a_x??
 public class PlayerController : MonoBehaviour
 {
@@ -60,9 +60,9 @@ public class PlayerController : MonoBehaviour
     public static List<GameObject> spikes;
     public static List<GameObject> coins;
     public static List<GameObject> stars;
-    public static List<Vector3> lvl;
-    public static List<Vector3> upperLvl;
-    public static List<Vector3> lowerLvl;
+    public static List<List<GameObject>> ground;
+    public static List<List<GameObject>> upperGround;
+    public static List<List<GameObject>> lowerGround;
     public static List<Vector4> ranges;
 
     public static int numLives = 5;
@@ -292,9 +292,9 @@ public class PlayerController : MonoBehaviour
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
         stars = GeometryGenerator.stars;
-        lvl = GeometryGenerator.lvl;
-        upperLvl = GeometryGenerator.upperLvl;
-        lowerLvl = GeometryGenerator.lowerLvl;
+        ground = GeometryGenerator.ground;
+        upperGround = GeometryGenerator.upperGround;
+        lowerGround = GeometryGenerator.lowerGround;
         ranges = GeometryGenerator.lvlRanges;
 
         totalEnemies = enemies.Count + superEnemies.Count + lowerEnemies.Count + upperEnemies.Count;
@@ -305,7 +305,7 @@ public class PlayerController : MonoBehaviour
                                  new Vector2(0.5f, 0.5f), 100.0f);
         sr.sprite = mySprite;
 
-        timer = (lvl.Count /*+ upperLvl.Count + lowerLvl.Count*/) / 2 - 5;
+        timer = (ground.Count /*+ upperLvl.Count + lowerLvl.Count*/) / 2 - 5;
 
         if (RhythmGenerator.constraints[6] == 1)
         {
@@ -336,15 +336,15 @@ public class PlayerController : MonoBehaviour
         spikes = GeometryGenerator.spikes;
         coins = GeometryGenerator.coins;
         stars = GeometryGenerator.stars;
-        lvl = GeometryGenerator.lvl;
-        upperLvl = GeometryGenerator.upperLvl;
-        lowerLvl = GeometryGenerator.lowerLvl;
+        ground = GeometryGenerator.ground;
+        upperGround = GeometryGenerator.upperGround;
+        lowerGround = GeometryGenerator.lowerGround;
         ranges = GeometryGenerator.lvlRanges;
         totalStars = stars.Count;
         win = false;
         death = false;
         totalEnemies = enemies.Count + superEnemies.Count + lowerEnemies.Count + upperEnemies.Count;
-        timer = (lvl.Count /*+ upperLvl.Count + lowerLvl.Count*/) / 2 - 5;
+        timer = (ground.Count /*+ upperLvl.Count + lowerLvl.Count*/) / 2 - 5;
 
     }
 
@@ -502,15 +502,18 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 dir = Vector2.right;
             //don't care about what's above range?
-            if (lvl[(int)(transform.position.x + 10)].z == 3)
+            if (ground[(int)(transform.position.x + 10)].Count > 0)
             {
-                dir = new Vector2(1, 1);
+                if (ground[(int)(transform.position.x + 10)][0].transform.position.z == -0.5f)
+                {
+                    dir = new Vector2(1, 1);
+                }
+                if (ground[(int)(transform.position.x + 10)][0].transform.position.z == -1)
+                {
+                    dir = new Vector2(-1, -1);
+                }
             }
-            if (lvl[(int)(transform.position.x + 10)].z == 4)
-            {
-                dir = new Vector2(-1, -1);
-            }
-            if (valid(0.5f * dir))
+            if (valid(dir))
             {
                 v_x = 0.15f;//f_x = 0.05f; //
                 direction.x = 1;
@@ -526,15 +529,18 @@ public class PlayerController : MonoBehaviour
                 end();
             }
             Vector2 dir = Vector2.right;
-            if (lvl[(int)(transform.position.x + 10)].z == 3)
+            if (ground[(int)(transform.position.x + 10)].Count > 0)
             {
-                dir = new Vector2(1, 1);
+                if (ground[(int)(transform.position.x + 10)][0].transform.position.z == -0.5f)
+                {
+                    dir = new Vector2(1, 1);
+                }
+                if (ground[(int)(transform.position.x + 10)][0].transform.position.z == -1)
+                {
+                    dir = new Vector2(-1, -1);
+                }
             }
-            if (lvl[(int)(transform.position.x + 10)].z == 4)
-            {
-                dir = new Vector2(-1, -1);
-            }
-            if (valid(-0.5f * dir))
+            if (valid(-1 * dir))
             {
                 v_x = -0.15f;//f_x = 0.05f;// 
                 direction.x = -1;
@@ -557,31 +563,31 @@ public class PlayerController : MonoBehaviour
         {
             //Debug.Log("DOWNARRRAOOWOAFEOKSG");
             //warp to destination
-            if (upperLvl.Count > 0)
+            if (upperGround.Count > 0)
             {
                 int pos = (int)Mathf.Round(transform.position.x - ranges[1].x);
                 //Debug.Log("WJOOOOOO " + pos + " , " + upperLvl.Count);
-                if (pos >= 0 && pos < upperLvl.Count)
+                if (pos >= 0 && pos < upperGround.Count)
                 {
-                    Vector3 obstacle = upperLvl[pos];
+                    Vector3 obstacle = upperGround[pos][0].transform.position;
                     //Debug.Log("HIIIII " + obstacle.x + " , " + transform.position.x);
                     if (obstacle.x == (int)Mathf.Round(transform.position.x))
                     {
-                        preWarpPos = lvl[(int)Mathf.Round(transform.position.x) + 10];
+                        preWarpPos = ground[(int)Mathf.Round(transform.position.x) + 10][0].transform.position;
                         transform.position = new Vector3(obstacle.x, obstacle.y + 4, -3);
                     }
                 }
             }
-            if (lowerLvl.Count > 0)
+            if (lowerGround.Count > 0)
             {
                 int pos = (int)Mathf.Round(transform.position.x - ranges[2].x);
-                if (pos >= 0 && pos < lowerLvl.Count)
+                if (pos >= 0 && pos < lowerGround.Count)
                 {
-                    Vector3 obstacle = lowerLvl[pos];
+                    Vector3 obstacle = lowerGround[pos][0].transform.position;
                     ////Debug.Log("HIIIII " + obstacle.x + " , " + transform.position.x);
                     if (obstacle.x == (int)Mathf.Round(transform.position.x))
                     {
-                        preWarpPos = lvl[(int)Mathf.Round(transform.position.x) + 10];
+                        preWarpPos = ground[(int)Mathf.Round(transform.position.x) + 10][0].transform.position;
                         transform.position = new Vector3(obstacle.x, obstacle.y + 4, -3);
                     }
                 }
@@ -596,8 +602,8 @@ public class PlayerController : MonoBehaviour
         onCollideWithPlatform();
         onCollideWithSmasher();
         onCollideWithSpike();
-        onCollideWithCoin();
-        onCollideWithStar();
+        //onCollideWithCoin();
+        //onCollideWithStar();
         onFallOfCliff();
 
         if (numCoins >= 5)
@@ -617,14 +623,14 @@ public class PlayerController : MonoBehaviour
         }
 
         if (RhythmGenerator.constraints[1] == 1 && killed == totalEnemies &&
-            (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4))
+            (int)Mathf.Round(transform.position.x + 9) >= (ground.Count - 1))
         {
             Reloader.win = true;
             //Debug.Log("hello??" + win);
             end();
         }
         else if (RhythmGenerator.constraints[4] == 1
-          && (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4)
+          && (int)Mathf.Round(transform.position.x + 9) >= (ground.Count - 1)
           && numStars == totalStars)
         {
             Reloader.win = true;
@@ -632,7 +638,7 @@ public class PlayerController : MonoBehaviour
             end();
         }
         else if (RhythmGenerator.constraints[1] == 0 && RhythmGenerator.constraints[4] == 0
-            && (int)Mathf.Round(transform.position.x + 10) >= (lvl.Count - 4))
+            && (int)Mathf.Round(transform.position.x + 9) >= (ground.Count - 1))
         {
 
             Reloader.win = true;
@@ -788,16 +794,16 @@ public class PlayerController : MonoBehaviour
     bool isAirborne(Vector2 pos)
     {
         bool yCollided = yCollide();
-        yCollided = yCollideUpper() || yCollided;
-        yCollided = yCollideLower() || yCollided;
+        //yCollided = yCollideUpper() || yCollided;
+        //yCollided = yCollideLower() || yCollided;
         return (!yCollided);
     }
 
     bool valid(Vector2 dir)
     {
         xCollided = xCollide(dir);
-        xCollided = xCollideUpper(dir) && xCollided;
-        xCollided = xCollideLower(dir) && xCollided;
+        //xCollided = xCollideUpper(dir) && xCollided;
+        //xCollided = xCollideLower(dir) && xCollided;
         //I want each function to be called to update LastValidPos!
         return (!xCollided);
     }
@@ -805,12 +811,12 @@ public class PlayerController : MonoBehaviour
     bool overPipe()
     {
         int pos = (int)Mathf.Round(transform.position.x + 10);
-        if (pos < 0 || pos >= lvl.Count)
+        if (pos < 0 || pos >= ground.Count)
         {
             return false;
         }
 
-        Vector3 obstacle = lvl[pos];
+        Vector3 obstacle = ground[pos][0].transform.position;
         if (obstacle.z == 5)
         {
             return true;
@@ -818,303 +824,58 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
-    //bool overPipeLower()
-    //{
-    //    int pos = (int)Mathf.Round(transform.position.x - ranges[1].x);
-    //    if (pos < 0 || pos >= upperLvl.Count)
-    //    {
-    //        return false;
-    //    }
-
-    //    Vector3 obstacle = upperLvl[pos];
-    //    if (obstacle.z == 5)
-    //    {
-    //        return true;
-    //    }
-    //    return false;
-    //}
-
-    //bool overPipeUpper()
-    //{
-    //    int pos = (int)Mathf.Round(transform.position.x - ranges[2].x);
-    //    if (pos < 0 || pos >= lowerLvl.Count)
-    //    {
-    //        return false;
-    //    }
-
-    //    Vector3 obstacle = lowerLvl[pos];
-    //    if (obstacle.z == 5)
-    //    {
-    //        return true;
-    //    }
-    //    return false;
-    //}
-
     bool xCollide(Vector2 dir)
     {
-        Vector2 pos = transform.position;
-        Vector2 posFuture = pos + dir;
-
-        int posNow = (int)Mathf.Round(pos.x + 10);
-        int posFtr = (int)Mathf.Round(posFuture.x + 10);
-
-        if (pos.y < ranges[0].z)
-        {
-            return false;
-        }
-
-        //is there anything between curr x,y and future x,y?
-        if (pos.x < posFuture.x)
-        {
-            for (int i = posNow + 1; i < posFtr + 1; i++)
-            {
-                if (lvl[i - 1].z == 3)
-                {
-                    if ((pos.y - 0.3) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
-                        && lvl[i].z != 3 && lvl[i + 1].z != 3)
-                    {
-                        return true;
-                    }
-                }
-
-                if (System.Math.Abs(lvl[i].z - -1) < 0.01)
-                {
-                    //==-1
-                    if (lvl[posNow].z != -1)
-                    {
-                        lastValidPos = lvl[posNow];//new Vector2(posNow, pos.y);
-                        ////Debug.Log("LAST VALID: " + lastValidPos);
-                    }
-                }
-            }
-        }
-        else
-        {
-            for (int i = posFtr; i < posNow; i++)
-            {
-                if (lvl[i - 1].z == 3)
-                {
-                    if ((pos.y - 0.4) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
-                        && lvl[i].z != 3 && lvl[i + 1].z != 3)
-                    {
-                        return true;
-                    }
-                }
-                if (System.Math.Abs(lvl[i].z - -1) < 0.01)
-                {
-                    //==-1
-                    if (lvl[posNow].z != -1)
-                    {
-                        lastValidPos = lvl[posNow];//new Vector2(posNow, pos.y);
-                        ////Debug.Log("LAST VALID: " + lastValidPos);
-                    }
-                }
-            }
-        }
-
-
-        return false;
-    }
-
-    bool xCollideUpper(Vector2 dir)
-    {
-        Vector2 pos = transform.position;
-        Vector2 posFuture = pos + dir;
-
-        int posNow = (int)(Mathf.Round(pos.x - ranges[1].x));
-        int posFtr = (int)(Mathf.Round(posFuture.x - ranges[1].x));
-
-        if (posNow < 0 || posNow >= upperLvl.Count || posFtr < 0 || posFtr >= upperLvl.Count
-            || pos.y < ranges[1].z)
-        {
-            return false;
-        }
-
-        //is there anything between curr x,y and future x,y?
-        if (pos.x < posFuture.x)
-        {
-            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, upperLvl.Count); i++)
-            {
-                if (upperLvl[i - 1].z == 3)
-                {
-                    if ((pos.y - 0.3) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if ((pos.y - 1) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1
-                        && upperLvl[i].z != 3 && upperLvl[i + 1].z != 3)
-                    {
-                        return true;
-                    }
-                }
-
-                if (System.Math.Abs(upperLvl[i].z - -1) < 0.01)
-                {
-                    //==-1
-                    if (upperLvl[posNow].z != -1)
-                    {
-                        lastValidPos = upperLvl[posNow];//new Vector2(posNow, pos.y);
-                        ////Debug.Log("LAST VALID: " + lastValidPos);
-                    }
-                }
-            }
-        }
-        else
-        {
-            for (int i = (int)Mathf.Max(posFtr, 1); i < posNow; i++)
-            {
-                if (upperLvl[i - 1].z == 3)
-                {
-                    if ((pos.y - 0.4) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if ((pos.y - 1) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1
-                        && upperLvl[i].z != 3 && upperLvl[i + 1].z != 3)
-                    {
-                        return true;
-                    }
-                }
-                if (System.Math.Abs(upperLvl[i].z - -1) < 0.01)
-                {
-                    //==-1
-                    if (upperLvl[posNow].z != -1)
-                    {
-                        lastValidPos = upperLvl[posNow];//new Vector2(posNow, pos.y);
-                        ////Debug.Log("LAST VALID: " + lastValidPos);
-                    }
-                }
-            }
-        }
-
-
-        return false;
-    }
-
-    bool xCollideLower(Vector2 dir)
-    {
-        Vector2 pos = transform.position;
-        Vector2 posFuture = pos + dir;
-
-        int posNow = (int)(Mathf.Round(pos.x - ranges[2].x));
-        int posFtr = (int)(Mathf.Round(posFuture.x - ranges[2].x));
-
-        ////Debug.Log("::x's " + posNow + " , " + posFtr);
-        ////Debug.Log("::range " + ranges[2].x + " , " + ranges[2].y);
-
-        if (posNow < 0 || posNow >= lowerLvl.Count || posFtr < 0 || posFtr >= lowerLvl.Count
-            || pos.y < ranges[2].z)
-        {
-            return false;
-        }
-
-        ////Debug.Log("now vs ftr: " + pos.x + " , " + posFuture.x);
-
-        //is there anything between curr x,y and future x,y?
-        if (pos.x < posFuture.x)
-        {
-            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, lowerLvl.Count); i++)
-            {
-                if (lowerLvl[i - 1].z == 3)
-                {
-                    if ((pos.y - 0.3) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if ((pos.y - 1) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1
-                        && lowerLvl[i].z != 3 && lowerLvl[i + 1].z != 3)
-                    {
-                        return true;
-                    }
-                }
-
-                if (System.Math.Abs(lowerLvl[i].z - -1) < 0.01)
-                {
-                    //==-1
-                    if (lowerLvl[posNow].z != -1)
-                    {
-                        lastValidPos = lowerLvl[posNow];//new Vector2(posNow, pos.y);
-                        ////Debug.Log("LAST VALID: " + lastValidPos);
-                    }
-                }
-            }
-        }
-        else
-        {
-            for (int i = (int)Mathf.Max(posFtr, 1); i < posNow; i++)
-            {
-                if (lowerLvl[i - 1].z == 3)
-                {
-                    if ((pos.y - 0.4) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if ((pos.y - 1) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1
-                        && lowerLvl[i].z != 3 && lowerLvl[i + 1].z != 3)
-                    {
-                        return true;
-                    }
-                }
-                if (System.Math.Abs(lowerLvl[i].z - -1) < 0.01)
-                {
-                    //==-1
-                    //Debug.Log("Am I -1??? " + lowerLvl[i].z);
-                    if (lowerLvl[posNow].z != -1)
-                    {
-                        lastValidPos = lowerLvl[posNow];//new Vector2(posNow, pos.y);
-                        ////Debug.Log("LAST VALID: " + lastValidPos);
-                    }
-                }
-            }
-        }
-
-
-        return false;
+        return false; //all cases should be handled by dir until
+                      //block on block is implemented
     }
 
     bool yCollide()
     {
-        int pos = (int)Mathf.Round(transform.position.x + 10);
-        if (pos < 0 || pos >= lvl.Count)
+        //Debug.Log(transform.position.x + 9);
+
+        int pos = (int)Mathf.Round(transform.position.x + 9);
+        if (pos < 0 || pos >= ground.Count)
         {
-            ////Debug.Log("ERRRRRRR");
             return false;
         }
 
-        Vector3 obstacle = lvl[pos];
-        if (System.Math.Abs(obstacle.z - -1) < 0.01)
+        for (int i = 0; i < platforms.Count; i++)
         {
-            //cliff!
-            ////Debug.Log("-1!!!!!!!");
+            Vector2 playerPos = transform.position;
+            Vector2 platPos = platforms[i].transform.position;
+            if (playerPos.x < platPos.x + 0.5f && playerPos.x > platPos.x - 0.5f)
+            {
+                if ((playerPos.y - 1) > (platPos.y - 0.1)
+                    && (playerPos.y - 1) < (platPos.y + 0.1))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        if (ground[pos].Count <= 0)
+        {
             return false;
         }
-        if (obstacle.z == 3)
+
+        Vector3 obstacle = ground[pos][0].transform.position;
+        Vector3 position = transform.position;
+        if (obstacle.z == 0)
+        {
+            //level ground
+            if ((position.y - 0.7f) - obstacle.y < 0.5f && (position.y - 0.7f) - obstacle.y > -0.1f)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+        } else if (obstacle.z == -0.5f)
         {
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y - 0.5f);
@@ -1127,7 +888,7 @@ public class PlayerController : MonoBehaviour
             //change direction which we move
             return false;
         }
-        if (obstacle.z == 4)
+        else if (obstacle.z == -1)
         {
             float x = transform.position.x - (obstacle.x - 0.5f);
             float b = (obstacle.y + 0.5f);
@@ -1140,158 +901,8 @@ public class PlayerController : MonoBehaviour
             //change direction which we move
             return false;
         }
-        if (System.Math.Abs(obstacle.z - 2) < 0.1) //this means its a moving platform
-        {
 
-            for (int i = 0; i < platforms.Count; i++)
-            {
-                Vector2 playerPos = transform.position;
-                Vector2 platPos = platforms[i].transform.position;
-                if (playerPos.x < platPos.x + 0.5f && playerPos.x > platPos.x - 0.5f &&
-                (playerPos.y - 1) > (platPos.y - 0.1) && (playerPos.y - 1) < (platPos.y + 0.1))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        ////Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
-        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    bool yCollideUpper()
-    {
-        int pos = (int)Mathf.Round(transform.position.x - ranges[1].x); //DOESNT WORK BECAUSE SIZE IS TOO SMALL
-                                                                        //NEED TO ADJUST FOR SIZE DIFF
-        if (pos < 0 || pos >= upperLvl.Count)
-        {
-            ////Debug.Log("ERRRRRRR at pos " + pos + " , " + (pos - ranges[1].x));
-            ////Debug.Log("RANGES " + (ranges[1].x) + " , " + ranges[1].y);
-            return false;
-        }
-
-        Vector3 obstacle = upperLvl[pos];
-        if (System.Math.Abs(obstacle.z - -1) < 0.01)
-        {
-            //cliff!
-            return false;
-        }
-        if (obstacle.z == 3)
-        {
-            float x = transform.position.x - (obstacle.x - 0.5f);
-            float b = (obstacle.y - 0.5f);
-            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
-            if (transform.position.y > (x + b) && transform.position.y < (x + b + 0.5)) //y=mx + b
-            {
-                v_y = v_x;
-                return true;
-            }
-            //change direction which we move
-            return false;
-        }
-        if (obstacle.z == 4)
-        {
-            float x = transform.position.x - (obstacle.x - 0.5f);
-            float b = (obstacle.y + 0.5f);
-            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
-            if (transform.position.y > (-x + b) && transform.position.y < (-x + b + 0.5)) //y=mx + b
-            {
-                v_y = -v_x;
-                return true;
-            }
-            //change direction which we move
-            return false;
-        }
-        if (System.Math.Abs(obstacle.z - 2) < 0.1) //this means its a moving platform
-        {
-
-            for (int i = 0; i < platforms.Count; i++)
-            {
-                Vector2 playerPos = transform.position;
-                Vector2 platPos = platforms[i].transform.position;
-                if (playerPos.x < platPos.x + 0.5f && playerPos.x > platPos.x - 0.5f &&
-                (playerPos.y - 1) > (platPos.y - 0.1) && (playerPos.y - 1) < (platPos.y + 0.1))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        ////Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
-        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    bool yCollideLower()
-    {
-        int pos = (int)Mathf.Round(transform.position.x - ranges[2].x);
-        if (pos < 0 || pos >= lowerLvl.Count)
-        {
-            ////Debug.Log("ERRRRRRR");
-            return false;
-        }
-
-        Vector3 obstacle = lowerLvl[pos];
-        if (System.Math.Abs(obstacle.z - -1) < 0.01)
-        {
-            //cliff!
-            ////Debug.Log("-1!!!!!!!");
-            return false;
-        }
-        if (obstacle.z == 3)
-        {
-            float x = transform.position.x - (obstacle.x - 0.5f);
-            float b = (obstacle.y - 0.5f);
-            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
-            if (transform.position.y > (x + b) && transform.position.y < (x + b + 0.5)) //y=mx + b
-            {
-                v_y = v_x;
-                return true;
-            }
-            //change direction which we move
-            return false;
-        }
-        if (obstacle.z == 4)
-        {
-            float x = transform.position.x - (obstacle.x - 0.5f);
-            float b = (obstacle.y + 0.5f);
-            ////Debug.Log("y = mx + b: " + (transform.position.y - 1) + " v " + (x + b));
-            if (transform.position.y > (-x + b) && transform.position.y < (-x + b + 0.5)) //y=mx + b
-            {
-                v_y = -v_x;
-                return true;
-            }
-            //change direction which we move
-            return false;
-        }
-        if (System.Math.Abs(obstacle.z - 2) < 0.1) //this means its a moving platform
-        {
-
-            for (int i = 0; i < platforms.Count; i++)
-            {
-                Vector2 playerPos = transform.position;
-                Vector2 platPos = platforms[i].transform.position;
-                if (playerPos.x < platPos.x + 0.5f && playerPos.x > platPos.x - 0.5f &&
-                (playerPos.y - 1) > (platPos.y - 0.1) && (playerPos.y - 1) < (platPos.y + 0.1))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        ////Debug.Log("Player: " + (transform.position.y - 1) + " ground " + obstacle.y);
-        if (System.Math.Abs((transform.position.y - 1) - obstacle.y) < 0.1)
-        {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     /// <summary>
@@ -1532,7 +1143,7 @@ public class PlayerController : MonoBehaviour
 
     void onFallOfCliff()
     {
-        if (transform.position.y < ranges[2].z - 5)
+        if (transform.position.y < -15)
         {
             numLives -= 1;
             transform.position = lastValidPos + 4f * Vector2.up;
@@ -1542,7 +1153,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void onCollideWithPlatform()
+    bool onCollideWithPlatform()
     {
         f_ext = false;
         for (int i = 0; i < platforms.Count; i++)
@@ -1575,6 +1186,7 @@ public class PlayerController : MonoBehaviour
                 f_ext = f_ext || false;
             }
         }
+        return f_ext;
     }
 
     void onCollideWithSmasher()

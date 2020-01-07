@@ -196,13 +196,13 @@ public class EnemyController : MonoBehaviour
     {
         //return !xCollide(dir);
         bool xCollided = xCollide(dir);
-        if (level == 1)
-        {
-            xCollided = xCollideUpper(dir);
-        } else if (level == 2)
-        {
-            xCollided = xCollideLower(dir);
-        }
+        //if (level == 1)
+        //{
+        //    xCollided = xCollideUpper(dir);
+        //} else if (level == 2)
+        //{
+        //    xCollided = xCollideLower(dir);
+        //}
         //xCollided = xCollideUpper(dir) || xCollided;
         //xCollided = xCollideLower(dir) || xCollided;
         //I want each function to be called to update LastValidPos!
@@ -211,45 +211,36 @@ public class EnemyController : MonoBehaviour
 
     bool xCollide(Vector2 dir)
     {
-        List<Vector3> lvl = GeometryGenerator.lvl;
+        List<List<GameObject>> ground = GeometryGenerator.ground;
         List<Vector4> ranges = GeometryGenerator.lvlRanges;
         Vector2 pos = transform.position;
         Vector2 posFuture = pos + dir;
 
-        int posNow = (int)Mathf.Round(pos.x + 10);
-        int posFtr = (int)Mathf.Round(posFuture.x + 10);
+        int posNow = (int)Mathf.Round(pos.x + 9);
+        int posFtr = (int)Mathf.Round(posFuture.x + 9);
 
-        if (pos.y < ranges[0].z)
-        {
-            return false;
-        }
+        //if (pos.y < ranges[0].z)
+        //{
+        //    return false;
+        //}
 
         //is there anything between curr x,y and future x,y?
         if (pos.x < posFuture.x)
         {
             for (int i = posNow + 1; i < posFtr + 1; i++)
             {
-                if (lvl[i - 1].z == 3)
-                {
-                    if ((pos.y - 0.3) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
-                        && lvl[i].z != 3 && lvl[i + 1].z != 3)
-                    {
-                        return true;
-                    }
-                }
-                //if future position is over cliff, return true
-                if (System.Math.Abs(lvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                if (ground[i].Count <= 0)
                 {
                     return true;
                 }
-                if ((pos.y - 1) > lvl[i].y) //isAirborneCondition
+
+                if (pos.y - 1 < ground[i][0].transform.position.y)
+                {
+                    return true;
+                }
+
+                if (ground[i][0].transform.position.z == -1 ||
+                    ground[i][0].transform.position.z == -0.5f)
                 {
                     return true;
                 }
@@ -257,28 +248,20 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            for (int i = posFtr; i < posNow; i++)
+            for (int i = posNow; i > posFtr - 1; i--)
             {
-                if (lvl[i - 1].z == 3)
-                {
-                    if ((pos.y - 0.4) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if ((pos.y - 1) < lvl[i].y && System.Math.Abs(lvl[i].z - -1) > 0.1
-                        && lvl[i].z != 3 && lvl[i + 1].z != 3)
-                    {
-                        return true;
-                    }
-                }
-                if (System.Math.Abs(lvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                if (ground[i].Count <= 0)
                 {
                     return true;
                 }
-                if ((pos.y - 1) > lvl[i].y) //isAirborneCondition
+
+                if (pos.y - 1 < ground[i][0].transform.position.y)
+                {
+                    return true;
+                }
+
+                if (ground[i][0].transform.position.z == -1 ||
+                    ground[i][0].transform.position.z == -0.5f)
                 {
                     return true;
                 }
@@ -292,14 +275,14 @@ public class EnemyController : MonoBehaviour
     bool xCollideUpper(Vector2 dir)
     {
         List<Vector4> ranges = GeometryGenerator.lvlRanges;
-        List<Vector3> upperLvl = GeometryGenerator.upperLvl;
+        List<List<GameObject>> upperGround = GeometryGenerator.upperGround;
         Vector2 pos = transform.position;
         Vector2 posFuture = pos + dir;
 
         int posNow = (int)(Mathf.Round(pos.x - ranges[1].x));
         int posFtr = (int)(Mathf.Round(posFuture.x - ranges[1].x));
 
-        if (posNow < 0 || posNow >= upperLvl.Count || posFtr < 0 || posFtr >= upperLvl.Count
+        if (posNow < 0 || posNow >= upperGround.Count || posFtr < 0 || posFtr >= upperGround.Count
             || pos.y < ranges[1].z)
         {
             return false;
@@ -308,30 +291,30 @@ public class EnemyController : MonoBehaviour
         //is there anything between curr x,y and future x,y?
         if (pos.x < posFuture.x)
         {
-            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, upperLvl.Count); i++)
+            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, upperGround.Count); i++)
             {
-                if (upperLvl[i - 1].z == 3)
+                if (upperGround[i - 1][0].transform.position.z == 3)
                 {
-                    if ((pos.y - 0.3) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1)
+                    if ((pos.y - 0.3) < upperGround[i][0].transform.position.y && System.Math.Abs(upperGround[i][0].transform.position.z - -1) > 0.1)
                     {
                         return true;
                     }
                 }
                 else
                 {
-                    if ((pos.y - 1) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1
-                        && upperLvl[i].z != 3 && upperLvl[i + 1].z != 3)
+                    if ((pos.y - 1) < upperGround[i][0].transform.position.y && System.Math.Abs(upperGround[i][0].transform.position.z - -1) > 0.1
+                        && upperGround[i][0].transform.position.z != 3 && upperGround[i + 1][0].transform.position.z != 3)
                     {
                         return true;
                     }
                 }
 
                 //if future position is over cliff, return true
-                if (System.Math.Abs(upperLvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                if (System.Math.Abs(upperGround[i][0].transform.position.z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
                 {
                     return true;
                 }
-                if ((pos.y - 1) > upperLvl[i].y) //isAirborneCondition
+                if ((pos.y - 1) > upperGround[i][0].transform.position.y) //isAirborneCondition
                 {
                     return true;
                 }
@@ -341,27 +324,27 @@ public class EnemyController : MonoBehaviour
         {
             for (int i = (int)Mathf.Max(posFtr, 1); i < posNow; i++)
             {
-                if (upperLvl[i - 1].z == 3)
+                if (upperGround[i - 1][0].transform.position.z == 3)
                 {
-                    if ((pos.y - 0.4) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1)
+                    if ((pos.y - 0.4) < upperGround[i][0].transform.position.y && System.Math.Abs(upperGround[i][0].transform.position.z - -1) > 0.1)
                     {
                         return true;
                     }
                 }
                 else
                 {
-                    if ((pos.y - 1) < upperLvl[i].y && System.Math.Abs(upperLvl[i].z - -1) > 0.1
-                        && upperLvl[i].z != 3 && upperLvl[i + 1].z != 3)
+                    if ((pos.y - 1) < upperGround[i][0].transform.position.y && System.Math.Abs(upperGround[i][0].transform.position.z - -1) > 0.1
+                        && upperGround[i][0].transform.position.z != 3 && upperGround[i + 1][0].transform.position.z != 3)
                     {
                         return true;
                     }
                 }
                 //if future position is over cliff, return true
-                if (System.Math.Abs(upperLvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                if (System.Math.Abs(upperGround[i][0].transform.position.z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
                 {
                     return true;
                 }
-                if ((pos.y - 1) > upperLvl[i].y) //isAirborneCondition
+                if ((pos.y - 1) > upperGround[i][0].transform.position.y) //isAirborneCondition
                 {
                     return true;
                 }
@@ -375,7 +358,7 @@ public class EnemyController : MonoBehaviour
     bool xCollideLower(Vector2 dir)
     {
         List<Vector4> ranges = GeometryGenerator.lvlRanges;
-        List<Vector3> lowerLvl = GeometryGenerator.lowerLvl;
+        List<List<GameObject>> lowerGround = GeometryGenerator.lowerGround;
         Vector2 pos = transform.position;
         Vector2 posFuture = pos + dir;
 
@@ -385,7 +368,7 @@ public class EnemyController : MonoBehaviour
         //Debug.Log("::x's " + posNow + " , " + posFtr);
         //Debug.Log("::range " + ranges[2].x + " , " + ranges[2].y);
 
-        if (posNow < 0 || posNow >= lowerLvl.Count || posFtr < 0 || posFtr >= lowerLvl.Count
+        if (posNow < 0 || posNow >= lowerGround.Count || posFtr < 0 || posFtr >= lowerGround.Count
             || pos.y < ranges[2].z)
         {
             return false;
@@ -396,30 +379,30 @@ public class EnemyController : MonoBehaviour
         //is there anything between curr x,y and future x,y?
         if (pos.x < posFuture.x)
         {
-            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, lowerLvl.Count); i++)
+            for (int i = posNow + 1; i < (int)Mathf.Min(posFtr + 1, lowerGround.Count); i++)
             {
-                if (lowerLvl[i - 1].z == 3)
+                if (lowerGround[i - 1][0].transform.position.z == 3)
                 {
-                    if ((pos.y - 0.3) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1)
+                    if ((pos.y - 0.3) < lowerGround[i][0].transform.position.y && System.Math.Abs(lowerGround[i][0].transform.position.z - -1) > 0.1)
                     {
                         return true;
                     }
                 }
                 else
                 {
-                    if ((pos.y - 1) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1
-                        && lowerLvl[i].z != 3 && lowerLvl[i + 1].z != 3)
+                    if ((pos.y - 1) < lowerGround[i][0].transform.position.y && System.Math.Abs(lowerGround[i][0].transform.position.z - -1) > 0.1
+                        && lowerGround[i][0].transform.position.z != 3 && lowerGround[i + 1][0].transform.position.z != 3)
                     {
                         return true;
                     }
                 }
 
                 //if future position is over cliff, return true
-                if (System.Math.Abs(lowerLvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                if (System.Math.Abs(lowerGround[i][0].transform.position.z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
                 {
                     return true;
                 }
-                if ((pos.y - 1) > lowerLvl[i].y) //isAirborneCondition
+                if ((pos.y - 1) > lowerGround[i][0].transform.position.y) //isAirborneCondition
                 {
                     return true;
                 }
@@ -429,27 +412,27 @@ public class EnemyController : MonoBehaviour
         {
             for (int i = (int)Mathf.Max(posFtr, 1); i < posNow; i++)
             {
-                if (lowerLvl[i - 1].z == 3)
+                if (lowerGround[i - 1][0].transform.position.z == 3)
                 {
-                    if ((pos.y - 0.4) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1)
+                    if ((pos.y - 0.4) < lowerGround[i][0].transform.position.y && System.Math.Abs(lowerGround[i][0].transform.position.z - -1) > 0.1)
                     {
                         return true;
                     }
                 }
                 else
                 {
-                    if ((pos.y - 1) < lowerLvl[i].y && System.Math.Abs(lowerLvl[i].z - -1) > 0.1
-                        && lowerLvl[i].z != 3 && lowerLvl[i + 1].z != 3)
+                    if ((pos.y - 1) < lowerGround[i][0].transform.position.y && System.Math.Abs(lowerGround[i][0].transform.position.z - -1) > 0.1
+                        && lowerGround[i][0].transform.position.z != 3 && lowerGround[i + 1][0].transform.position.z != 3)
                     {
                         return true;
                     }
                 }
                 //if future position is over cliff, return true
-                if (System.Math.Abs(lowerLvl[i].z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
+                if (System.Math.Abs(lowerGround[i][0].transform.position.z - -1) < 0.1)//isAirborne(new Vector2(i,pos.y - 1)))
                 {
                     return true;
                 }
-                if ((pos.y - 1) > lowerLvl[i].y) //isAirborneCondition
+                if ((pos.y - 1) > lowerGround[i][0].transform.position.y) //isAirborneCondition
                 {
                     return true;
                 }
@@ -519,15 +502,15 @@ public class EnemyController : MonoBehaviour
 
     bool yCollide()
     {
-        List<Vector3> lvl = GeometryGenerator.lvl;
+        List<List<GameObject>> ground = GeometryGenerator.ground;
         int pos = (int)Mathf.Round(transform.position.x + 10);
-        if (pos < 0 || pos >= lvl.Count)
+        if (pos < 0 || pos >= ground.Count)
         {
             //Debug.Log("ERRRRRRR");
             return false;
         }
 
-        Vector3 obstacle = lvl[pos];
+        Vector3 obstacle = ground[pos][0].transform.position;
         if (System.Math.Abs(obstacle.z - -1) < 0.01)
         {
             //cliff!

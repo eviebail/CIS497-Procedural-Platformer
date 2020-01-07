@@ -249,16 +249,18 @@ public class RhythmGenerator : MonoBehaviour
         }
 
         //place geometry based on the blocks generated
-        gen = new GeometryGenerator(levelBlocks, startX, startY, texGround, texEnemy, texSpike, texCoin, texGnd, texSlope, texSlope2, texGoal, texPipe, texUnderGnd, texMoveGnd, texEnemy2, texEnemy3, texEnemy4);
+        gen = new GeometryGenerator(levelBlocks);
         gen.generateGeometry();
-        gen.cleanUpEnemies();
-        gen.cleanUpStomps();
+        //gen.cleanUpEnemies();
+        //gen.cleanUpStomps();
         
-        if (constraints[0] == 1) { gen.jumpTerrain(); }
-        if (constraints[3] == 1 && constraints[0] != 1) { gen.cleanUpSpikes(); }
-        if (constraints[3] == 1) { gen.placeSuperEnemies(); }
+        //if (constraints[0] == 1) { gen.jumpTerrain(); }
+        //if (constraints[3] == 1 && constraints[0] != 1) { gen.cleanUpSpikes(); }
+        //if (constraints[3] == 1) { gen.placeSuperEnemies(); }
 
-        gen.cosmetics();
+        //gen.cosmetics();
+
+
         //Debug.Log("LVL COUNT: " + GeometryGenerator.lvl.Count);
         //Debug.Log("UPPERLVL COUNT: " + GeometryGenerator.upperLvl.Count);
         //Debug.Log("LOWERLVL COUNT: " + GeometryGenerator.lowerLvl.Count);
