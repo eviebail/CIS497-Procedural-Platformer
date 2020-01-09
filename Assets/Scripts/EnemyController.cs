@@ -240,7 +240,8 @@ public class EnemyController : MonoBehaviour
                 }
 
                 if (ground[i][0].transform.position.z == -1 ||
-                    ground[i][0].transform.position.z == -0.5f)
+                    ground[i][0].transform.position.z == -0.5f ||
+                    ground[i][0].transform.position.z == -0.1f)
                 {
                     return true;
                 }
@@ -261,7 +262,8 @@ public class EnemyController : MonoBehaviour
                 }
 
                 if (ground[i][0].transform.position.z == -1 ||
-                    ground[i][0].transform.position.z == -0.5f)
+                    ground[i][0].transform.position.z == -0.5f ||
+                    ground[i][0].transform.position.z == -0.1f)
                 {
                     return true;
                 }

@@ -51,7 +51,7 @@ public class RhythmGenerator : MonoBehaviour
             val = (int) Mathf.Min((Random.value * 5.0f), 2);
     
         }
-        val = 0;
+        //val = 0;
         switch (val)
         {
             case 0:
@@ -249,7 +249,7 @@ public class RhythmGenerator : MonoBehaviour
         }
 
         //place geometry based on the blocks generated
-        gen = new GeometryGenerator(levelBlocks);
+        gen = new GeometryGenerator(levelBlocks, difficulty);
         gen.generateGeometry();
         //gen.cleanUpEnemies();
         //gen.cleanUpStomps();

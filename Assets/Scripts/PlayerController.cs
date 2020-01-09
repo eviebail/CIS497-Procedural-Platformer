@@ -360,6 +360,8 @@ public class PlayerController : MonoBehaviour
 
     bool prevDisable = false;
 
+    bool startCliff = false;
+
     float xDest = 0;
 
     private void Move()
@@ -390,12 +392,19 @@ public class PlayerController : MonoBehaviour
         {
             prevDisable = true;
             dest = transform.position;
-            if (direction.x == 1)
+            if (direction.y != 0)
             {
-                dest = new Vector2(dest.x + 3, dest.y);
+                startCliff = true;
             } else
             {
-                dest = new Vector2(dest.x - 3, dest.y);
+                startCliff = false;
+            }
+            if (direction.x == 1)
+            {
+                dest = new Vector2(dest.x + 3, dest.y + 3*direction.y);
+            } else
+            {
+                dest = new Vector2(dest.x - 3, dest.y + 3 * direction.y);
             }
         }
 
@@ -439,9 +448,23 @@ public class PlayerController : MonoBehaviour
         Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
         GetComponent<Rigidbody2D>().MovePosition(p);
 
+        if (DISABLE_CONTROLS && !startCliff)
+        {
+            int posX = (int)Mathf.Round(transform.position.x + 9);
+            if (ground[posX].Count > 0)
+            {
+                if (ground[posX][0].transform.position.z == -1 ||
+                    ground[posX][0].transform.position.z == -0.5f)
+                {
+                    dest = transform.position; //stop sliding!
+                }
+            }
+        }
+
         if (DISABLE_CONTROLS && transform.position.x == dest.x && transform.position.y == dest.y)
         {
             DISABLE_CONTROLS = false;
+            startCliff = false;
             if (direction.x == 1) {
                 srState = 1;
             }
@@ -482,6 +505,12 @@ public class PlayerController : MonoBehaviour
             a_y = 0;
         }
 
+        //update lastValidPos
+        if (ground[(int)Mathf.Round(transform.position.x + 9)].Count > 0)
+        {
+            lastValidPos = ground[(int)Mathf.Round(transform.position.x + 9)][0].transform.position;
+        }
+
         if (Input.GetKey(KeyCode.Space) && valid(Vector2.up)
                             && !isAirborne(transform.position)
                             && !DISABLE_CONTROLS && !hit)
@@ -502,13 +531,13 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 dir = Vector2.right;
             //don't care about what's above range?
-            if (ground[(int)(transform.position.x + 10)].Count > 0)
+            if (ground[(int)(transform.position.x + 9)].Count > 0)
             {
-                if (ground[(int)(transform.position.x + 10)][0].transform.position.z == -0.5f)
+                if (ground[(int)(transform.position.x + 9)][0].transform.position.z == -0.5f)
                 {
                     dir = new Vector2(1, 1);
                 }
-                if (ground[(int)(transform.position.x + 10)][0].transform.position.z == -1)
+                if (ground[(int)(transform.position.x + 9)][0].transform.position.z == -1)
                 {
                     dir = new Vector2(-1, -1);
                 }
@@ -517,6 +546,7 @@ public class PlayerController : MonoBehaviour
             {
                 v_x = 0.15f;//f_x = 0.05f; //
                 direction.x = 1;
+                direction.y = dir.y;
                 transform.parent = null;
             }
 
@@ -529,13 +559,13 @@ public class PlayerController : MonoBehaviour
                 end();
             }
             Vector2 dir = Vector2.right;
-            if (ground[(int)(transform.position.x + 10)].Count > 0)
+            if (ground[(int)(transform.position.x + 9)].Count > 0)
             {
-                if (ground[(int)(transform.position.x + 10)][0].transform.position.z == -0.5f)
+                if (ground[(int)(transform.position.x + 9)][0].transform.position.z == -0.5f)
                 {
                     dir = new Vector2(1, 1);
                 }
-                if (ground[(int)(transform.position.x + 10)][0].transform.position.z == -1)
+                if (ground[(int)(transform.position.x + 9)][0].transform.position.z == -1)
                 {
                     dir = new Vector2(-1, -1);
                 }
@@ -544,6 +574,7 @@ public class PlayerController : MonoBehaviour
             {
                 v_x = -0.15f;//f_x = 0.05f;// 
                 direction.x = -1;
+                direction.y = -1*dir.y;
                 transform.parent = null;
             }
 
@@ -702,7 +733,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        if (Input.GetKeyDown(KeyCode.Z) && !isAir)
+        if (Input.GetKeyDown(KeyCode.Z) /*&& !isAir*/)
         {
             DISABLE_CONTROLS = true;
             prevDisable = false;
@@ -865,7 +896,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 obstacle = ground[pos][0].transform.position;
         Vector3 position = transform.position;
-        if (obstacle.z == 0)
+        if (obstacle.z == 0 || obstacle.z == -0.1f)
         {
             //level ground
             if ((position.y - 0.7f) - obstacle.y < 0.5f && (position.y - 0.7f) - obstacle.y > -0.1f)
@@ -917,6 +948,37 @@ public class PlayerController : MonoBehaviour
             GameObject en = enemies[i];
             Vector2 pos = transform.position;
             Vector2 enemy = en.transform.position;
+
+            ProjectileController enemyPC = en.GetComponent<ProjectileController>();
+
+            //if the enemy shoots pellets, check for collisions with the pellet
+            if (enemyPC != null)
+            {
+                if (enemyPC.pellet != null)
+                {
+                    Vector3 pelletPos = enemyPC.pellet.transform.position;
+                    if (pos.x < (pelletPos.x + 0.2) && pos.x > (pelletPos.x - 0.2))
+                    {
+                        if (pos.y < (pelletPos.y + 0.2) && pos.y > (pelletPos.y - 0.2))
+                        {
+                            if (!DISABLE_CONTROLS)
+                            {
+                                if (prevEnemy.x != i || prevEnemy.y != 0)
+                                {
+                                    hit = true;
+                                    prevHit = false;
+                                    numLives -= 1;
+                                    v_y = 1f;
+                                    v_x = 0f; // -0.5f * v_x;
+                                    prevEnemy.x = i;
+                                    prevEnemy.y = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             //want to know if transform.pos is in the bounding box of the enemy position
             //pos.x < enemy.x + 1 && pos.x > enemy.x - 1
             if (pos.x < (enemy.x + 0.7) && pos.x > (enemy.x - 0.7) /*&&
@@ -937,17 +999,21 @@ public class PlayerController : MonoBehaviour
                             hit = true;
                             prevHit = false;
                             numLives -= 1;
-                            en.GetComponent<EnemyController>().state = (en.GetComponent<EnemyController>().state + 1) % 2;
+                            if (en.GetComponent<EnemyController>() != null)
+                            {
+                                en.GetComponent<EnemyController>().state = (en.GetComponent<EnemyController>().state + 1) % 2;
+                            }
                             v_y = 1f;
                             v_x = 0f; // -0.5f * v_x;
                             prevEnemy.x = i;
                             prevEnemy.y = 0;
                         }
-                    } else
+                    }
+                    else
                     {
                         toDelete.Add(i);
                     }
-                    
+
                 }
             }
             else
@@ -965,9 +1031,17 @@ public class PlayerController : MonoBehaviour
         {
             GameObject en = enemies[toDelete[j]];
             enemies.RemoveAt(toDelete[j]);
-            EnemyController guide = en.GetComponent<EnemyController>();
-            guide.death = true;
-            guide.srState = 5;
+            if (en.GetComponent<EnemyController>() != null)
+            {
+                EnemyController guide = en.GetComponent<EnemyController>();
+                guide.death = true;
+                guide.srState = 5;
+            } else
+            {
+                ProjectileController g = en.GetComponent<ProjectileController>();
+                g.srState = 8;
+                g.death = true;
+            }
         }
         toDelete.Clear();
 

@@ -461,19 +461,34 @@ MonoBehaviour:
   texFallL: {fileID: 2800000, guid: e73d57d77dadc4f98976d71a87429816, type: 3}
   texFallR: {fileID: 2800000, guid: 2e440ad93a1504ed0ab691ddee4cc753, type: 3}
   texGround: {fileID: 2800000, guid: b30ee38608bac4370a9ea2b83e09e5ec, type: 3}
+  texGroundL: {fileID: 2800000, guid: 31bb0ce6792eb4a0f8a9cd32c93e4808, type: 3}
+  texGroundR: {fileID: 2800000, guid: 791eebf3556cc4a36807a8f3860dcc62, type: 3}
   texEnemy: {fileID: 2800000, guid: a5302483f08ca4290908ca400dcd9404, type: 3}
   texSpike: {fileID: 2800000, guid: 2c048898f26ae4477ae448c54af4f569, type: 3}
   texCoin: {fileID: 2800000, guid: 4b15cd5d1f241454c963a580523e5872, type: 3}
   texGnd: {fileID: 2800000, guid: f4a2eee0caff14979b44f9942302f27b, type: 3}
   texUnderGnd: {fileID: 2800000, guid: 4ef2bfb1799d44fb8baebebe4aea1634, type: 3}
+  texLColumn: {fileID: 2800000, guid: af0e9bdd3e7fd4118869e0b1f93fd726, type: 3}
+  texRColumn: {fileID: 2800000, guid: 545b46f55c2d74a77bcd641ea92ad837, type: 3}
+  texLBottom: {fileID: 2800000, guid: 4bd39bdbf79284a39acd52e43f52262f, type: 3}
+  texBottom: {fileID: 2800000, guid: 9a952e3718f784e039bdeaba1e0588a2, type: 3}
+  texRBottom: {fileID: 2800000, guid: b318e988a8960401387aaf456b70837a, type: 3}
   texMoveGnd: {fileID: 2800000, guid: 561fb5af7d009401b857248d08debda7, type: 3}
   texSlope: {fileID: 2800000, guid: 176657d1b3944495dac2e8a5e8514335, type: 3}
   texSlope2: {fileID: 2800000, guid: d68632f3397f94ba4af3b90bceb79a78, type: 3}
+  texUnderSlope: {fileID: 2800000, guid: ac03a3f8333ff446ea76c17dcdde42f9, type: 3}
+  texUnderSlope2: {fileID: 2800000, guid: 4640f2b95fe774d40b68741fa1ac895c, type: 3}
   texGoal: {fileID: 2800000, guid: 0b765ed966fd7499d878aa2f999be5ae, type: 3}
   texPipe: {fileID: 2800000, guid: 63899db3a453048ac9448632040b58a2, type: 3}
   texEnemy2: {fileID: 2800000, guid: ad690aeb4b43a4e7482f82333fcaad75, type: 3}
   texEnemy3: {fileID: 2800000, guid: 15ccb171c5fd84c968863b2abccd528b, type: 3}
   texEnemy4: {fileID: 2800000, guid: 57e7d72ac09d84437b4058c54d5dea0d, type: 3}
+  texEnemyAttackL1: {fileID: 2800000, guid: ed8781e2be9344ee98a0f8a5d1a26df2, type: 3}
+  texEnemyAttackL2: {fileID: 2800000, guid: 4c4db9fa2c69f43979ddbceb9e2e6f44, type: 3}
+  texEnemyAttackR1: {fileID: 2800000, guid: 0837c5f246a79488e9beb9595e728b1b, type: 3}
+  texEnemyAttackR2: {fileID: 2800000, guid: ea14a01074f624ee6abdb75619ac5c12, type: 3}
+  texEnemyAttackPellet: {fileID: 2800000, guid: 6a0f29b5daa6042d4be70fa315e2fdb5,
+    type: 3}
   texEnemyDeath1: {fileID: 2800000, guid: 815f73f3585044a32811d21502d58770, type: 3}
   texEnemyDeath2: {fileID: 2800000, guid: 1c8013ef5a0c147a5a059fde439f12b6, type: 3}
   texEnemyDeath3: {fileID: 2800000, guid: eec3312b68dc24bacb68c6f19907ddcd, type: 3}
@@ -926,6 +941,8 @@ MonoBehaviour:
   speed: 0.3
   dest: {x: 0, y: 0}
   tex: {fileID: 2800000, guid: c2e4bbc82501143948c8ef1d47768c0a, type: 3}
+  hit: 0
+  prevHit: 0
   v_x: 0
   max_vx: 0.15
   v_y: 0

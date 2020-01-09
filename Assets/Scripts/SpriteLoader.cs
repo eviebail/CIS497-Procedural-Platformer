@@ -36,19 +36,37 @@ public class SpriteLoader : MonoBehaviour
     public Texture2D texFallR;
 
     public Texture2D texGround;
+    public Texture2D texGroundL;
+    public Texture2D texGroundR;
     public Texture2D texEnemy;
     public Texture2D texSpike;
     public Texture2D texCoin;
     public Texture2D texGnd;
     public Texture2D texUnderGnd;
+
+    public Texture2D texLColumn;
+    public Texture2D texRColumn;
+    public Texture2D texLBottom;
+    public Texture2D texBottom;
+    public Texture2D texRBottom;
+
     public Texture2D texMoveGnd;
     public Texture2D texSlope;
     public Texture2D texSlope2;
+    public Texture2D texUnderSlope;
+    public Texture2D texUnderSlope2;
     public Texture2D texGoal;
     public Texture2D texPipe;
     public Texture2D texEnemy2;
     public Texture2D texEnemy3;
     public Texture2D texEnemy4;
+
+    public Texture2D texEnemyAttackL1;
+    public Texture2D texEnemyAttackL2;
+    public Texture2D texEnemyAttackR1;
+    public Texture2D texEnemyAttackR2;
+
+    public Texture2D texEnemyAttackPellet;
 
     public Texture2D texEnemyDeath1;
     public Texture2D texEnemyDeath2;
@@ -82,19 +100,36 @@ public class SpriteLoader : MonoBehaviour
     public static Sprite spriteFallR;
            
     public static Sprite spriteGround;
+    public static Sprite spriteGroundL;
+    public static Sprite spriteGroundR;
     public static Sprite spriteEnemy;
     public static Sprite spriteSpike;
     public static Sprite spriteCoin;
     public static Sprite spriteGnd;
     public static Sprite spriteUnderGnd;
+
+    public static Sprite spriteLColumn;
+    public static Sprite spriteRColumn;
+    public static Sprite spriteLBottom;
+    public static Sprite spriteBottom;
+    public static Sprite spriteRBottom;
+
     public static Sprite spriteMoveGnd;
     public static Sprite spriteSlope;
     public static Sprite spriteSlope2;
+    public static Sprite spriteUnderSlope;
+    public static Sprite spriteUnderSlope2;
     public static Sprite spriteGoal;
     public static Sprite spritePipe;
     public static Sprite spriteEnemy2;
     public static Sprite spriteEnemy3;
     public static Sprite spriteEnemy4;
+
+    public static Sprite spriteEnemyAttackL1;
+    public static Sprite spriteEnemyAttackL2;
+    public static Sprite spriteEnemyAttackR1;
+    public static Sprite spriteEnemyAttackR2;
+    public static Sprite spriteEnemyAttackPellet;
 
     public static Sprite spriteDashL;
     public static Sprite spriteDashR;
@@ -168,6 +203,11 @@ public class SpriteLoader : MonoBehaviour
         spriteGround = Sprite.Create(texGround, new Rect(0.0f, 0.0f, texGround.width, texGround.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
 
+        spriteGroundL = Sprite.Create(texGroundL, new Rect(0.0f, 0.0f, texGroundL.width, texGroundL.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteGroundR = Sprite.Create(texGroundR, new Rect(0.0f, 0.0f, texGroundR.width, texGroundR.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+
         spriteEnemy = Sprite.Create(texEnemy, new Rect(0.0f, 0.0f, texEnemy.width, texEnemy.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
         spriteSpike = Sprite.Create(texSpike, new Rect(0.0f, 0.0f, texSpike.width, texSpike.height),
@@ -178,11 +218,27 @@ public class SpriteLoader : MonoBehaviour
                                  new Vector2(0.5f, 0.5f), 100.0f);
         spriteUnderGnd = Sprite.Create(texUnderGnd, new Rect(0.0f, 0.0f, texUnderGnd.width, texUnderGnd.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
+
+        spriteLColumn = Sprite.Create(texLColumn, new Rect(0.0f, 0.0f, texLColumn.width, texLColumn.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteRColumn = Sprite.Create(texRColumn, new Rect(0.0f, 0.0f, texRColumn.width, texRColumn.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteLBottom = Sprite.Create(texLBottom, new Rect(0.0f, 0.0f, texLBottom.width, texLBottom.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteBottom = Sprite.Create(texBottom, new Rect(0.0f, 0.0f, texBottom.width, texBottom.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteRBottom = Sprite.Create(texRBottom, new Rect(0.0f, 0.0f, texRBottom.width, texRBottom.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+
         spriteMoveGnd = Sprite.Create(texMoveGnd, new Rect(0.0f, 0.0f, texMoveGnd.width, texMoveGnd.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
         spriteSlope = Sprite.Create(texSlope, new Rect(0.0f, 0.0f, texSlope.width, texSlope.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
         spriteSlope2 = Sprite.Create(texSlope2, new Rect(0.0f, 0.0f, texSlope2.width, texSlope2.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteUnderSlope = Sprite.Create(texUnderSlope, new Rect(0.0f, 0.0f, texUnderSlope.width, texUnderSlope.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteUnderSlope2 = Sprite.Create(texUnderSlope2, new Rect(0.0f, 0.0f, texUnderSlope2.width, texUnderSlope2.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
         spriteGoal = Sprite.Create(texGoal, new Rect(0.0f, 0.0f, texGoal.width, texGoal.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
@@ -193,6 +249,17 @@ public class SpriteLoader : MonoBehaviour
         spriteEnemy3 = Sprite.Create(texEnemy3, new Rect(0.0f, 0.0f, texEnemy3.width, texEnemy3.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
         spriteEnemy4 = Sprite.Create(texEnemy4, new Rect(0.0f, 0.0f, texEnemy4.width, texEnemy4.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+
+        spriteEnemyAttackL1 = Sprite.Create(texEnemyAttackL1, new Rect(0.0f, 0.0f, texEnemyAttackL1.width, texEnemyAttackL1.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyAttackL2 = Sprite.Create(texEnemyAttackL2, new Rect(0.0f, 0.0f, texEnemyAttackL2.width, texEnemyAttackL2.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyAttackR1 = Sprite.Create(texEnemyAttackR1, new Rect(0.0f, 0.0f, texEnemyAttackR1.width, texEnemyAttackR1.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyAttackR2 = Sprite.Create(texEnemyAttackR2, new Rect(0.0f, 0.0f, texEnemyAttackR2.width, texEnemyAttackR2.height),
+                                 new Vector2(0.5f, 0.5f), 100.0f);
+        spriteEnemyAttackPellet = Sprite.Create(texEnemyAttackPellet, new Rect(0.0f, 0.0f, texEnemyAttackPellet.width, texEnemyAttackPellet.height),
                                  new Vector2(0.5f, 0.5f), 100.0f);
 
         spriteEnemyDeath1 = Sprite.Create(texEnemyDeath1, new Rect(0.0f, 0.0f, texEnemyDeath1.width, texEnemyDeath1.height),
