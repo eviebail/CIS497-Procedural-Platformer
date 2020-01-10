@@ -445,8 +445,11 @@ public class PlayerController : MonoBehaviour
             prevHit = true;
         }
 
-        Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
-        GetComponent<Rigidbody2D>().MovePosition(p);
+        if ((int)Mathf.Round(dest.x + 9) < ground.Count)
+        {
+            Vector2 p = Vector2.MoveTowards(transform.position, dest, speed);
+            GetComponent<Rigidbody2D>().MovePosition(p);
+        }
 
         if (DISABLE_CONTROLS && !startCliff)
         {

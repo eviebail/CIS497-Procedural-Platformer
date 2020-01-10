@@ -17,6 +17,8 @@ public class GeometryGenerator : MonoBehaviour
     private int level = 0;
     int difficulty = 0;
 
+    int waitTime = 0;
+
     public static List<GameObject> enemies = new List<GameObject>();
     public static List<GameObject> lowerEnemies = new List<GameObject>();
     public static List<GameObject> upperEnemies = new List<GameObject>();
@@ -56,6 +58,11 @@ public class GeometryGenerator : MonoBehaviour
     //Need to patch platformController
     //Add player climbing on platform much later...
     //basic set up of geometry generator working!
+
+        //Check on enemy ranges for spike constraint
+        //restrict changes in elevation
+        //have invincibility state for mercy
+        //fix getting hurt and respawning issue
 
     public GeometryGenerator(List<Block> blocks, int difficulty)
     {
@@ -147,10 +154,20 @@ public class GeometryGenerator : MonoBehaviour
                 }
             }
 
-                for (int j = 0; j < rhythm.Length; j++)
+            for (int j = 0; j < rhythm.Length; j++)
             {
                 if (rhythm[j] == 0) //this is a ground block
                 {
+                    if (waitTime == 3)
+                    {
+                        state.keepFlat(false);
+                        waitTime = 0;
+                    } else
+                    {
+                        state.keepFlat(true);
+                        waitTime += 1;
+                    }
+                    
                     groundState = state.getNextState(); //only update the state if it is not an action block!
                     if (groundState == 0) //flat_ground
                     {
@@ -158,12 +175,19 @@ public class GeometryGenerator : MonoBehaviour
                         GameObject flat_ground = new GameObject();
                         SpriteRenderer sr = flat_ground.AddComponent<SpriteRenderer>() as SpriteRenderer;
                         flat_ground.transform.localScale = blockScale;
-                        sr.sprite = SpriteLoader.spriteGround;
                         flat_ground.AddComponent<BoxCollider2D>();
                         flat_ground.transform.position = new Vector3(globalX, globalY, 0);
-
                         List<GameObject> l = new List<GameObject>();
                         l.Add(flat_ground);
+
+                        if (RhythmGenerator.constraints[3] == 1)
+                        {
+                            sr.sprite = SpriteLoader.spriteSpike;
+                            spikes.Add(flat_ground);
+                        } else
+                        {
+                            sr.sprite = SpriteLoader.spriteGround;
+                        }
 
                         if (level == 0) //==flat_ground + ground
                         {
@@ -191,11 +215,23 @@ public class GeometryGenerator : MonoBehaviour
                         slant_up_ground.transform.localScale = blockScale;
                         sr2.sprite = SpriteLoader.spriteSlope;
                         slant_up_ground.AddComponent<BoxCollider2D>();
-                        slant_up_ground.transform.position = new Vector3(globalX, globalY + 1, -0.5f);
 
                         List<GameObject> l = new List<GameObject>();
-                        l.Add(slant_up_ground);
-                        l.Add(flat_ground);
+
+                        if (RhythmGenerator.constraints[3] == 1)
+                        {
+                            sr2.sprite = SpriteLoader.spriteSpike;
+                            spikes.Add(slant_up_ground);
+                            l.Add(slant_up_ground);
+                            slant_up_ground.transform.position = new Vector3(globalX, globalY, -0.5f);
+                        }
+                        else
+                        {
+                            sr2.sprite = SpriteLoader.spriteSlope;
+                            l.Add(slant_up_ground);
+                            l.Add(flat_ground);
+                            slant_up_ground.transform.position = new Vector3(globalX, globalY + 1, -0.5f);
+                        }
 
                         if (level == 0) //==up_slope + ground
                         {
@@ -229,6 +265,16 @@ public class GeometryGenerator : MonoBehaviour
                         List<GameObject> l = new List<GameObject>();
                         l.Add(slant_down_ground);
                         l.Add(flat_ground);
+
+                        if (RhythmGenerator.constraints[3] == 1)
+                        {
+                            sr2.sprite = SpriteLoader.spriteSpike;
+                            spikes.Add(slant_down_ground);
+                        }
+                        else
+                        {
+                            sr2.sprite = SpriteLoader.spriteSlope2;
+                        }
 
                         if (level == 0) //==up_slope + ground
                         {
@@ -319,6 +365,16 @@ public class GeometryGenerator : MonoBehaviour
                         List<GameObject> l = new List<GameObject>();
                         l.Add(flat_ground);
 
+                        if (RhythmGenerator.constraints[3] == 1)
+                        {
+                            sr.sprite = SpriteLoader.spriteSpike;
+                            spikes.Add(flat_ground);
+                        }
+                        else
+                        {
+                            sr.sprite = SpriteLoader.spriteGround;
+                        }
+
                         if (level == 0) //==up_slope + ground
                         {
                             ground.Add(l);
@@ -335,6 +391,8 @@ public class GeometryGenerator : MonoBehaviour
                         GameObject enemy = new GameObject();
                         enemy.transform.localScale = blockScale;
                         enemy.AddComponent<BoxCollider2D>();
+                        BoxCollider2D b = enemy.GetComponent<BoxCollider2D>();
+                        b.size = b.bounds.size * 0.1f;
                         enemy.AddComponent<Rigidbody2D>();
                         enemy.GetComponent<Rigidbody2D>().isKinematic = true;
                         enemy.AddComponent<EnemyController>();
@@ -360,70 +418,100 @@ public class GeometryGenerator : MonoBehaviour
                         if (Random.value < 0.5) //smasher!
                         {
                             //make flat ground for the smasher to smoosh you under
-                            GameObject flat_ground = new GameObject();
-                            SpriteRenderer sr = flat_ground.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                            flat_ground.transform.localScale = blockScale;
-                            sr.sprite = SpriteLoader.spriteGround;
-                            flat_ground.AddComponent<BoxCollider2D>();
-                            flat_ground.transform.position = new Vector3(globalX, globalY, 0);
+                            if (RhythmGenerator.constraints[3] == 0) {
+                                GameObject flat_ground = new GameObject();
+                                SpriteRenderer sr = flat_ground.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                                flat_ground.transform.localScale = blockScale;
+                                sr.sprite = SpriteLoader.spriteGround;
+                                flat_ground.AddComponent<BoxCollider2D>();
+                                flat_ground.transform.position = new Vector3(globalX, globalY, 0);
 
-                            List<GameObject> l = new List<GameObject>();
-                            l.Add(flat_ground);
+                                List<GameObject> l = new List<GameObject>();
+                                l.Add(flat_ground);
 
-                            //create the smasher
-                            GameObject smasher = new GameObject();
-                            SpriteRenderer sr2 = smasher.AddComponent<SpriteRenderer>() as SpriteRenderer;
-                            sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
-                            smasher.transform.localScale = blockScale;
-                            sr2.sprite = SpriteLoader.spriteMoveGnd;
-                            smasher.AddComponent<BoxCollider2D>();
-                            BoxCollider2D b = smasher.GetComponent<BoxCollider2D>();
-                            b.isTrigger = true;
-                            b.size = b.bounds.size * 0.1f;
-                            smasher.AddComponent<Rigidbody2D>();
-                            smasher.name = "smasher";
-                            smasher.AddComponent<SmasherController>();
-                            smasher.GetComponent<Rigidbody2D>().freezeRotation = true;
-                            smasher.GetComponent<Rigidbody2D>().isKinematic = false;
-                            smasher.transform.position = new Vector3(globalX, globalY + 1, 0);
+                                //create the smasher
+                                GameObject smasher = new GameObject();
+                                SpriteRenderer sr2 = smasher.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                                sr2.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                                smasher.transform.localScale = blockScale;
+                                sr2.sprite = SpriteLoader.spriteMoveGnd;
+                                smasher.AddComponent<BoxCollider2D>();
+                                BoxCollider2D b = smasher.GetComponent<BoxCollider2D>();
+                                b.isTrigger = true;
+                                b.size = b.bounds.size * 0.1f;
+                                smasher.AddComponent<Rigidbody2D>();
+                                smasher.name = "smasher";
+                                smasher.AddComponent<SmasherController>();
+                                smasher.GetComponent<Rigidbody2D>().freezeRotation = true;
+                                smasher.GetComponent<Rigidbody2D>().isKinematic = false;
+                                smasher.transform.position = new Vector3(globalX, globalY + 1, 0);
 
-                            //assign a diff speed
-                            float v = Random.value;
-                            if (v < 0.3)
-                            {
-                                smasher.GetComponent<SmasherController>().speed = 0.05f;
-                            }
-                            else if (v < 0.6)
-                            {
-                                smasher.GetComponent<SmasherController>().speed = 0.07f;
-                            }
-                            else
-                            {
-                                if (difficulty == 2)
-                                {
-                                    smasher.GetComponent<SmasherController>().speed = 0.1f;
-                                }
-                                else
+                                //assign a diff speed
+                                float v = Random.value;
+                                if (v < 0.3)
                                 {
                                     smasher.GetComponent<SmasherController>().speed = 0.05f;
                                 }
-                            }
+                                else if (v < 0.6)
+                                {
+                                    smasher.GetComponent<SmasherController>().speed = 0.07f;
+                                }
+                                else
+                                {
+                                    if (difficulty == 2)
+                                    {
+                                        smasher.GetComponent<SmasherController>().speed = 0.1f;
+                                    }
+                                    else
+                                    {
+                                        smasher.GetComponent<SmasherController>().speed = 0.05f;
+                                    }
+                                }
 
-                            if (level == 0) //==up_slope + ground
+                                if (level == 0) //==up_slope + ground
+                                {
+                                    ground.Add(l);
+                                    stompers.Add(smasher);
+                                }
+                                else if (level == 1) //==up_slope + upperground
+                                {
+                                    upperGround.Add(l);
+                                    upperStompers.Add(smasher);
+                                }
+                                else //up_slope + lowerground
+                                {
+                                    lowerGround.Add(l);
+                                    lowerStompers.Add(smasher);
+                                }
+                            } else
                             {
-                                ground.Add(l);
-                                stompers.Add(smasher);
+                                GameObject flat_ground = new GameObject();
+                                SpriteRenderer sr = flat_ground.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                                flat_ground.transform.localScale = blockScale;
+                                flat_ground.AddComponent<BoxCollider2D>();
+                                flat_ground.transform.position = new Vector3(globalX, globalY, 0);
+
+                                List<GameObject> l = new List<GameObject>();
+                                l.Add(flat_ground);
+
+                                sr.sprite = SpriteLoader.spriteSpike;
+                                spikes.Add(flat_ground);
+                                
+
+                                if (level == 0) //==up_slope + ground
+                                {
+                                    ground.Add(l);
+                                }
+                                else if (level == 1) //==up_slope + upperground
+                                {
+                                    upperGround.Add(l);
+                                }
+                                else //up_slope + lowerground
+                                {
+                                    lowerGround.Add(l);
+                                }
                             }
-                            else if (level == 1) //==up_slope + upperground
-                            {
-                                upperGround.Add(l);
-                                upperStompers.Add(smasher);
-                            }
-                            else //up_slope + lowerground
-                            {
-                                lowerGround.Add(l);
-                                lowerStompers.Add(smasher);
-                            }
+                            
                         } else //moving platforms --> cliff, platform, cliff
                         {
                             List<GameObject> l1 = new List<GameObject>();
@@ -536,16 +624,20 @@ public class GeometryGenerator : MonoBehaviour
 
         List<GameObject> list = new List<GameObject>();
         lastGround.transform.position = new Vector3(globalX, globalY, 0);
-        list.Add(goal);
         list.Add(lastGround);
+        list.Add(goal);
         globalX += 1;
 
         ground.Add(list);
 
 
         augmentGround();
+        if (RhythmGenerator.constraints[3] == 1)
+        {
+            addSuperEnemies();
+        }
         cleanUpEnemies();
-
+        
         //Debug.Log(":: " + ground.Count);
         //for (int i = 0; i < ground.Count; i++)
         //{
@@ -640,7 +732,10 @@ public class GeometryGenerator : MonoBehaviour
                 else if (ground[i - 1].Count <= 0 && ground[i + 1].Count > 0)
                 {
                     sr.sprite = SpriteLoader.spriteLColumn;
-                    contents[0].GetComponent<SpriteRenderer>().sprite = SpriteLoader.spriteGroundL;
+                    if (RhythmGenerator.constraints[3] == 0)
+                    {
+                        contents[0].GetComponent<SpriteRenderer>().sprite = SpriteLoader.spriteGroundL;
+                    }
                     if (py == lowest_y - 2)
                     {
                         sr.sprite = SpriteLoader.spriteLBottom;
@@ -649,7 +744,10 @@ public class GeometryGenerator : MonoBehaviour
                 else if (ground[i - 1].Count > 0 && ground[i + 1].Count <= 0)
                 {
                     sr.sprite = SpriteLoader.spriteRColumn;
-                    contents[0].GetComponent<SpriteRenderer>().sprite = SpriteLoader.spriteGroundR;
+                    if (RhythmGenerator.constraints[3] == 0)
+                    {
+                        contents[0].GetComponent<SpriteRenderer>().sprite = SpriteLoader.spriteGroundR;
+                    }
                     if (py == lowest_y - 2)
                     {
                         sr.sprite = SpriteLoader.spriteRBottom;
@@ -725,6 +823,98 @@ public class GeometryGenerator : MonoBehaviour
             }
         }
     }
+
+    public void addSuperEnemies()
+    {
+        //loop over spike array and add enemies
+        Vector4 range = new Vector4(spikes[0].transform.position.x, 0, spikes[0].transform.position.y, 1); //startX, endX, Ypos, length
+        List<Vector4> ranges = new List<Vector4>();
+        for (int i = 0; i < spikes.Count - 1; i++)
+        {
+            float x1 = (int)spikes[i].transform.position.x;
+            float x2 = (int)spikes[i + 1].transform.position.x;
+            float y1 = (int)spikes[i].transform.position.y;
+            float y2 = (int)spikes[i + 1].transform.position.y;
+            ////Debug.Log(y1 + " : " + y2 + " - " + (y1-y2));
+            if (System.Math.Abs(x2 - x1 - 1) < 0.1 &&
+                System.Math.Abs(System.Math.Abs(y2 - y1)) < 0.1)
+            {
+                range.w += 1;
+            }
+            else
+            {
+                range.y = x1;
+                //add enemies here
+                ranges.Add(new Vector4(range.x, range.y, range.z, range.w));
+                range.x = x2;
+                range.y = x2;
+                range.z = (int)spikes[i + 1].transform.position.y;
+                range.w = 1;
+            }
+            if (i == spikes.Count - 2)
+            {
+                ranges.Add(new Vector4(range.x, (int)spikes[i + 1].transform.position.x, range.z, range.w + 1));
+            }
+        }
+
+        //for (int i = 0; i < ranges.Count; i++)
+        //{
+        //    Debug.Log("Range: " + ranges[i]);
+        //}
+        for (int i = 0; i < ranges.Count; i++)
+        {
+            ////Debug.Log("Range" + i + " : " + ranges[i]);
+            Vector4 block = ranges[i];
+            if (block.w > 0)
+            {
+                int numEnemies = (int)Mathf.Round(block.w / 3f);
+                if (numEnemies == 0)
+                {
+                    numEnemies = 1;
+                }
+                bool dir = true;
+                //3 = 1, 6 = 2, 9 = 3
+                for (int j = 0; j < numEnemies; j++)
+                {
+                    //create enemy
+                    GameObject enemy = new GameObject();
+                    SpriteRenderer sr4 = enemy.AddComponent<SpriteRenderer>() as SpriteRenderer;
+                    sr4.color = new Color(0.9f, 0.9f, 0.9f, 1.0f);
+                    if (dir)
+                    {
+                        //0, 3, 6
+                        enemy.transform.position = new Vector3(block.x + j * 3, block.z + 1, 0);
+                    }
+                    else
+                    {
+                        enemy.transform.position = new Vector3(block.x + j * 3, block.z + 1, 0);
+                    }
+
+                    enemy.transform.localScale = blockScale;
+                    sr4.sprite = SpriteLoader.spriteEnemy;
+                    enemy.AddComponent<BoxCollider2D>();
+                    enemy.AddComponent<Rigidbody2D>();
+                    enemy.GetComponent<Rigidbody2D>().isKinematic = true;
+                    enemy.AddComponent<EnemyController>();
+                    enemy.GetComponent<EnemyController>().level = 0;
+                    BoxCollider2D b = enemy.GetComponent<BoxCollider2D>();
+                    b.size = b.bounds.size * 0.1f;
+                    ////Debug.Log("gbx: " + globalX + " , " + (globalX + 3));
+                    if (j == numEnemies - 1)
+                    {
+                        enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 3, block.y);
+                    }
+                    else
+                    {
+                        enemy.GetComponent<EnemyController>().xRange = new Vector2(block.x + j * 3, block.x + j * 3 + 2);
+                    }
+
+                    enemies.Add(enemy);
+                    dir = !dir;
+                }
+            }
+        }
+    }
 }
 
 //state machine for flat (0), slantUp (1), and slantDown(2) platforms
@@ -739,7 +929,7 @@ public class StateMachine : MonoBehaviour
         freeze = false;
     }
 
-    public void freezeFlat(bool isFreeze)
+    public void keepFlat(bool isFreeze)
     {
         freeze = isFreeze;
     }

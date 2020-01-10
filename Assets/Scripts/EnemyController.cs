@@ -134,14 +134,14 @@ public class EnemyController : MonoBehaviour
         {
             if (xRange.x != -100)
             {
-                if (!valid(1f * Vector2.right) || transform.position.x + 1 >= xRange.y + 1)
+                if (!valid(1f * Vector2.right) || transform.position.x + 1 >= xRange.y + 2)
                 {
                     state = 1;
                     //Debug.Log("YO 1");
                     //v_x = 0.15f;
                     srState = 1;
                 }
-                else if (!valid(-1f * Vector2.right) || transform.position.x - 1 <= xRange.x - 1)
+                else if (!valid(-1f * Vector2.right) || transform.position.x - 1 <= xRange.x - 2)
                 {
                     state = 0;
                     srState = 2;
